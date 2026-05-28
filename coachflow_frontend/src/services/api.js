@@ -222,4 +222,10 @@ export const api = {
     disconnect: () => req('POST', '/auth/google-calendar/disconnect/'),
     syncAll:    () => req('POST', '/auth/google-calendar/sync/'),
   },
+
+  gamification: {
+    portalSummary: () => req('GET', '/portal/gamification/'),
+    portalBadges:  () => req('GET', '/portal/badges/'),
+    coachClient:   (clientId) => req('GET', `/clients/${clientId}/badges/`),
+  },
 };

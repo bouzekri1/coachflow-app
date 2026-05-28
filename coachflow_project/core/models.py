@@ -742,6 +742,45 @@ class ExceptionDisponibilite(models.Model):
         return f"{self.date} — {self.get_type_display()}"
 
 
+class Badge(models.Model):
+    CATEGORIE_CHOICES = [
+        ('assiduite','Assiduité'),
+        ('regularite','Régularité'),
+        ('suivi','Suivi'),
+        ('nutrition','Nutrition'),
+        ('objectifs','Objectifs'),
+        ('special','Spéciaux'),
+    ]
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    slug = models.SlugField(max_length=64, unique=True)
+    nom = models.CharField(max_length=100)
+    description = models.CharField(max_length=255)
+    icone = models.CharField(max_length=8, default='🏆')
+    categorie = models.CharField(max_length=20, choices=CATEGORIE_CHOICES)
+    # condition encodée en JSON : {type:'seances_realisees', seuil:10}
+    condition = models.JSONField(default=dict)
+    ordre = models.PositiveSmallIntegerField(default=0)
+    class Meta:
+        db_table = 'badges'
+        ordering = ['categorie', 'ordre']
+    def __str__(self):
+        return f"{self.icone} {self.nom}"
+
+
+class ClientBadge(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='badges')
+    badge = models.ForeignKey(Badge, on_delete=models.CASCADE, related_name='attributions')
+    obtenu_le = models.DateTimeField(auto_now_add=True)
+    vu = models.BooleanField(default=False)  # passe à True quand le client a vu la notif
+    class Meta:
+        db_table = 'client_badges'
+        unique_together = [('client', 'badge')]
+        ordering = ['-obtenu_le']
+    def __str__(self):
+        return f"{self.client} — {self.badge}"
+
+
 class GoogleCalendarToken(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='google_calendar')
     access_token = models.TextField()

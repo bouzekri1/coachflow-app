@@ -74,4 +74,7 @@ urlpatterns = [
     path('auth/google-calendar/callback/',   views.google_calendar_callback,   name='gcal-callback'),
     path('auth/google-calendar/disconnect/', views.google_calendar_disconnect, name='gcal-disconnect'),
     path('auth/google-calendar/sync/',       views.google_calendar_sync_all,   name='gcal-sync'),
+    path('portal/gamification/', views.portal_gamification, name='portal-gamification'),
+    path('portal/badges/',       views.portal_badges,       name='portal-badges'),
+    path('clients/<uuid:client_id>/badges/', views.coach_client_badges, name='coach-client-badges'),
 ]

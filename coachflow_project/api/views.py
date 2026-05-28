@@ -2958,3 +2958,68 @@ def portal_reserver_seance(request):
         'date_heure': seance.date_heure.isoformat(),
         'duree_minutes': seance.duree_minutes,
     }, status=201)
+
+
+# ─── GAMIFICATION ─────────────────────────────────────────────────────────────
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def portal_gamification(request):
+    """Retourne streaks + résumé badges + badges récemment débloqués (non vus)."""
+    try:
+        client = Client.objects.get(user_account=request.user)
+    except Client.DoesNotExist:
+        return Response({'error': 'Profil client introuvable.'}, status=404)
+
+    from core.gamification import compute_streaks
+    streaks = compute_streaks(client)
+    total_badges = Badge.objects.count()
+    acquired = ClientBadge.objects.filter(client=client)
+    acquired_count = acquired.count()
+
+    # Badges non vus → on les renvoie pour déclencher un toast côté client
+    nouveaux = list(acquired.filter(vu=False).select_related('badge'))
+    new_badges_data = [{
+        'slug': cb.badge.slug, 'nom': cb.badge.nom, 'icone': cb.badge.icone,
+        'description': cb.badge.description,
+    } for cb in nouveaux]
+    # On marque comme vus
+    if nouveaux:
+        ClientBadge.objects.filter(id__in=[cb.id for cb in nouveaux]).update(vu=True)
+
+    return Response({
+        **streaks,
+        'badges_acquis': acquired_count,
+        'badges_total': total_badges,
+        'nouveaux_badges': new_badges_data,
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def portal_badges(request):
+    """Liste complète des badges avec acquis/progression pour le client connecté."""
+    try:
+        client = Client.objects.get(user_account=request.user)
+    except Client.DoesNotExist:
+        return Response({'error': 'Profil client introuvable.'}, status=404)
+    from core.gamification import list_badges_with_progress, compute_streaks
+    return Response({
+        'badges': list_badges_with_progress(client),
+        'streaks': compute_streaks(client),
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def coach_client_badges(request, client_id):
+    """Vue coach : badges + streaks d'un client donné."""
+    try:
+        client = Client.objects.get(id=client_id, coach=request.user)
+    except Client.DoesNotExist:
+        return Response({'error': 'Client introuvable.'}, status=404)
+    from core.gamification import list_badges_with_progress, compute_streaks
+    return Response({
+        'badges': list_badges_with_progress(client),
+        'streaks': compute_streaks(client),
+    })

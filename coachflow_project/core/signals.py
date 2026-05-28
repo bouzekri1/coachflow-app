@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from .models import Objectif, Alerte, Seance, User
+from .models import Objectif, Alerte, Seance, User, Mesure, PhotoProgression, CheckinReponse, JournalAlimentaire
 
 
 @receiver(post_save, sender=Objectif)
@@ -88,3 +88,44 @@ def seance_gcal_delete_signal(sender, instance, **kwargs):
         delete_seance(instance.coach, instance.google_event_id)
     except Exception:
         pass
+
+
+# ─── GAMIFICATION : éval badges après chaque action client ────────────────────
+
+def _eval_badges_for_client(client):
+    try:
+        from core.gamification import evaluate_badges
+        evaluate_badges(client)
+    except Exception:
+        pass
+
+
+@receiver(post_save, sender=Seance)
+def seance_eval_badges(sender, instance, **kwargs):
+    if instance.statut == 'realisee':
+        _eval_badges_for_client(instance.client)
+
+
+@receiver(post_save, sender=Mesure)
+def mesure_eval_badges(sender, instance, **kwargs):
+    _eval_badges_for_client(instance.client)
+
+
+@receiver(post_save, sender=PhotoProgression)
+def photo_eval_badges(sender, instance, **kwargs):
+    _eval_badges_for_client(instance.client)
+
+
+@receiver(post_save, sender=Objectif)
+def objectif_eval_badges(sender, instance, **kwargs):
+    _eval_badges_for_client(instance.client)
+
+
+@receiver(post_save, sender=CheckinReponse)
+def checkin_eval_badges(sender, instance, **kwargs):
+    _eval_badges_for_client(instance.client)
+
+
+@receiver(post_save, sender=JournalAlimentaire)
+def journal_eval_badges(sender, instance, **kwargs):
+    _eval_badges_for_client(instance.client)

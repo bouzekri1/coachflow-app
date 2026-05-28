@@ -74,6 +74,15 @@ export function ClientPortalLayout() {
     return () => clearInterval(t);
   }, []);
 
+  // Récupère les nouveaux badges au chargement et affiche un toast pour chacun
+  useEffect(() => {
+    api.gamification.portalSummary().then(d => {
+      (d.nouveaux_badges || []).forEach((b, i) => {
+        setTimeout(() => toast(`${b.icone} Nouveau succès : ${b.nom} !`), i * 1500);
+      });
+    }).catch(() => {});
+  }, []);
+
   const switchTab = (key) => {
     setTab(key);
     setShowMore(false);
@@ -89,14 +98,15 @@ export function ClientPortalLayout() {
     { key: 'nutrition',  label: '🥗 Nutrition' },
     { key: 'checkin',    label: '📋 Check-in' },
     { key: 'photos',     label: '📸 Photos' },
+    { key: 'badges',     label: '🏆 Succès' },
     { key: 'messages',   label: '💬 Messages' },
   ];
 
   /* Tabs bottom nav mobile : 5 principaux + "Plus" */
   const MAIN_TABS  = ['dashboard','seances','carnet','mesures','messages'];
   const MAIN_LBLS  = { dashboard:'Accueil', seances:'Séances', carnet:'Carnet', mesures:'Mesures', messages:'Messages' };
-  const MORE_TABS  = ['programme','nutrition','checkin','photos'];
-  const MORE_LBLS  = { programme:'Programme', nutrition:'Nutrition', checkin:'Check-in', photos:'Photos' };
+  const MORE_TABS  = ['programme','nutrition','checkin','photos','badges'];
+  const MORE_LBLS  = { programme:'Programme', nutrition:'Nutrition', checkin:'Check-in', photos:'Photos', badges:'Succès' };
   const moreActive = MORE_TABS.includes(tab);
 
   return (
@@ -180,6 +190,7 @@ export function ClientPortalLayout() {
         {tab === 'nutrition'  && <PortalNutrition />}
         {tab === 'checkin'    && <PortalCheckin />}
         {tab === 'photos'     && <PortalPhotos />}
+        {tab === 'badges'     && <PortalBadges />}
         {tab === 'messages'   && <PortalMessages />}
       </div>
 
@@ -394,10 +405,12 @@ function PortalDashboard({ onGoMessages }) {
   const [data, setData] = useState(null);
   const [unreadMsgs, setUnreadMsgs] = useState(0);
   const [showProg, setShowProg] = useState(false);
+  const [gami, setGami] = useState(null);
 
   useEffect(() => {
     api.portal.dashboard().then(setData).catch(() => {});
     api.portal.unreadMessages().then(d => setUnreadMsgs(d.count || 0)).catch(() => {});
+    api.gamification.portalSummary().then(setGami).catch(() => {});
   }, []);
   if (!data) return <Loader />;
 
@@ -451,6 +464,37 @@ function PortalDashboard({ onGoMessages }) {
           </div>
         )}
       </div>
+
+      {/* Bandeau gamification */}
+      {gami && (gami.streak_actif > 0 || gami.badges_acquis > 0) && (
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))', gap:10, marginBottom:16 }}>
+          {gami.streak_actif > 0 && (
+            <div style={{ background:'linear-gradient(135deg, #f97316, #ea580c)', borderRadius:12, padding:'12px 14px', color:'#fff', display:'flex', alignItems:'center', gap:10 }}>
+              <div style={{ fontSize:26 }}>🔥</div>
+              <div>
+                <div style={{ fontSize:18, fontWeight:900, lineHeight:1 }}>{gami.streak_actif} jour{gami.streak_actif > 1 ? 's' : ''}</div>
+                <div style={{ fontSize:10, opacity:.9, marginTop:3, fontWeight:600 }}>Streak actif</div>
+              </div>
+            </div>
+          )}
+          {gami.streak_seances > 0 && (
+            <div style={{ background:'linear-gradient(135deg, #059669, #047857)', borderRadius:12, padding:'12px 14px', color:'#fff', display:'flex', alignItems:'center', gap:10 }}>
+              <div style={{ fontSize:26 }}>💪</div>
+              <div>
+                <div style={{ fontSize:18, fontWeight:900, lineHeight:1 }}>{gami.streak_seances}</div>
+                <div style={{ fontSize:10, opacity:.9, marginTop:3, fontWeight:600 }}>Séances d'affilée</div>
+              </div>
+            </div>
+          )}
+          <div style={{ background:'linear-gradient(135deg, #f59e0b, #d97706)', borderRadius:12, padding:'12px 14px', color:'#fff', display:'flex', alignItems:'center', gap:10 }}>
+            <div style={{ fontSize:26 }}>🏆</div>
+            <div>
+              <div style={{ fontSize:18, fontWeight:900, lineHeight:1 }}>{gami.badges_acquis}<span style={{ fontSize:12, opacity:.8 }}> / {gami.badges_total}</span></div>
+              <div style={{ fontSize:10, opacity:.9, marginTop:3, fontWeight:600 }}>Succès débloqués</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bannière messages non lus */}
       {unreadMsgs > 0 && (
@@ -2894,6 +2938,84 @@ function PortalMessages() {
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ── BADGES & STREAKS ────────────────────────────────────────────────────── */
+const BADGE_CAT_LABELS = {
+  assiduite: 'Assiduité', regularite: 'Régularité', suivi: 'Suivi',
+  nutrition: 'Nutrition', objectifs: 'Objectifs', special: 'Spéciaux',
+};
+const BADGE_CAT_ORDER = ['assiduite','regularite','suivi','nutrition','objectifs','special'];
+
+function PortalBadges() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    api.gamification.portalBadges().then(setData).catch(() => setData({ badges:[], streaks:{} }));
+  }, []);
+
+  if (!data) return <Loader />;
+
+  const { badges, streaks } = data;
+  const acquis = badges.filter(b => b.acquis).length;
+  const grouped = BADGE_CAT_ORDER.map(cat => ({
+    cat, label: BADGE_CAT_LABELS[cat],
+    items: badges.filter(b => b.categorie === cat),
+  })).filter(g => g.items.length > 0);
+
+  return (
+    <div>
+      <div style={{ fontSize:20, fontWeight:800, marginBottom:4 }}>Mes succès</div>
+      <div style={{ fontSize:13, color:'var(--t3)', marginBottom:20 }}>
+        {acquis} / {badges.length} succès débloqués
+      </div>
+
+      {/* Streaks */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))', gap:10, marginBottom:24 }}>
+        <div style={{ background:'linear-gradient(135deg, #f97316, #ea580c)', borderRadius:14, padding:'18px', color:'#fff' }}>
+          <div style={{ fontSize:11, fontWeight:700, opacity:.9, textTransform:'uppercase', letterSpacing:'.5px' }}>🔥 Streak actif</div>
+          <div style={{ fontSize:32, fontWeight:900, marginTop:6 }}>{streaks.streak_actif || 0}<span style={{ fontSize:14, fontWeight:600, opacity:.85, marginLeft:4 }}>jours</span></div>
+          <div style={{ fontSize:11, opacity:.85, marginTop:4 }}>Record : {streaks.best_streak_actif || 0} jours</div>
+        </div>
+        <div style={{ background:'linear-gradient(135deg, #059669, #047857)', borderRadius:14, padding:'18px', color:'#fff' }}>
+          <div style={{ fontSize:11, fontWeight:700, opacity:.9, textTransform:'uppercase', letterSpacing:'.5px' }}>💪 Séances d'affilée</div>
+          <div style={{ fontSize:32, fontWeight:900, marginTop:6 }}>{streaks.streak_seances || 0}<span style={{ fontSize:14, fontWeight:600, opacity:.85, marginLeft:4 }}>séances</span></div>
+          <div style={{ fontSize:11, opacity:.85, marginTop:4 }}>Sans absence</div>
+        </div>
+      </div>
+
+      {/* Badges groupés par catégorie */}
+      {grouped.map(g => (
+        <div key={g.cat} className="card" style={{ marginBottom:14 }}>
+          <div className="card-t">{g.label}</div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(140px, 1fr))', gap:10, marginTop:12 }}>
+            {g.items.map(b => (
+              <div key={b.slug} style={{
+                background: b.acquis ? 'linear-gradient(135deg, #fef3c7, #fde68a)' : 'var(--bg)',
+                border: `1px solid ${b.acquis ? '#fbbf24' : 'var(--bdr)'}`,
+                borderRadius: 12, padding:'14px 10px', textAlign:'center',
+                opacity: b.acquis ? 1 : 0.65,
+              }}>
+                <div style={{ fontSize:34, marginBottom:6, filter: b.acquis ? 'none' : 'grayscale(1)' }}>{b.icone}</div>
+                <div style={{ fontSize:12, fontWeight:700, color: b.acquis ? '#92400e' : 'var(--t2)', marginBottom:3 }}>{b.nom}</div>
+                <div style={{ fontSize:10, color:'var(--t3)', lineHeight:1.4, marginBottom:6 }}>{b.description}</div>
+                {b.acquis ? (
+                  <div style={{ fontSize:10, fontWeight:700, color:'#065f46' }}>✓ Débloqué</div>
+                ) : (
+                  <>
+                    <div style={{ height:4, background:'var(--bdr)', borderRadius:2, overflow:'hidden' }}>
+                      <div style={{ height:'100%', width:`${b.progression*100}%`, background:'var(--acc)', transition:'width .4s' }} />
+                    </div>
+                    <div style={{ fontSize:10, color:'var(--t3)', marginTop:3 }}>{Math.round(b.progression*100)}%</div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

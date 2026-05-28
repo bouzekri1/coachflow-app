@@ -331,6 +331,7 @@ export function ClientDetail() {
           { key: 'mesures', label: 'Mesures' }, { key: 'historique', label: 'Historique' },
           { key: 'objectifs', label: 'Objectifs' }, { key: 'nutrition', label: '🥗 Nutrition' },
           { key: 'checkins', label: '📋 Check-ins' }, { key: 'photos', label: '📸 Photos' },
+          { key: 'badges', label: '🏆 Succès' },
         ].map(t => (
           <button key={t.key} className={`tab${tab === t.key ? ' on' : ''}`} onClick={() => setTab(t.key)}>
             {t.label}
@@ -654,6 +655,8 @@ export function ClientDetail() {
           onRefresh={load}
         />
       )}
+
+      {tab === 'badges' && <ClientBadgesTab clientId={id} />}
 
       {showProgIa && (
         <ProgrammeIaModal
@@ -1453,6 +1456,83 @@ function ClientProgrammeTab({ client, clientId, onIaOpen, onRefresh }) {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+const BADGE_CAT_LABELS_COACH = {
+  assiduite: 'Assiduité', regularite: 'Régularité', suivi: 'Suivi',
+  nutrition: 'Nutrition', objectifs: 'Objectifs', special: 'Spéciaux',
+};
+const BADGE_CAT_ORDER_COACH = ['assiduite','regularite','suivi','nutrition','objectifs','special'];
+
+function ClientBadgesTab({ clientId }) {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    api.gamification.coachClient(clientId).then(setData).catch(() => setData({ badges:[], streaks:{} }));
+  }, [clientId]);
+
+  if (!data) return <Loader />;
+
+  const { badges, streaks } = data;
+  const acquis = badges.filter(b => b.acquis).length;
+  const grouped = BADGE_CAT_ORDER_COACH.map(cat => ({
+    cat, label: BADGE_CAT_LABELS_COACH[cat],
+    items: badges.filter(b => b.categorie === cat),
+  })).filter(g => g.items.length > 0);
+
+  return (
+    <div>
+      {/* Stats streaks */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))', gap:10, marginBottom:18 }}>
+        <div style={{ background:'linear-gradient(135deg, #f97316, #ea580c)', borderRadius:12, padding:'14px 16px', color:'#fff' }}>
+          <div style={{ fontSize:10, fontWeight:700, opacity:.9, textTransform:'uppercase', letterSpacing:'.5px' }}>🔥 Streak actif</div>
+          <div style={{ fontSize:26, fontWeight:900, marginTop:6 }}>{streaks.streak_actif || 0}<span style={{ fontSize:12, opacity:.85, marginLeft:4 }}>jours</span></div>
+          <div style={{ fontSize:11, opacity:.85, marginTop:2 }}>Record : {streaks.best_streak_actif || 0} j</div>
+        </div>
+        <div style={{ background:'linear-gradient(135deg, #059669, #047857)', borderRadius:12, padding:'14px 16px', color:'#fff' }}>
+          <div style={{ fontSize:10, fontWeight:700, opacity:.9, textTransform:'uppercase', letterSpacing:'.5px' }}>💪 Séances d'affilée</div>
+          <div style={{ fontSize:26, fontWeight:900, marginTop:6 }}>{streaks.streak_seances || 0}</div>
+          <div style={{ fontSize:11, opacity:.85, marginTop:2 }}>Sans absence</div>
+        </div>
+        <div style={{ background:'linear-gradient(135deg, #f59e0b, #d97706)', borderRadius:12, padding:'14px 16px', color:'#fff' }}>
+          <div style={{ fontSize:10, fontWeight:700, opacity:.9, textTransform:'uppercase', letterSpacing:'.5px' }}>🏆 Succès</div>
+          <div style={{ fontSize:26, fontWeight:900, marginTop:6 }}>{acquis}<span style={{ fontSize:14, opacity:.85, marginLeft:3 }}>/{badges.length}</span></div>
+          <div style={{ fontSize:11, opacity:.85, marginTop:2 }}>débloqués</div>
+        </div>
+      </div>
+
+      {/* Liste des badges par catégorie */}
+      {grouped.map(g => (
+        <div key={g.cat} className="card" style={{ marginBottom:14 }}>
+          <div className="card-t">{g.label}</div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(150px, 1fr))', gap:10, marginTop:12 }}>
+            {g.items.map(b => (
+              <div key={b.slug} style={{
+                background: b.acquis ? 'linear-gradient(135deg, #fef3c7, #fde68a)' : 'var(--bg)',
+                border: `1px solid ${b.acquis ? '#fbbf24' : 'var(--bdr)'}`,
+                borderRadius: 10, padding:'12px 10px', textAlign:'center',
+                opacity: b.acquis ? 1 : 0.65,
+              }}>
+                <div style={{ fontSize:30, marginBottom:4, filter: b.acquis ? 'none' : 'grayscale(1)' }}>{b.icone}</div>
+                <div style={{ fontSize:12, fontWeight:700, color: b.acquis ? '#92400e' : 'var(--t2)', marginBottom:3 }}>{b.nom}</div>
+                <div style={{ fontSize:10, color:'var(--t3)', lineHeight:1.4, marginBottom:5 }}>{b.description}</div>
+                {b.acquis ? (
+                  <div style={{ fontSize:10, fontWeight:700, color:'#065f46' }}>✓ {new Date(b.obtenu_le).toLocaleDateString('fr-FR', { day:'numeric', month:'short' })}</div>
+                ) : (
+                  <>
+                    <div style={{ height:4, background:'var(--bdr)', borderRadius:2, overflow:'hidden' }}>
+                      <div style={{ height:'100%', width:`${b.progression*100}%`, background:'var(--acc)' }} />
+                    </div>
+                    <div style={{ fontSize:10, color:'var(--t3)', marginTop:3 }}>{Math.round(b.progression*100)}%</div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
