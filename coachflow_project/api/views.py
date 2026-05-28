@@ -2222,125 +2222,72 @@ def generer_plan_ia(request, client_id):
     import anthropic, json, re
     from datetime import date as date_cls
 
-    client = get_object_or_404(Client, id=client_id, coach=request.user)
-
+    client  = get_object_or_404(Client, id=client_id, coach=request.user)
     api_key = settings.ANTHROPIC_API_KEY
     if not api_key:
-        return Response({'error': 'Clé API Anthropic non configurée. Ajoutez ANTHROPIC_API_KEY dans le fichier .env'}, status=503)
+        return Response({'error': 'Clé API Anthropic non configurée.'}, status=503)
 
-    # Paramètres de la requête
-    objectif_type = request.data.get('objectif', 'equilibre')   # perte_poids | prise_masse | equilibre
+    objectif_type = request.data.get('objectif', 'equilibre')
     kcal_cible    = request.data.get('kcal_cible')
     restrictions  = request.data.get('restrictions', '')
     nb_jours      = min(int(request.data.get('nb_jours', 5)), 7)
 
-    # Poids actuel
     last_mesure  = client.mesures.order_by('-date').first()
     poids_actuel = float(last_mesure.poids_kg) if last_mesure and last_mesure.poids_kg else float(client.poids_depart_kg or 70)
 
-    # Calcul TDEE si kcal non fournie
     if not kcal_cible:
         taille = client.taille_cm or 170
         age    = client.age or 30
-        if client.genre == 'femme':
-            bmr = 655 + (9.6 * poids_actuel) + (1.8 * taille) - (4.7 * age)
-        else:
-            bmr = 66 + (13.7 * poids_actuel) + (5 * taille) - (6.8 * age)
+        bmr = (655 + 9.6*poids_actuel + 1.8*taille - 4.7*age) if client.genre == 'femme' \
+              else (66 + 13.7*poids_actuel + 5*taille - 6.8*age)
         tdee = bmr * 1.5
-        if objectif_type == 'perte_poids':
-            kcal_cible = round(tdee - 400)
-        elif objectif_type == 'prise_masse':
-            kcal_cible = round(tdee + 300)
-        else:
-            kcal_cible = round(tdee)
+        kcal_cible = round(tdee - 400 if objectif_type == 'perte_poids' else tdee + 300 if objectif_type == 'prise_masse' else tdee)
 
     kcal = int(kcal_cible)
-
-    # Macros cibles
     if objectif_type == 'prise_masse':
-        proteines_g = round(poids_actuel * 2.0)
-        lipides_g   = round(kcal * 0.25 / 9)
+        proteines_g = round(poids_actuel * 2.0); lipides_g = round(kcal * 0.25 / 9)
     elif objectif_type == 'perte_poids':
-        proteines_g = round(poids_actuel * 2.2)
-        lipides_g   = round(kcal * 0.30 / 9)
+        proteines_g = round(poids_actuel * 2.2); lipides_g = round(kcal * 0.30 / 9)
     else:
-        proteines_g = round(poids_actuel * 1.6)
-        lipides_g   = round(kcal * 0.28 / 9)
-    glucides_g = max(0, round((kcal - proteines_g * 4 - lipides_g * 9) / 4))
+        proteines_g = round(poids_actuel * 1.6); lipides_g = round(kcal * 0.28 / 9)
+    glucides_g = max(0, round((kcal - proteines_g*4 - lipides_g*9) / 4))
 
-    # Recettes disponibles avec macros
-    recettes_qs = Recette.objects.prefetch_related('ingredients__aliment').filter(coach=request.user)
-    recettes_list = []
-    for r in recettes_qs:
+    # Recettes : clés courtes, triées par proximité calorique, limitées à 40
+    kcal_repas_cible = kcal / 3.5
+    recettes_raw = []
+    for r in Recette.objects.prefetch_related('ingredients__aliment').filter(coach=request.user):
         try:
             m = r.macros_par_portion
-            recettes_list.append({
-                'id':          str(r.id),
-                'nom':         r.nom,
-                'calories':    round(m['calories']),
-                'proteines_g': round(m['proteines'], 1),
-                'glucides_g':  round(m['glucides'],  1),
-                'lipides_g':   round(m['lipides'],   1),
-            })
+            recettes_raw.append({'i': str(r.id), 'n': r.nom,
+                                  'c': round(m['calories']), 'p': round(m['proteines'])})
         except Exception:
             pass
+    recettes_raw.sort(key=lambda x: abs(x['c'] - kcal_repas_cible))
+    recettes_list = recettes_raw[:40]
 
-    JOURS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+    JOURS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
+    j_str = ','.join(JOURS[:nb_jours])
 
-    prompt = f"""Tu es un nutritionniste expert. Génère un plan alimentaire de {nb_jours} jours pour ce client.
-
-PROFIL CLIENT :
-- Prénom : {client.prenom}
-- Âge : {client.age or 'N/A'} ans | Genre : {client.genre or 'N/A'}
-- Poids actuel : {poids_actuel} kg | Poids cible : {client.poids_cible_kg or 'N/A'} kg | Taille : {client.taille_cm or 'N/A'} cm
-- Objectif : {objectif_type.replace('_', ' ')}
-- Préférences alimentaires : {client.alimentation or 'Aucune'}
-- Blessures / contraintes : {client.blessures or 'Aucune'}
-{f'- Restrictions supplémentaires : {restrictions}' if restrictions else ''}
-
-OBJECTIFS NUTRITIONNELS PAR JOUR :
-- Calories : {kcal} kcal
-- Protéines : {proteines_g} g | Glucides : {glucides_g} g | Lipides : {lipides_g} g
-
-RECETTES DISPONIBLES (utilise uniquement ces recettes avec leur id exact) :
-{json.dumps(recettes_list[:70], ensure_ascii=False)}
-
-RÈGLES :
-1. Génère exactement {nb_jours} jours : {', '.join(JOURS[:nb_jours])}
-2. Chaque jour contient : petit_dejeuner, dejeuner, diner (+ collation_matin et/ou collation_soir si besoin)
-3. Utilise UNIQUEMENT les recettes de la liste avec leur id exact
-4. Varie les recettes entre les jours (évite les répétitions du même repas principal)
-5. Total journalier proche de {kcal} kcal (±150 kcal)
-
-Réponds UNIQUEMENT avec ce JSON (rien d'autre) :
-{{
-  "nom": "Plan [objectif] – {client.prenom}",
-  "description": "Description courte 1 phrase",
-  "kcal_cible": {kcal},
-  "proteines_g": {proteines_g},
-  "glucides_g": {glucides_g},
-  "lipides_g": {lipides_g},
-  "jours": [
-    {{
-      "jour": "Lundi",
-      "repas": [
-        {{"type_repas": "petit_dejeuner", "recette_id": "uuid", "nom_recette": "Nom"}},
-        {{"type_repas": "dejeuner",       "recette_id": "uuid", "nom_recette": "Nom"}},
-        {{"type_repas": "diner",          "recette_id": "uuid", "nom_recette": "Nom"}}
-      ],
-      "total_calories": 1850,
-      "total_proteines_g": 145,
-      "total_glucides_g": 180,
-      "total_lipides_g": 58
-    }}
-  ]
-}}"""
+    prompt = (
+        f"Nutritionniste. Plan {nb_jours}j pour {client.prenom} "
+        f"({client.genre or '?'}, {client.age or '?'}ans, {poids_actuel}kg→{client.poids_cible_kg or '?'}kg).\n"
+        f"Objectif:{objectif_type} | Cible:{kcal}kcal P:{proteines_g}g G:{glucides_g}g L:{lipides_g}g\n"
+        f"Prefs:{client.alimentation or 'aucune'}"
+        + (f" | Restrictions:{restrictions}" if restrictions else "") + "\n"
+        f"Recettes (i=id,n=nom,c=cal,p=prot): {json.dumps(recettes_list, ensure_ascii=False, separators=(',',':'))}\n"
+        f"Jours:{j_str}. Repas:petit_dejeuner,dejeuner,diner(+collations si utile). "
+        f"IDs exacts. Varie. ±150kcal/j.\n"
+        f'JSON only:{{"nom":"...","description":"...","kcal_cible":{kcal},"proteines_g":{proteines_g},'
+        f'"glucides_g":{glucides_g},"lipides_g":{lipides_g},"jours":['
+        f'{{"jour":"Lundi","repas":[{{"type_repas":"petit_dejeuner","recette_id":"i","nom_recette":"n"}}],'
+        f'"total_calories":0,"total_proteines_g":0,"total_glucides_g":0,"total_lipides_g":0}}]}}'
+    )
 
     try:
         anth = anthropic.Anthropic(api_key=api_key)
         msg  = anth.messages.create(
-            model='claude-opus-4-7',
-            max_tokens=4096,
+            model='claude-haiku-4-5-20251001',
+            max_tokens=1800,
             messages=[{'role': 'user', 'content': prompt}],
         )
         raw = msg.content[0].text
@@ -2426,89 +2373,58 @@ def sauvegarder_plan_ia(request, client_id):
 def generer_programme_ia(request, client_id):
     import anthropic, json, re
 
-    client = get_object_or_404(Client, id=client_id, coach=request.user)
+    client  = get_object_or_404(Client, id=client_id, coach=request.user)
     api_key = settings.ANTHROPIC_API_KEY
     if not api_key:
         return Response({'error': 'Clé API Anthropic non configurée.'}, status=503)
 
-    objectif          = request.data.get('objectif', 'force')
-    seances_par_sem   = min(int(request.data.get('seances_par_semaine', 3)), 6)
-    duree_semaines    = min(int(request.data.get('duree_semaines', 8)), 16)
-    materiel          = request.data.get('materiel', 'salle_complete')
-    notes_coach       = request.data.get('notes', '')
+    objectif        = request.data.get('objectif', 'force')
+    seances_par_sem = min(int(request.data.get('seances_par_semaine', 3)), 6)
+    duree_semaines  = min(int(request.data.get('duree_semaines', 8)), 16)
+    materiel        = request.data.get('materiel', 'salle_complete')
+    notes_coach     = request.data.get('notes', '')
+    niveau          = client.niveau or 'intermediaire'
 
-    niveau = client.niveau or 'intermediaire'
+    JOURS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
 
-    OBJECTIF_LABELS = {
-        'force':        'Force & Musculation',
-        'perte_poids':  'Perte de poids / Circuit',
-        'remise_forme': 'Remise en forme',
-        'mobilite':     'Mobilité & Souplesse',
-        'cardio':       'Cardio & Endurance',
+    # Filtrage exercices par objectif + matériel → réduction drastique de la liste
+    GROUPES = {
+        'force':        {'pectoraux','dorsaux','epaules','biceps','triceps','quadriceps','ischio','fessiers','mollets','abdominaux'},
+        'perte_poids':  {'full_body','cardio','quadriceps','fessiers','abdominaux','ischio'},
+        'remise_forme': {'full_body','pectoraux','dorsaux','quadriceps','fessiers','abdominaux','cardio','epaules'},
+        'cardio':       {'cardio','full_body','quadriceps','fessiers'},
+        'mobilite':     {'full_body','abdominaux','mollets'},
     }
-    MATERIEL_LABELS = {
-        'salle_complete': 'Salle de sport complète (machines, barres, haltères)',
-        'halteres':       'Haltères & banc seulement',
-        'poids_corps':    'Poids du corps uniquement (aucun matériel)',
-    }
-    NOMS_JOURS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-    jours_choisis = NOMS_JOURS[:seances_par_sem]
+    groupes_cibles = GROUPES.get(objectif, set(GROUPES['force']))
 
-    exos_qs = Exercice.objects.filter(est_personnalise=False).order_by('groupe_musculaire', 'nom')
-    exos_list = [{'nom': e.nom, 'groupe': e.groupe_musculaire, 'cat': e.categorie} for e in exos_qs[:150]]
+    qs = Exercice.objects.filter(est_personnalise=False, groupe_musculaire__in=groupes_cibles)
+    if materiel == 'poids_corps':
+        qs = qs.filter(categorie__in=['gainage', 'mobilite', 'cardio'])
+    elif materiel == 'halteres':
+        qs = qs.exclude(categorie='mobilite')
 
-    prompt = f"""Tu es un coach sportif expert. Génère un programme d'entraînement complet pour ce client.
+    # Seuls les noms — l'IA connaît les exercices, pas besoin de groupe/catégorie
+    noms_exos = [e.nom for e in qs.order_by('groupe_musculaire', 'nom')[:70]]
 
-PROFIL CLIENT :
-- Prénom : {client.prenom}
-- Niveau : {niveau}
-- Objectif principal : {client.objectifs[0] if client.objectifs else objectif}
-- Blessures / contraintes : {client.blessures or 'Aucune'}
-- Contraintes médicales : {client.contraintes_medicales or 'Aucune'}
-
-PARAMÈTRES DU PROGRAMME :
-- Objectif : {OBJECTIF_LABELS.get(objectif, objectif)}
-- Matériel disponible : {MATERIEL_LABELS.get(materiel, materiel)}
-- Séances par semaine : {seances_par_sem} ({', '.join(jours_choisis)})
-- Durée totale : {duree_semaines} semaines
-{f'- Notes du coach : {notes_coach}' if notes_coach else ''}
-
-EXERCICES DISPONIBLES (utilise uniquement les noms exacts de cette liste) :
-{json.dumps(exos_list, ensure_ascii=False)}
-
-RÈGLES :
-1. Génère exactement {seances_par_sem} séances (une par jour indiqué)
-2. Chaque séance contient 5 à 8 exercices adaptés au niveau et au matériel
-3. Utilise UNIQUEMENT les noms d'exercices présents dans la liste
-4. Adapte les séries/reps à l'objectif : force (4×6-8), hypertrophie (3-4×10-15), endurance (3×15-20)
-5. Prévois des temps de repos adaptés
-6. Équilibre les groupes musculaires sur la semaine (push/pull/legs ou full body selon le nb de séances)
-
-Réponds UNIQUEMENT avec ce JSON (rien d'autre) :
-{{
-  "nom": "Programme {OBJECTIF_LABELS.get(objectif, objectif)} {seances_par_sem}J – {client.prenom}",
-  "description": "Description courte 1-2 phrases du programme et de ses bénéfices.",
-  "categorie": "{objectif}",
-  "duree_semaines": {duree_semaines},
-  "seances_par_semaine": {seances_par_sem},
-  "conseils": "Conseils généraux sur la progression (1-2 phrases).",
-  "jours": [
-    {{
-      "jour": "Lundi",
-      "titre": "Push – Pectoraux / Épaules / Triceps",
-      "exercices": [
-        {{"nom": "Développé couché", "series": 4, "reps": "8-10", "repos_sec": 90, "notes": ""}},
-        {{"nom": "Élévations latérales haltères", "series": 3, "reps": "12-15", "repos_sec": 60, "notes": ""}}
-      ]
-    }}
-  ]
-}}"""
+    prompt = (
+        f"Coach sportif. Programme {seances_par_sem}j/sem {duree_semaines}sem pour {client.prenom}.\n"
+        f"Niveau:{niveau} | Objectif:{objectif} | Matériel:{materiel}"
+        + (f" | Blessures:{client.blessures}" if client.blessures else "")
+        + (f"\nNotes:{notes_coach}" if notes_coach else "") + "\n"
+        f"Exercices disponibles (noms exacts uniquement):{json.dumps(noms_exos, ensure_ascii=False, separators=(',',':'))}\n"
+        f"Jours:{','.join(JOURS[:seances_par_sem])}. 5-7 exos/séance. Équilibre musculaire. "
+        f"Séries/reps selon objectif.\n"
+        f'JSON only:{{"nom":"...","description":"...","categorie":"{objectif}",'
+        f'"duree_semaines":{duree_semaines},"seances_par_semaine":{seances_par_sem},'
+        f'"conseils":"...","jours":[{{"jour":"Lundi","titre":"...","exercices":['
+        f'{{"nom":"...","series":3,"reps":"10","repos_sec":60,"notes":""}}]}}]}}'
+    )
 
     try:
         anth = anthropic.Anthropic(api_key=api_key)
         msg  = anth.messages.create(
-            model='claude-opus-4-7',
-            max_tokens=8096,
+            model='claude-haiku-4-5-20251001',
+            max_tokens=2500,
             messages=[{'role': 'user', 'content': prompt}],
         )
         raw = msg.content[0].text
