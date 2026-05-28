@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from .models import Objectif, Alerte, Seance, User
 
@@ -53,5 +53,38 @@ def nouveau_coach_recettes_signal(sender, instance, created, **kwargs):
     try:
         from core.base_data import create_base_recettes_global
         create_base_recettes_global()
+    except Exception:
+        pass
+
+
+@receiver(post_save, sender=Seance)
+def seance_gcal_sync_signal(sender, instance, created, **kwargs):
+    """Crée ou met à jour l'événement Google Calendar correspondant."""
+    if instance.statut in ('annulee', 'absence'):
+        # On retire l'event Google si la séance est annulée
+        if instance.google_event_id:
+            try:
+                from core.google_calendar import delete_seance
+                delete_seance(instance.coach, instance.google_event_id)
+                Seance.objects.filter(pk=instance.pk).update(google_event_id='')
+            except Exception:
+                pass
+        return
+    try:
+        from core.google_calendar import push_seance
+        event_id = push_seance(instance)
+        if event_id and event_id != instance.google_event_id:
+            Seance.objects.filter(pk=instance.pk).update(google_event_id=event_id)
+    except Exception:
+        pass
+
+
+@receiver(post_delete, sender=Seance)
+def seance_gcal_delete_signal(sender, instance, **kwargs):
+    if not instance.google_event_id:
+        return
+    try:
+        from core.google_calendar import delete_seance
+        delete_seance(instance.coach, instance.google_event_id)
     except Exception:
         pass

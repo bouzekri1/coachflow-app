@@ -2,7 +2,7 @@ from django.db.models import Sum, Q
 from django.utils import timezone
 from django.conf import settings
 from django.shortcuts import get_object_or_404
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 from rest_framework import viewsets, status, generics
 from rest_framework.decorators import action, api_view, permission_classes, throttle_classes
 from rest_framework.response import Response
@@ -280,6 +280,11 @@ def me_view(request):
             profile, _ = CoachProfile.objects.get_or_create(user=user)
             data['plan'] = profile.plan
             data['onboarding_completed'] = profile.onboarding_completed
+            data['reservation_active']   = profile.reservation_active
+            data['reservation_preavis_h']= profile.reservation_preavis_h
+            data['reservation_horizon_j']= profile.reservation_horizon_j
+            data['reservation_duree_min']= profile.reservation_duree_min
+            data['gcal_block_allday']    = profile.gcal_block_allday
         return Response(data)
 
     if request.method == 'PATCH':
@@ -299,10 +304,23 @@ def me_view(request):
             user.set_password(new_pw)
             Token.objects.filter(user=user).delete()
         user.save()
-        data = UserSerializer(user).data
+
+        # Paramètres réservation (coach uniquement)
         if user.role == 'coach':
             profile, _ = CoachProfile.objects.get_or_create(user=user)
+            for field in ['reservation_active', 'reservation_preavis_h', 'reservation_horizon_j', 'reservation_duree_min', 'gcal_block_allday']:
+                if field in request.data:
+                    setattr(profile, field, request.data[field])
+            profile.save()
+
+        data = UserSerializer(user).data
+        if user.role == 'coach':
             data['plan'] = profile.plan
+            data['reservation_active']   = profile.reservation_active
+            data['reservation_preavis_h']= profile.reservation_preavis_h
+            data['reservation_horizon_j']= profile.reservation_horizon_j
+            data['reservation_duree_min']= profile.reservation_duree_min
+            data['gcal_block_allday']    = profile.gcal_block_allday
         # Renvoyer un nouveau token si le mot de passe a changé
         if old_pw and new_pw:
             token, _ = Token.objects.get_or_create(user=user)
@@ -681,7 +699,10 @@ class ProgrammeViewSet(viewsets.ModelViewSet):
     serializer_class = ProgrammeSerializer
 
     def get_queryset(self):
-        return Programme.objects.filter(coach=self.request.user)
+        qs = Programme.objects.filter(coach=self.request.user)
+        if self.request.query_params.get('templates') == '1':
+            qs = qs.filter(est_template=True)
+        return qs
 
     def perform_create(self, serializer):
         serializer.save(coach=self.request.user)
@@ -2443,61 +2464,56 @@ def generer_programme_ia(request, client_id):
 def sauvegarder_programme_ia(request, client_id):
     from django.db import transaction
 
-    client   = get_object_or_404(Client, id=client_id, coach=request.user)
-    data     = request.data
+    client      = get_object_or_404(Client, id=client_id, coach=request.user)
+    data        = request.data
+    as_template = bool(data.get('as_template', False))
 
-    JOUR_MAP = {'Lundi':'1','Mardi':'2','Mercredi':'3','Jeudi':'4','Vendredi':'5','Samedi':'6','Dimanche':'7'}
-
+    JOUR_MAP  = {'Lundi':'1','Mardi':'2','Mercredi':'3','Jeudi':'4','Vendredi':'5','Samedi':'6','Dimanche':'7'}
     exo_cache = {e.nom.lower(): e for e in Exercice.objects.filter(est_personnalise=False)}
+    CAT_MAP   = {'force':'force','perte_poids':'perte_poids','remise_forme':'remise_forme','mobilite':'mobilite','cardio':'cardio'}
 
-    CAT_MAP = {
-        'force':'force', 'perte_poids':'perte_poids', 'remise_forme':'remise_forme',
-        'mobilite':'mobilite', 'cardio':'cardio',
-    }
-
-    with transaction.atomic():
-        prog = Programme.objects.create(
-            coach             = request.user,
-            nom               = data.get('nom', 'Programme IA'),
-            description       = data.get('description', ''),
-            categorie         = CAT_MAP.get(data.get('categorie', 'force'), 'custom'),
-            duree_semaines    = int(data.get('duree_semaines', 8)),
+    def _build(est_template):
+        p = Programme.objects.create(
+            coach               = request.user,
+            nom                 = data.get('nom', 'Programme IA'),
+            description         = data.get('description', ''),
+            categorie           = CAT_MAP.get(data.get('categorie', 'force'), 'custom'),
+            duree_semaines      = int(data.get('duree_semaines', 8)),
             seances_par_semaine = int(data.get('seances_par_semaine', 3)),
-            est_template      = False,
-            genere_par_ia     = True,
+            est_template        = est_template,
+            genere_par_ia       = True,
         )
-
         for ordre, jour_data in enumerate(data.get('jours', [])):
             jour = ProgrammeJour.objects.create(
-                programme = prog,
-                semaine   = 1,
+                programme = p, semaine=1, ordre=ordre,
                 jour      = JOUR_MAP.get(jour_data.get('jour', 'Lundi'), '1'),
                 titre     = jour_data.get('titre', ''),
-                ordre     = ordre,
             )
             for ex_ordre, ex_data in enumerate(jour_data.get('exercices', [])):
                 nom = ex_data.get('nom', '')
-                exercice_obj = exo_cache.get(nom.lower())
+                obj = exo_cache.get(nom.lower())
                 ProgrammeJourExercice.objects.create(
-                    jour       = jour,
-                    exercice   = exercice_obj,
-                    nom_libre  = '' if exercice_obj else nom,
-                    series     = int(ex_data.get('series', 3)),
-                    reps       = str(ex_data.get('reps', '10')),
-                    repos_sec  = int(ex_data.get('repos_sec', 60)),
-                    notes      = ex_data.get('notes', ''),
-                    ordre      = ex_ordre,
+                    jour=jour, exercice=obj, ordre=ex_ordre,
+                    nom_libre = '' if obj else nom,
+                    series    = int(ex_data.get('series', 3)),
+                    reps      = str(ex_data.get('reps', '10')),
+                    repos_sec = int(ex_data.get('repos_sec', 60)),
+                    notes     = ex_data.get('notes', ''),
                 )
+        return p
+
+    with transaction.atomic():
+        prog = _build(est_template=False)
+        if as_template:
+            _build(est_template=True)
 
         date_debut_str = date.today()
         from datetime import timedelta
         date_fin = date_debut_str + timedelta(weeks=prog.duree_semaines)
         AssignationProgramme.objects.filter(client=client, statut='en_cours').update(statut='abandonne')
         AssignationProgramme.objects.create(
-            client         = client,
-            programme      = prog,
-            date_debut     = date_debut_str,
-            date_fin_prevue= date_fin,
+            client=client, programme=prog,
+            date_debut=date_debut_str, date_fin_prevue=date_fin,
         )
         if client.statut in ['nouveau', 'inactif']:
             client.statut = 'actif'
@@ -2521,3 +2537,424 @@ def push_send_to_client(request, client_id):
     for sub in subs:
         _send_push(sub, title, body, url)
     return Response({'sent': subs.count()})
+
+
+# ─── RÉSERVATION DE SÉANCES ───────────────────────────────────────────────────
+
+def _serialize_dispo(d):
+    return {
+        'id': str(d.id), 'jour_semaine': d.jour_semaine,
+        'heure_debut': d.heure_debut.strftime('%H:%M'),
+        'heure_fin':   d.heure_fin.strftime('%H:%M'),
+        'actif': d.actif,
+    }
+
+def _serialize_exception(e):
+    return {
+        'id': str(e.id), 'date': e.date.isoformat(), 'type': e.type,
+        'heure_debut': e.heure_debut.strftime('%H:%M') if e.heure_debut else None,
+        'heure_fin':   e.heure_fin.strftime('%H:%M') if e.heure_fin else None,
+        'motif': e.motif,
+    }
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def disponibilites_view(request):
+    if request.method == 'GET':
+        qs = DisponibiliteCoach.objects.filter(coach=request.user)
+        return Response([_serialize_dispo(d) for d in qs])
+
+    d = request.data
+    try:
+        h_deb = datetime.strptime(d.get('heure_debut'), '%H:%M').time()
+        h_fin = datetime.strptime(d.get('heure_fin'),   '%H:%M').time()
+    except (ValueError, TypeError):
+        return Response({'error': 'Format heure invalide (HH:MM attendu).'}, status=400)
+    if h_fin <= h_deb:
+        return Response({'error': 'Heure de fin doit être après heure de début.'}, status=400)
+    jour = int(d.get('jour_semaine', 0))
+    if not 0 <= jour <= 6:
+        return Response({'error': 'Jour invalide (0-6).'}, status=400)
+    dispo = DisponibiliteCoach.objects.create(
+        coach=request.user, jour_semaine=jour,
+        heure_debut=h_deb, heure_fin=h_fin, actif=True,
+    )
+    return Response(_serialize_dispo(dispo), status=201)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def disponibilite_delete(request, dispo_id):
+    try:
+        DisponibiliteCoach.objects.get(id=dispo_id, coach=request.user).delete()
+    except DisponibiliteCoach.DoesNotExist:
+        return Response({'error': 'Introuvable.'}, status=404)
+    return Response(status=204)
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def exceptions_dispo_view(request):
+    if request.method == 'GET':
+        qs = ExceptionDisponibilite.objects.filter(coach=request.user, date__gte=date.today())
+        return Response([_serialize_exception(e) for e in qs])
+
+    d = request.data
+    try:
+        date_obj = date.fromisoformat(d.get('date'))
+    except (ValueError, TypeError):
+        return Response({'error': 'Date invalide.'}, status=400)
+    type_e = d.get('type', 'ferme')
+    if type_e not in ('ferme', 'ouvert'):
+        return Response({'error': 'Type invalide.'}, status=400)
+    h_deb = h_fin = None
+    if type_e == 'ouvert':
+        try:
+            h_deb = datetime.strptime(d.get('heure_debut'), '%H:%M').time()
+            h_fin = datetime.strptime(d.get('heure_fin'),   '%H:%M').time()
+        except (ValueError, TypeError):
+            return Response({'error': 'Heures requises pour un créneau ouvert.'}, status=400)
+    exc = ExceptionDisponibilite.objects.create(
+        coach=request.user, date=date_obj, type=type_e,
+        heure_debut=h_deb, heure_fin=h_fin, motif=d.get('motif', ''),
+    )
+    return Response(_serialize_exception(exc), status=201)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def exception_dispo_delete(request, exc_id):
+    try:
+        ExceptionDisponibilite.objects.get(id=exc_id, coach=request.user).delete()
+    except ExceptionDisponibilite.DoesNotExist:
+        return Response({'error': 'Introuvable.'}, status=404)
+    return Response(status=204)
+
+
+def _compute_slots(coach, date_debut, date_fin):
+    profile = getattr(coach, 'coach_profile', None)
+    if not profile or not profile.reservation_active:
+        return []
+    duree = profile.reservation_duree_min
+    preavis = timedelta(hours=profile.reservation_preavis_h)
+    now = timezone.now()
+    limit_min = now + preavis
+
+    dispos_par_jour = {}
+    for d in DisponibiliteCoach.objects.filter(coach=coach, actif=True):
+        dispos_par_jour.setdefault(d.jour_semaine, []).append(d)
+
+    exceptions = {e.date: e for e in ExceptionDisponibilite.objects.filter(
+        coach=coach, date__gte=date_debut, date__lte=date_fin,
+    )}
+
+    seances_occ = set(
+        Seance.objects.filter(
+            coach=coach,
+            date_heure__date__gte=date_debut,
+            date_heure__date__lte=date_fin,
+            statut__in=['planifiee', 'realisee'],
+        ).values_list('date_heure', flat=True)
+    )
+
+    # Périodes occupées dans Google Calendar (silent si non connecté)
+    try:
+        from core.google_calendar import list_busy as _gcal_busy
+        gcal_busy = _gcal_busy(coach, date_debut, date_fin)
+    except Exception:
+        gcal_busy = []
+
+    def _slot_overlaps_gcal(slot_start, slot_end):
+        for bs, be in gcal_busy:
+            if slot_start < be and slot_end > bs:
+                return True
+        return False
+
+    slots = []
+    cur = date_debut
+    while cur <= date_fin:
+        plages = []
+        exc = exceptions.get(cur)
+        if exc and exc.type == 'ferme':
+            cur += timedelta(days=1)
+            continue
+        for d in dispos_par_jour.get(cur.weekday(), []):
+            plages.append((d.heure_debut, d.heure_fin))
+        if exc and exc.type == 'ouvert' and exc.heure_debut and exc.heure_fin:
+            plages.append((exc.heure_debut, exc.heure_fin))
+
+        for h_deb, h_fin in plages:
+            curseur = timezone.make_aware(datetime.combine(cur, h_deb))
+            fin = timezone.make_aware(datetime.combine(cur, h_fin))
+            while curseur + timedelta(minutes=duree) <= fin:
+                slot_end = curseur + timedelta(minutes=duree)
+                if curseur >= limit_min and curseur not in seances_occ and not _slot_overlaps_gcal(curseur, slot_end):
+                    slots.append({'date_heure': curseur.isoformat(), 'duree_min': duree})
+                curseur += timedelta(minutes=duree)
+        cur += timedelta(days=1)
+
+    slots.sort(key=lambda s: s['date_heure'])
+    return slots
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def portal_disponibilites(request):
+    try:
+        client = Client.objects.get(user_account=request.user)
+    except Client.DoesNotExist:
+        return Response({'error': 'Profil client introuvable.'}, status=404)
+    coach = client.coach
+    profile = getattr(coach, 'coach_profile', None)
+    if not profile or not profile.reservation_active:
+        return Response({'active': False, 'slots': []})
+
+    try:
+        d_debut = date.fromisoformat(request.query_params.get('date_debut') or '')
+    except ValueError:
+        d_debut = date.today()
+    try:
+        d_fin = date.fromisoformat(request.query_params.get('date_fin') or '')
+    except ValueError:
+        d_fin = d_debut + timedelta(days=profile.reservation_horizon_j)
+
+    max_fin = date.today() + timedelta(days=profile.reservation_horizon_j)
+    if d_fin > max_fin:
+        d_fin = max_fin
+
+    slots = _compute_slots(coach, d_debut, d_fin)
+    return Response({
+        'active': True,
+        'duree_min': profile.reservation_duree_min,
+        'preavis_h': profile.reservation_preavis_h,
+        'horizon_j': profile.reservation_horizon_j,
+        'slots': slots,
+    })
+
+
+# ─── GOOGLE CALENDAR SYNC ─────────────────────────────────────────────────────
+
+GCAL_SCOPES = [
+    'https://www.googleapis.com/auth/calendar.events',
+    'https://www.googleapis.com/auth/calendar.readonly',
+    'openid',
+    'https://www.googleapis.com/auth/userinfo.email',
+]
+
+
+def _gcal_flow():
+    from google_auth_oauthlib.flow import Flow
+    from django.conf import settings as dj_settings
+    flow = Flow.from_client_config(
+        {'web': {
+            'client_id':     dj_settings.GOOGLE_OAUTH_CLIENT_ID,
+            'client_secret': dj_settings.GOOGLE_OAUTH_CLIENT_SECRET,
+            'auth_uri':      'https://accounts.google.com/o/oauth2/auth',
+            'token_uri':     'https://oauth2.googleapis.com/token',
+            'redirect_uris': [dj_settings.GOOGLE_CALENDAR_REDIRECT_URI],
+        }},
+        scopes=GCAL_SCOPES,
+        autogenerate_code_verifier=False,  # PKCE désactivé : client confidentiel avec secret
+    )
+    flow.redirect_uri = dj_settings.GOOGLE_CALENDAR_REDIRECT_URI
+    return flow
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def google_calendar_status(request):
+    token = GoogleCalendarToken.objects.filter(user=request.user).first()
+    if not token:
+        return Response({'connected': False})
+    return Response({
+        'connected': True,
+        'email': token.google_email,
+        'calendar_id': token.calendar_id,
+        'sync_enabled': token.sync_enabled,
+        'last_sync_at': token.last_sync_at.isoformat() if token.last_sync_at else None,
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def google_calendar_connect(request):
+    """Retourne l'URL OAuth Google pour démarrer la connexion."""
+    from django.core.signing import TimestampSigner
+    if not settings.GOOGLE_OAUTH_CLIENT_SECRET:
+        return Response({'error': 'Google OAuth non configuré côté serveur.'}, status=503)
+    flow = _gcal_flow()
+    # State signé contenant l'ID utilisateur pour identifier au callback
+    state = TimestampSigner().sign(str(request.user.id))
+    auth_url, _ = flow.authorization_url(
+        access_type='offline',     # nécessaire pour obtenir refresh_token
+        include_granted_scopes='true',
+        prompt='consent',          # force consent → refresh_token toujours fourni
+        state=state,
+    )
+    return Response({'auth_url': auth_url})
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def google_calendar_callback(request):
+    """Callback OAuth — échange le code contre des tokens, sauvegarde, redirige vers frontend."""
+    from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
+    from django.shortcuts import redirect
+    from urllib.parse import urlencode
+
+    code = request.query_params.get('code')
+    state = request.query_params.get('state')
+    err = request.query_params.get('error')
+
+    def _redirect(status, msg=''):
+        params = {'gcal': status}
+        if msg: params['msg'] = msg
+        return redirect(f"{settings.FRONTEND_URL}/compte?{urlencode(params)}")
+
+    if err:
+        return _redirect('error', err)
+    if not code or not state:
+        return _redirect('error', 'code_missing')
+
+    try:
+        user_id = TimestampSigner().unsign(state, max_age=600)
+    except SignatureExpired:
+        return _redirect('error', 'state_expired')
+    except BadSignature:
+        return _redirect('error', 'state_invalid')
+
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return _redirect('error', 'user_not_found')
+
+    try:
+        flow = _gcal_flow()
+        flow.fetch_token(code=code)
+        creds = flow.credentials
+    except Exception as e:
+        import logging, traceback
+        logging.error(f"GCAL token exchange failed: {type(e).__name__}: {e}\n{traceback.format_exc()}")
+        return _redirect('error', f'token_exchange:{type(e).__name__}:{str(e)[:120]}')
+
+    from core.google_calendar import fetch_user_email
+    email = fetch_user_email(creds)
+
+    expires_at = creds.expiry
+    if expires_at and expires_at.tzinfo is None:
+        expires_at = timezone.make_aware(expires_at)
+
+    GoogleCalendarToken.objects.update_or_create(
+        user=user,
+        defaults={
+            'access_token':  creds.token,
+            'refresh_token': creds.refresh_token or '',
+            'token_uri':     creds.token_uri,
+            'expires_at':    expires_at or timezone.now() + timedelta(hours=1),
+            'google_email':  email,
+            'calendar_id':   'primary',
+            'sync_enabled':  True,
+        },
+    )
+    return _redirect('connected')
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def google_calendar_disconnect(request):
+    token = GoogleCalendarToken.objects.filter(user=request.user).first()
+    if not token:
+        return Response({'status': 'not_connected'})
+    # Tente de révoquer le token côté Google (best-effort)
+    try:
+        import requests as _req
+        _req.post('https://oauth2.googleapis.com/revoke',
+                  params={'token': token.refresh_token or token.access_token},
+                  headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                  timeout=5)
+    except Exception:
+        pass
+    token.delete()
+    return Response({'status': 'disconnected'})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def google_calendar_sync_all(request):
+    """Push toutes les séances futures vers Google Calendar."""
+    from core.google_calendar import push_seance
+    token = GoogleCalendarToken.objects.filter(user=request.user).first()
+    if not token:
+        return Response({'error': 'Non connecté à Google Calendar.'}, status=400)
+
+    seances = Seance.objects.filter(
+        coach=request.user,
+        date_heure__gte=timezone.now(),
+        statut__in=['planifiee', 'realisee'],
+    )
+    pushed = 0
+    for s in seances:
+        event_id = push_seance(s)
+        if event_id:
+            if event_id != s.google_event_id:
+                s.google_event_id = event_id
+                s.save(update_fields=['google_event_id'])
+            pushed += 1
+    token.last_sync_at = timezone.now()
+    token.save(update_fields=['last_sync_at'])
+    return Response({'pushed': pushed, 'total': seances.count()})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def portal_reserver_seance(request):
+    try:
+        client = Client.objects.get(user_account=request.user)
+    except Client.DoesNotExist:
+        return Response({'error': 'Profil client introuvable.'}, status=404)
+    coach = client.coach
+    profile = getattr(coach, 'coach_profile', None)
+    if not profile or not profile.reservation_active:
+        return Response({'error': 'La réservation n\'est pas activée pour ce coach.'}, status=400)
+
+    dh_str = request.data.get('date_heure')
+    if not dh_str:
+        return Response({'error': 'date_heure requis.'}, status=400)
+    try:
+        dh = datetime.fromisoformat(dh_str.replace('Z', '+00:00'))
+        if dh.tzinfo is None:
+            dh = timezone.make_aware(dh)
+    except ValueError:
+        return Response({'error': 'Format date_heure invalide.'}, status=400)
+
+    slots = _compute_slots(coach, dh.date(), dh.date())
+    if not any(s['date_heure'] == dh.isoformat() for s in slots):
+        return Response({'error': 'Ce créneau n\'est plus disponible.'}, status=409)
+
+    seance = Seance.objects.create(
+        coach=coach, client=client, date_heure=dh,
+        duree_minutes=profile.reservation_duree_min,
+        type_seance='presentiel', statut='planifiee',
+        titre='Séance réservée par le client',
+    )
+
+    Alerte.objects.create(
+        coach=coach, client=client,
+        type_alerte='nouvelle_reservation',
+        titre=f"{client.prenom} a réservé une séance",
+        description=f"Le {dh.strftime('%d/%m/%Y à %H:%M')} ({profile.reservation_duree_min} min)",
+        priorite='moyenne',
+    )
+
+    subs = PushSubscription.objects.filter(user=coach)
+    for sub in subs:
+        _send_push(sub, 'Nouvelle réservation',
+                   f"{client.prenom} a réservé le {dh.strftime('%d/%m à %Hh%M')}",
+                   '/planning')
+
+    return Response({
+        'id': str(seance.id),
+        'date_heure': seance.date_heure.isoformat(),
+        'duree_minutes': seance.duree_minutes,
+    }, status=201)

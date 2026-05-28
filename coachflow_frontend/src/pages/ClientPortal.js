@@ -556,11 +556,191 @@ function PortalDashboard({ onGoMessages }) {
 }
 
 /* ── SÉANCES CLIENT ───────────────────────────────────────────────────────── */
+function ReserverModal({ onClose, onDone }) {
+  const [data, setData]         = useState(null);
+  const [selectedDay, setSelDay] = useState(null);
+  const [selectedSlot, setSelSlot] = useState(null);
+  const [busy, setBusy]         = useState(false);
+  const today = new Date();
+  const [calMonth, setCalMonth] = useState({ year: today.getFullYear(), month: today.getMonth() });
+
+  useEffect(() => {
+    const dStart = new Date(); dStart.setHours(0,0,0,0);
+    const dEnd = new Date(); dEnd.setDate(dEnd.getDate() + 60);
+    const fmt = d => d.toISOString().slice(0,10);
+    api.reservation.portalSlots(`?date_debut=${fmt(dStart)}&date_fin=${fmt(dEnd)}`)
+      .then(setData).catch(() => setData({ active:false, slots:[] }));
+  }, []);
+
+  const reserver = async () => {
+    if (!selectedSlot) return;
+    setBusy(true);
+    try {
+      await api.reservation.portalReserver({ date_heure: selectedSlot });
+      toast('Séance réservée !');
+      onDone();
+    } catch (e) { toast(e.message, 'err'); setBusy(false); }
+  };
+
+  if (!data) return (
+    <div className="ov" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal" style={{ maxWidth:500 }}>
+        <div className="mhd"><div className="mttl">📅 Réserver une séance</div></div>
+        <div className="mbd" style={{ textAlign:'center', padding:'40px 20px' }}>
+          <div className="spin" style={{ margin:'0 auto' }} />
+        </div>
+      </div>
+    </div>
+  );
+
+  if (!data.active) return (
+    <div className="ov" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal" style={{ maxWidth:460 }}>
+        <div className="mhd">
+          <div className="mttl">📅 Réservation indisponible</div>
+          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', fontSize:20, color:'var(--t3)' }}>×</button>
+        </div>
+        <div className="mbd" style={{ textAlign:'center', padding:'30px 20px' }}>
+          <div style={{ fontSize:40, marginBottom:12 }}>📵</div>
+          <div style={{ fontWeight:600, marginBottom:8 }}>Votre coach n'a pas activé la réservation</div>
+          <div style={{ fontSize:13, color:'var(--t3)' }}>Contactez-le pour planifier votre prochaine séance.</div>
+        </div>
+        <div className="mft"><button className="btn btn-p" onClick={onClose}>Fermer</button></div>
+      </div>
+    </div>
+  );
+
+  // Index des slots par jour YYYY-MM-DD
+  const slotsByDay = {};
+  data.slots.forEach(s => {
+    const d = new Date(s.date_heure);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (!slotsByDay[key]) slotsByDay[key] = [];
+    slotsByDay[key].push(s);
+  });
+
+  const { year, month } = calMonth;
+  const firstDay = new Date(year, month, 1).getDay();
+  const startOffset = (firstDay + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const monthLabel = new Date(year, month, 1).toLocaleDateString('fr-FR', { month:'long', year:'numeric' });
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  const DAYS_FR = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+
+  const cells = [];
+  for (let i = 0; i < startOffset; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  const selectedKey = selectedDay
+    ? `${year}-${String(month+1).padStart(2,'0')}-${String(selectedDay).padStart(2,'0')}`
+    : null;
+  const slotsForDay = selectedKey ? (slotsByDay[selectedKey] || []) : [];
+
+  const prevMonth = () => { setSelDay(null); setSelSlot(null); setCalMonth(({year:y,month:m}) => m===0 ? {year:y-1,month:11} : {year:y,month:m-1}); };
+  const nextMonth = () => { setSelDay(null); setSelSlot(null); setCalMonth(({year:y,month:m}) => m===11 ? {year:y+1,month:0} : {year:y,month:m+1}); };
+
+  return (
+    <div className="ov" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal" style={{ maxWidth:540 }}>
+        <div className="mhd">
+          <div>
+            <div className="mttl">📅 Réserver une séance</div>
+            <div style={{ fontSize:12, color:'var(--t3)', marginTop:2 }}>
+              Durée : {data.duree_min} min · Préavis : {data.preavis_h}h
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', fontSize:20, color:'var(--t3)' }}>×</button>
+        </div>
+
+        <div className="mbd">
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14 }}>
+            <button onClick={prevMonth} style={{ width:32, height:32, borderRadius:8, border:'1px solid var(--bdr)', background:'transparent', cursor:'pointer' }}>‹</button>
+            <div style={{ fontSize:15, fontWeight:700, textTransform:'capitalize' }}>{monthLabel}</div>
+            <button onClick={nextMonth} style={{ width:32, height:32, borderRadius:8, border:'1px solid var(--bdr)', background:'transparent', cursor:'pointer' }}>›</button>
+          </div>
+
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2, marginBottom:4 }}>
+            {DAYS_FR.map(d => <div key={d} style={{ textAlign:'center', fontSize:10, fontWeight:700, color:'var(--t3)', padding:'4px 0' }}>{d}</div>)}
+          </div>
+
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:3 }}>
+            {cells.map((day, i) => {
+              if (!day) return <div key={`e${i}`} />;
+              const key = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+              const daySlots = slotsByDay[key] || [];
+              const isToday = key === todayKey;
+              const isSelected = day === selectedDay;
+              const hasSlots = daySlots.length > 0;
+              return (
+                <button key={day} onClick={() => { if (hasSlots) { setSelDay(isSelected ? null : day); setSelSlot(null); } }}
+                  style={{
+                    border: isSelected ? '2px solid var(--acc)' : isToday ? '2px solid #1D9E75' : '1px solid transparent',
+                    borderRadius:9, padding:'6px 2px 5px', minHeight:46,
+                    background: isSelected ? 'var(--acc2)' : hasSlots ? '#dcfce7' : 'transparent',
+                    cursor: hasSlots ? 'pointer' : 'default', opacity: hasSlots ? 1 : 0.45,
+                    display:'flex', flexDirection:'column', alignItems:'center', gap:2,
+                  }}>
+                  <span style={{ fontSize:13, fontWeight: isToday || isSelected ? 800 : 500, color: isSelected ? 'var(--acc3)' : 'var(--t1)' }}>{day}</span>
+                  {hasSlots && <span style={{ fontSize:9, fontWeight:700, color:'#166534' }}>{daySlots.length}</span>}
+                </button>
+              );
+            })}
+          </div>
+
+          {selectedDay && (
+            <div style={{ marginTop:18, borderTop:'1px solid var(--bdr)', paddingTop:14 }}>
+              <div style={{ fontSize:13, fontWeight:700, marginBottom:10 }}>
+                Créneaux du {new Date(year, month, selectedDay).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' })}
+              </div>
+              {slotsForDay.length === 0
+                ? <div style={{ fontSize:12, color:'var(--t3)' }}>Aucun créneau disponible.</div>
+                : (
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(80px, 1fr))', gap:6 }}>
+                    {slotsForDay.map(s => {
+                      const dt = new Date(s.date_heure);
+                      const lbl = dt.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+                      const isSel = selectedSlot === s.date_heure;
+                      return (
+                        <button key={s.date_heure} onClick={() => setSelSlot(s.date_heure)}
+                          style={{
+                            padding:'8px 4px', borderRadius:8, fontSize:13, fontWeight:600,
+                            border:`2px solid ${isSel ? 'var(--acc)' : 'var(--bdr)'}`,
+                            background: isSel ? 'var(--acc2)' : 'var(--bg)',
+                            color: isSel ? 'var(--acc3)' : 'var(--t1)', cursor:'pointer',
+                          }}>{lbl}</button>
+                      );
+                    })}
+                  </div>
+                )
+              }
+            </div>
+          )}
+
+          {data.slots.length === 0 && (
+            <div style={{ marginTop:18, padding:'20px', textAlign:'center', background:'var(--bg)', borderRadius:10 }}>
+              <div style={{ fontSize:32, marginBottom:8 }}>😴</div>
+              <div style={{ fontSize:13, color:'var(--t3)' }}>Aucun créneau disponible pour le moment.</div>
+            </div>
+          )}
+        </div>
+
+        <div className="mft">
+          <button className="btn btn-s" onClick={onClose}>Annuler</button>
+          <button className="btn btn-p" onClick={reserver} disabled={!selectedSlot || busy}>
+            {busy ? 'Réservation…' : selectedSlot ? `✓ Réserver ${new Date(selectedSlot).toLocaleString('fr-FR', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}` : 'Choisir un créneau'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PortalSeances() {
   const [seances, setSeances] = useState(null);
   const [demandes, setDemandes] = useState({});
   const [view, setView] = useState('calendar');
   const [selectedCarnet, setSelectedCarnet] = useState(null);
+  const [showReserver, setShowReserver] = useState(false);
   const today = new Date();
   const [calMonth, setCalMonth] = useState({ year: today.getFullYear(), month: today.getMonth() });
   const [selectedDay, setSelectedDay] = useState(null);
@@ -743,12 +923,15 @@ function PortalSeances() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4, gap: 8, flexWrap: 'wrap' }}>
         <div style={{ fontSize: 20, fontWeight: 800 }}>Mes séances</div>
-        <div style={{ display: 'flex', gap: 4 }}>
-          {[['calendar','📅 Calendrier'],['list','📋 Liste']].map(([v, lbl]) => (
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <button onClick={() => setShowReserver(true)} className="btn btn-p btn-sm" style={{ fontSize: 12 }}>
+            ➕ Réserver
+          </button>
+          {[['calendar','📅'],['list','📋']].map(([v, lbl]) => (
             <button key={v} onClick={() => setView(v)} style={{
-              padding: '5px 13px', border: '1px solid var(--bdr)', borderRadius: 8,
+              padding: '5px 10px', border: '1px solid var(--bdr)', borderRadius: 8,
               fontSize: 12, fontWeight: 600, cursor: 'pointer',
               background: view === v ? 'var(--acc2)' : 'transparent',
               color: view === v ? 'var(--acc3)' : 'var(--t2)',
@@ -785,6 +968,7 @@ function PortalSeances() {
       )}
 
       {selectedCarnet && <CarnetModal seanceId={selectedCarnet} onClose={() => setSelectedCarnet(null)} />}
+      {showReserver && <ReserverModal onClose={() => setShowReserver(false)} onDone={() => { setShowReserver(false); load(); }} />}
     </div>
   );
 }

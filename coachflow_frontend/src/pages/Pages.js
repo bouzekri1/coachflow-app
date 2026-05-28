@@ -3,6 +3,9 @@ import { api } from '../services/api';
 import { Loader, Empty, STag, Ic, Modal, PBar, Av, toast, ExerciseImg } from '../components/UI';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
+// Clé date locale "YYYY-MM-DD" (évite le décalage UTC de toISOString)
+const localDk = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
 /* ══════════════════════════════════════════════════════════════
    PROGRAMMES
 ══════════════════════════════════════════════════════════════ */
@@ -628,7 +631,7 @@ function easterDate(year) {
 function getFrenchHolidays(year) {
   const easter = easterDate(year);
   const add = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
-  const dk = d => d.toISOString().slice(0, 10);
+  const dk = localDk;
   return {
     [dk(new Date(year, 0, 1))]:   "Jour de l'An",
     [dk(add(easter, 1))]:         "Lundi de Pâques",
@@ -666,13 +669,13 @@ function CalendarView({ seances, month, onMonthChange, onCarnet, onMarquer, onAn
   const holidays = { ...getFrenchHolidays(year), ...getFrenchHolidays(year + 1) };
 
   const byDate = seances.reduce((acc, s) => {
-    const k = new Date(s.date_heure).toISOString().slice(0, 10);
+    const k = localDk(new Date(s.date_heure));
     if (!acc[k]) acc[k] = [];
     acc[k].push(s);
     return acc;
   }, {});
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDk(new Date());
   const prev  = () => onMonthChange(new Date(year, mon - 1, 1));
   const next  = () => onMonthChange(new Date(year, mon + 1, 1));
 
@@ -701,7 +704,7 @@ function CalendarView({ seances, month, onMonthChange, onCarnet, onMarquer, onAn
         {/* Grille compacte */}
         <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2 }}>
           {cells.map((d, i) => {
-            const dk = d.toISOString().slice(0, 10);
+            const dk = localDk(d);
             const inMonth   = d.getMonth() === mon;
             const isToday   = dk === today;
             const isWeekend = d.getDay() === 0 || d.getDay() === 6;
@@ -823,7 +826,7 @@ function CalendarView({ seances, month, onMonthChange, onCarnet, onMarquer, onAn
       {/* Grille desktop */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(7, 1fr)', gap:3 }}>
         {cells.map((d, i) => {
-          const dk = d.toISOString().slice(0, 10);
+          const dk = localDk(d);
           const inMonth  = d.getMonth() === mon;
           const isToday  = dk === today;
           const isWeekend = d.getDay() === 0 || d.getDay() === 6;

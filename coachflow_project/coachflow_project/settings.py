@@ -184,6 +184,11 @@ ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
 
 # ── GOOGLE OAUTH ───────────────────────────────────────────────────────────────
 GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID', '')
+GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET', '')
+GOOGLE_CALENDAR_REDIRECT_URI = os.environ.get('GOOGLE_CALENDAR_REDIRECT_URI', 'http://127.0.0.1:8000/api/auth/google-calendar/callback/')
+
+# ── FRONTEND URL (utilisé pour redirections après OAuth) ──────────────────────
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
 
 # ── BACKUPS ────────────────────────────────────────────────────────────────────
 BACKUP_DIR         = os.environ.get('BACKUP_DIR', str(BASE_DIR / 'backups'))

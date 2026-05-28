@@ -651,6 +651,7 @@ export function ClientDetail() {
           client={client}
           clientId={id}
           onIaOpen={() => setShowProgIa(true)}
+          onRefresh={load}
         />
       )}
 
@@ -1052,6 +1053,7 @@ function ProgrammeIaModal({ clientId, client, onClose, onSaved }) {
   const [savedOk, setSavedOk]     = useState(false);
   const [savePhase, setSavePhase] = useState(0);
   const [activeDay, setActiveDay] = useState(0);
+  const [asTemplate, setAsTemplate] = useState(false);
 
   const OBJECTIFS = [
     { val:'force',        label:'Force',         icon:'🏋️', desc:'Musculation & gains de force' },
@@ -1086,7 +1088,7 @@ function ProgrammeIaModal({ clientId, client, onClose, onSaved }) {
     const t1 = setTimeout(() => setSavePhase(2), 700);
     const t2 = setTimeout(() => setSavePhase(3), 1400);
     try {
-      await api.clients.sauvegarderProgrammeIa(clientId, prog);
+      await api.clients.sauvegarderProgrammeIa(clientId, { ...prog, as_template: asTemplate });
       clearTimeout(t1); clearTimeout(t2);
       setSavePhase(4); setSavedOk(true);
       onSaved && onSaved();
@@ -1274,6 +1276,16 @@ function ProgrammeIaModal({ clientId, client, onClose, onSaved }) {
               </div>
             )}
 
+            {!savedOk && (
+              <label style={{ display:'flex', alignItems:'center', gap:10, marginTop:16, cursor:'pointer', padding:'10px 14px', background:'var(--bg)', borderRadius:10, border:`1px solid ${asTemplate ? 'var(--acc)' : 'var(--bdr)'}` }}>
+                <input type="checkbox" checked={asTemplate} onChange={e => setAsTemplate(e.target.checked)} style={{ width:16, height:16, accentColor:'var(--acc)', flexShrink:0 }} />
+                <div>
+                  <div style={{ fontSize:13, fontWeight:600, color: asTemplate ? 'var(--acc3)' : 'var(--t1)' }}>📋 Sauvegarder aussi comme template réutilisable</div>
+                  <div style={{ fontSize:11, color:'var(--t3)', marginTop:2 }}>Retrouvez-le dans la bibliothèque pour l'assigner rapidement à d'autres clients ayant un profil similaire.</div>
+                </div>
+              </label>
+            )}
+
             {err && <div style={{ marginTop:12, padding:'10px 12px', background:'var(--red-bg)', color:'var(--red)', borderRadius:8, fontSize:13 }}>{err}</div>}
           </>)}
         </div>
@@ -1298,18 +1310,93 @@ function ProgrammeIaModal({ clientId, client, onClose, onSaved }) {
   );
 }
 
-function ClientProgrammeTab({ client, clientId, onIaOpen }) {
+function TemplatePicker({ clientId, onClose, onDone }) {
+  const [templates, setTemplates] = useState(null);
+  const [busy, setBusy]           = useState(false);
+  const [selected, setSelected]   = useState(null);
+
+  useEffect(() => {
+    api.programmes.templates().then(setTemplates).catch(() => setTemplates([]));
+  }, []);
+
+  const CAT_LABELS = { force:'Force', perte_poids:'Perte de poids', remise_forme:'Remise en forme', cardio:'Cardio', mobilite:'Mobilité', custom:'Autre' };
+
+  const assigner = async () => {
+    if (!selected) return;
+    setBusy(true);
+    try {
+      await api.programmes.assigner(selected, { client_id: clientId, date_debut: new Date().toISOString().slice(0,10) });
+      toast('Programme assigné !'); onDone();
+    } catch (e) { toast(e.message, 'err'); setBusy(false); }
+  };
+
+  return (
+    <div className="ov" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal" style={{ maxWidth:560 }}>
+        <div className="mhd">
+          <div className="mttl">📋 Choisir un template de programme</div>
+          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', fontSize:20, color:'var(--t3)' }}>×</button>
+        </div>
+        <div className="mbd">
+          {!templates && <div style={{ textAlign:'center', padding:32 }}><div className="spin" style={{ margin:'0 auto' }} /></div>}
+          {templates && templates.length === 0 && (
+            <div style={{ textAlign:'center', padding:40 }}>
+              <div style={{ fontSize:36, marginBottom:12 }}>📋</div>
+              <div style={{ fontWeight:600, marginBottom:8 }}>Aucun template disponible</div>
+              <div style={{ fontSize:13, color:'var(--t3)' }}>Générez un programme avec l'IA et cochez "Sauvegarder comme template" pour en créer un.</div>
+            </div>
+          )}
+          {templates && templates.length > 0 && (
+            <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              {templates.map(t => (
+                <button key={t.id} onClick={() => setSelected(t.id)} style={{
+                  display:'flex', alignItems:'center', gap:14, padding:'12px 16px',
+                  borderRadius:12, border:`2px solid ${selected===t.id ? 'var(--acc)' : 'var(--bdr)'}`,
+                  background: selected===t.id ? 'var(--acc2)' : 'var(--bg)', cursor:'pointer', textAlign:'left',
+                }}>
+                  <div style={{ width:40, height:40, borderRadius:10, background: selected===t.id ? 'var(--acc)' : 'var(--bdr)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, flexShrink:0 }}>🏋️</div>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontWeight:700, fontSize:14, color: selected===t.id ? 'var(--acc3)' : 'var(--t1)' }}>{t.nom}</div>
+                    <div style={{ fontSize:12, color:'var(--t3)', marginTop:2 }}>
+                      {CAT_LABELS[t.categorie] || t.categorie} · {t.duree_semaines} sem · {t.seances_par_semaine}×/sem
+                      {t.genere_par_ia && <span style={{ marginLeft:6, background:'#f5f3ff', color:'#7c3aed', padding:'1px 6px', borderRadius:4, fontSize:11 }}>✨ IA</span>}
+                    </div>
+                  </div>
+                  {selected===t.id && <span style={{ color:'var(--acc3)', fontSize:18 }}>✓</span>}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="mft">
+          <button className="btn btn-s" onClick={onClose}>Annuler</button>
+          <button className="btn btn-p" onClick={assigner} disabled={!selected || busy}>{busy ? 'Assignation…' : '📋 Assigner ce template'}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ClientProgrammeTab({ client, clientId, onIaOpen, onRefresh }) {
   const prog = client.programme_actif;
+  const [showPicker, setShowPicker] = useState(false);
+
+  const handleTemplateAssigned = () => { setShowPicker(false); onRefresh && onRefresh(); };
 
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
 
+      {showPicker && <TemplatePicker clientId={clientId} onClose={() => setShowPicker(false)} onDone={handleTemplateAssigned} />}
+
       {/* Programme actif */}
       {prog ? (
         <div className="card">
-          <div className="card-t" style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <div className="card-t" style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:8, flexWrap:'wrap' }}>
             Programme actif
-            <button className="btn btn-p btn-sm" onClick={onIaOpen}>✨ Nouveau programme IA</button>
+            <div style={{ display:'flex', gap:6 }}>
+              <button className="btn btn-s btn-sm" onClick={() => setShowPicker(true)}>📋 Template</button>
+              <button className="btn btn-p btn-sm" onClick={onIaOpen}>✨ Nouveau IA</button>
+            </div>
           </div>
 
           <div style={{ display:'flex', gap:12, flexWrap:'wrap', marginTop:12, marginBottom:16 }}>
@@ -1338,9 +1425,12 @@ function ClientProgrammeTab({ client, clientId, onIaOpen }) {
           <div style={{ fontSize:48, marginBottom:12 }}>🏋️</div>
           <div style={{ fontSize:15, fontWeight:700, marginBottom:8 }}>Aucun programme actif</div>
           <div style={{ fontSize:13, color:'var(--t3)', marginBottom:24 }}>
-            Générez un programme d'entraînement personnalisé avec l'IA en quelques secondes.
+            Générez un programme personnalisé avec l'IA ou assignez un template existant.
           </div>
-          <button className="btn btn-p" onClick={onIaOpen}>✨ Générer un programme avec l'IA</button>
+          <div style={{ display:'flex', gap:8, justifyContent:'center', flexWrap:'wrap' }}>
+            <button className="btn btn-s" onClick={() => setShowPicker(true)}>📋 Utiliser un template</button>
+            <button className="btn btn-p" onClick={onIaOpen}>✨ Générer avec l'IA</button>
+          </div>
         </div>
       )}
 

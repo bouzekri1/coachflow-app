@@ -34,6 +34,11 @@ class CoachProfile(models.Model):
     plan = models.CharField(max_length=10, choices=PLAN_CHOICES, default=PLAN_FREE)
     plan_expires_at = models.DateTimeField(null=True, blank=True)
     onboarding_completed = models.BooleanField(default=False)
+    reservation_active = models.BooleanField(default=False)
+    reservation_preavis_h = models.PositiveSmallIntegerField(default=12)
+    reservation_horizon_j = models.PositiveSmallIntegerField(default=30)
+    reservation_duree_min = models.PositiveSmallIntegerField(default=60)
+    gcal_block_allday = models.BooleanField(default=True, help_text="Bloquer les events all-day Google même marqués 'Disponible'")
     class Meta:
         db_table = 'coach_profiles'
     def __str__(self):
@@ -297,6 +302,7 @@ class Seance(models.Model):
     ressenti_client = models.TextField(blank=True)
     semaine_numero = models.PositiveSmallIntegerField(null=True, blank=True)
     rappel_envoye = models.BooleanField(default=False)
+    google_event_id = models.CharField(max_length=200, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     class Meta:
@@ -686,7 +692,7 @@ class PushSubscription(models.Model):
 
 class Alerte(models.Model):
     PRIORITE_CHOICES = [('haute','Haute'),('moyenne','Moyenne'),('basse','Basse')]
-    TYPE_CHOICES = [('absences','Absences'),('inactivite','Inactivité'),('facture_retard','Facture retard'),('fin_programme','Fin programme'),('objectif_atteint','Objectif atteint'),('nouvelle_mesure','Nouvelle mesure')]
+    TYPE_CHOICES = [('absences','Absences'),('inactivite','Inactivité'),('facture_retard','Facture retard'),('fin_programme','Fin programme'),('objectif_atteint','Objectif atteint'),('nouvelle_mesure','Nouvelle mesure'),('nouvelle_reservation','Nouvelle réservation')]
     coach = models.ForeignKey(User, on_delete=models.CASCADE, related_name='alertes')
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='alertes')
     type_alerte = models.CharField(max_length=20, choices=TYPE_CHOICES, default='absences')
@@ -701,3 +707,54 @@ class Alerte(models.Model):
         ordering = ['-created_at']
     def __str__(self):
         return f"[{self.priorite}] {self.titre}"
+
+
+class DisponibiliteCoach(models.Model):
+    JOUR_CHOICES = [(0,'Lundi'),(1,'Mardi'),(2,'Mercredi'),(3,'Jeudi'),(4,'Vendredi'),(5,'Samedi'),(6,'Dimanche')]
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    coach = models.ForeignKey(User, on_delete=models.CASCADE, related_name='disponibilites')
+    jour_semaine = models.PositiveSmallIntegerField(choices=JOUR_CHOICES)
+    heure_debut = models.TimeField()
+    heure_fin = models.TimeField()
+    actif = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        db_table = 'disponibilites_coach'
+        ordering = ['jour_semaine', 'heure_debut']
+    def __str__(self):
+        return f"{self.get_jour_semaine_display()} {self.heure_debut}-{self.heure_fin}"
+
+
+class ExceptionDisponibilite(models.Model):
+    TYPE_CHOICES = [('ferme','Fermé'),('ouvert','Ouvert')]
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    coach = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exceptions_dispo')
+    date = models.DateField()
+    type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='ferme')
+    heure_debut = models.TimeField(null=True, blank=True)
+    heure_fin = models.TimeField(null=True, blank=True)
+    motif = models.CharField(max_length=200, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        db_table = 'exceptions_dispo'
+        ordering = ['date']
+    def __str__(self):
+        return f"{self.date} — {self.get_type_display()}"
+
+
+class GoogleCalendarToken(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='google_calendar')
+    access_token = models.TextField()
+    refresh_token = models.TextField()
+    token_uri = models.CharField(max_length=255, default='https://oauth2.googleapis.com/token')
+    expires_at = models.DateTimeField()
+    google_email = models.EmailField(blank=True)
+    calendar_id = models.CharField(max_length=255, default='primary')
+    sync_enabled = models.BooleanField(default=True)
+    last_sync_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        db_table = 'google_calendar_tokens'
+    def __str__(self):
+        return f"Google Calendar — {self.user}"

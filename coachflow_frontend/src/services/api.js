@@ -83,6 +83,7 @@ export const api = {
 
   programmes: {
     list:           () => req('GET', '/programmes/'),
+    templates:      () => req('GET', '/programmes/?templates=1'),
     create:         (d) => req('POST', '/programmes/', d),
     update:         (id, d) => req('PATCH', `/programmes/${id}/`, d),
     delete:         (id) => req('DELETE', `/programmes/${id}/`),
@@ -202,5 +203,23 @@ export const api = {
     subscribe:  (d) => req('POST',   '/push/subscribe/', d),
     unsubscribe:(d) => req('DELETE', '/push/subscribe/', d),
     sendTo:     (clientId, d) => req('POST', `/push/send/${clientId}/`, d),
+  },
+
+  reservation: {
+    dispoList:     ()    => req('GET',    '/disponibilites/'),
+    dispoCreate:   (d)   => req('POST',   '/disponibilites/', d),
+    dispoDelete:   (id)  => req('DELETE', `/disponibilites/${id}/`),
+    excList:       ()    => req('GET',    '/exceptions-dispo/'),
+    excCreate:     (d)   => req('POST',   '/exceptions-dispo/', d),
+    excDelete:     (id)  => req('DELETE', `/exceptions-dispo/${id}/`),
+    portalSlots:   (q='') => req('GET',  `/portal/disponibilites/${q}`),
+    portalReserver:(d)   => req('POST',   '/portal/reserver/', d),
+  },
+
+  googleCalendar: {
+    status:     () => req('GET',  '/auth/google-calendar/status/'),
+    connect:    () => req('GET',  '/auth/google-calendar/connect/'),
+    disconnect: () => req('POST', '/auth/google-calendar/disconnect/'),
+    syncAll:    () => req('POST', '/auth/google-calendar/sync/'),
   },
 };

@@ -1,4 +1,4 @@
-const CACHE = 'coachflow-v4';
+const CACHE = 'coachflow-v5';
 const OFFLINE = '/offline.html';
 const SYNC_QUEUE = 'coachflow-sync-queue';
 
@@ -7,8 +7,7 @@ self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE)
       .then(c => c.addAll(['/', OFFLINE]))
-    // Ne pas appeler skipWaiting() ici : le nouveau SW attend que
-    // l'utilisateur confirme la mise à jour via la bannière InstallPWA.
+      .then(() => self.skipWaiting()) // active immédiatement la nouvelle version
   );
 });
 
@@ -43,7 +42,13 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Assets statiques (JS, CSS, images) → cache-first
+  // JS / CSS → network-first (évite les bundles obsolètes)
+  if (/\.(?:js|css|map)$/.test(url.pathname)) {
+    e.respondWith(networkFirst(request));
+    return;
+  }
+
+  // Images / fonts / autres → cache-first
   e.respondWith(cacheFirst(request));
 });
 
