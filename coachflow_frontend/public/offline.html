@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>CoachFlow — Hors ligne</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 40px 32px;
+      text-align: center;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 4px 24px rgba(0,0,0,.08);
+    }
+    .logo {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, #065f46, #1D9E75);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 20px;
+    }
+    h1 { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 10px; }
+    p  { font-size: 14px; color: #64748b; line-height: 1.6; margin-bottom: 28px; }
+    .btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #065f46, #1D9E75);
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+    }
+    .hint {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">⚡</div>
+    <h1>Pas de connexion</h1>
+    <p>CoachFlow nécessite une connexion internet.<br>Vérifiez votre réseau et réessayez.</p>
+    <button class="btn" onclick="window.location.reload()">↻ Réessayer</button>
+    <div class="hint">Les données déjà chargées restent accessibles.</div>
+  </div>
+</body>
+</html>

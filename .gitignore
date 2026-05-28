@@ -1,0 +1,50 @@
+# ── Python / Django ───────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+env/
+.env
+*.env
+
+# Base de données
+*.sqlite3
+*.db
+
+# Backups (ne pas versionner — souvent volumineux)
+backups/
+
+# Media uploadée (photos clients, etc.)
+coachflow_project/media/
+
+# Fichiers statiques collectés
+coachflow_project/staticfiles/
+
+# Logs
+*.log
+backup.log
+
+# Django secret
+local_settings.py
+
+# ── Node / React ───────────────────────────────────────────────
+coachflow_frontend/node_modules/
+coachflow_frontend/build/
+coachflow_frontend/.env
+coachflow_frontend/.env.local
+coachflow_frontend/.env.production
+
+# ── OS ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

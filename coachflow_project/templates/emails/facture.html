@@ -1,0 +1,32 @@
+{% extends "emails/base.html" %}
+{% block content %}
+<div class="title">Facture {{ numero }}</div>
+<div class="subtitle">{{ coach_name }} vous a envoyé une facture.</div>
+
+<div class="card">
+  <div class="card-row">
+    <span class="label">Numéro</span>
+    <span class="value">{{ numero }}</span>
+  </div>
+  <div class="card-row">
+    <span class="label">Montant TTC</span>
+    <span class="value" style="color:#6366F1; font-size:18px;">{{ montant_ttc }} €</span>
+  </div>
+  <div class="card-row">
+    <span class="label">Date d'émission</span>
+    <span class="value">{{ date_emission }}</span>
+  </div>
+  <div class="card-row">
+    <span class="label">Date d'échéance</span>
+    <span class="value">{{ date_echeance }}</span>
+  </div>
+</div>
+
+{% if notes %}
+<p><strong>Notes :</strong><br>{{ notes }}</p>
+<div class="divider"></div>
+{% endif %}
+
+<p>Vous trouverez la facture détaillée en pièce jointe (format PDF).</p>
+<p style="color:#6B7280; font-size:13px;">Pour toute question, contactez directement {{ coach_name }}.</p>
+{% endblock %}

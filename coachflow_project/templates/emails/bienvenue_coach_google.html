@@ -1,0 +1,41 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2 style="margin:0 0 8px;font-size:22px;color:#1e293b;">Bienvenue sur CoachFlow ! 🎉</h2>
+<p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.6;">
+  Bonjour <strong>{{ prenom }}</strong>,<br>
+  Votre compte coach a bien été créé via Google. Vous pouvez dès maintenant accéder à votre espace.
+</p>
+
+<div style="background:#F8FAFF;border:1px solid #C7D2FE;border-radius:8px;padding:20px 24px;margin:0 0 24px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #E0E7FF;font-size:14px;">
+    <span style="color:#6B7280;">Connexion</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;color:#1e293b;">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="16" height="16" alt="Google" style="vertical-align:middle;" />
+      Google
+    </span>
+  </div>
+  <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px;">
+    <span style="color:#6B7280;">Email</span>
+    <strong style="color:#1e293b;font-family:monospace;">{{ email }}</strong>
+  </div>
+</div>
+
+<p style="margin:0 0 20px;color:#475569;font-size:14px;line-height:1.6;">
+  Chaque fois que vous souhaitez vous connecter, cliquez simplement sur <strong>Continuer avec Google</strong> — aucun mot de passe à retenir.
+</p>
+
+<div style="text-align:center;margin:28px 0;">
+  <a href="{{ app_url }}"
+     style="display:inline-block;background:#6366F1;color:#fff;text-decoration:none;
+            font-weight:600;font-size:15px;padding:14px 32px;border-radius:8px;">
+    Accéder à CoachFlow →
+  </a>
+</div>
+
+<div class="divider"></div>
+
+<p style="margin:0;color:#94a3b8;font-size:13px;text-align:center;">
+  Si vous n'êtes pas à l'origine de cette inscription, vous pouvez ignorer cet email.
+</p>
+{% endblock %}

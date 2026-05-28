@@ -1,0 +1,33 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2 style="margin:0 0 8px;font-size:22px;color:#1e293b;">Bienvenue sur CoachFlow !</h2>
+<p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.6;">
+  Bonjour <strong>{{ prenom }}</strong>,<br>
+  <strong>{{ coach_name }}</strong> vous a créé un espace personnel pour suivre votre progression.
+  Voici vos identifiants de connexion :
+</p>
+
+<div style="background:#F8FAFF;border:1px solid #C7D2FE;border-radius:8px;padding:20px 24px;margin:0 0 24px;">
+  <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #E0E7FF;font-size:14px;">
+    <span style="color:#6B7280;">Identifiant</span>
+    <strong style="color:#1e293b;font-family:monospace;">{{ username }}</strong>
+  </div>
+  <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px;">
+    <span style="color:#6B7280;">Mot de passe</span>
+    <strong style="color:#1e293b;font-family:monospace;">{{ password }}</strong>
+  </div>
+</div>
+
+<div style="text-align:center;margin:28px 0;">
+  <a href="{{ portal_url }}"
+     style="display:inline-block;background:#6366F1;color:#fff;text-decoration:none;
+            font-weight:600;font-size:15px;padding:14px 32px;border-radius:8px;">
+    Accéder à mon espace →
+  </a>
+</div>
+
+<p style="margin:20px 0 0;color:#94a3b8;font-size:13px;text-align:center;">
+  Pensez à changer votre mot de passe après votre première connexion.
+</p>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2 style="margin:0 0 8px;font-size:22px;color:#1e293b;">Bienvenue sur CoachFlow !</h2>
+<p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.6;">
+  Bonjour <strong>{{ prenom }}</strong>,<br>
+  Merci de vous être inscrit. Pour activer votre compte, cliquez sur le bouton ci-dessous.
+</p>
+
+<div style="text-align:center;margin:32px 0;">
+  <a href="{{ verification_url }}"
+     style="display:inline-block;background:#6366F1;color:#fff;text-decoration:none;
+            font-weight:600;font-size:15px;padding:14px 32px;border-radius:8px;">
+    Confirmer mon adresse email →
+  </a>
+</div>
+
+<p style="margin:20px 0 0;color:#94a3b8;font-size:13px;text-align:center;">
+  Ce lien est valable <strong>24 heures</strong>.<br>
+  Si vous n'avez pas créé de compte, ignorez cet email.
+</p>
+
+<hr style="border:none;border-top:1px solid #e2e8f0;margin:28px 0 20px;">
+
+<p style="margin:0;color:#94a3b8;font-size:12px;text-align:center;">
+  Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br>
+  <span style="color:#6366F1;word-break:break-all;">{{ verification_url }}</span>
+</p>
+{% endblock %}

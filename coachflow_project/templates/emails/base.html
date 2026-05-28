@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin:0; padding:0; background:#F3F4F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .wrap { max-width:600px; margin:32px auto; background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.08); }
+    .header { background:#6366F1; padding:28px 32px; }
+    .header-logo { color:#fff; font-size:22px; font-weight:800; letter-spacing:-.5px; }
+    .header-logo span { opacity:.7; font-weight:400; }
+    .body { padding:32px; color:#111827; }
+    .title { font-size:20px; font-weight:700; margin-bottom:8px; color:#111827; }
+    .subtitle { font-size:14px; color:#6B7280; margin-bottom:24px; }
+    .card { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; padding:20px; margin:20px 0; }
+    .card-row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #E5E7EB; font-size:14px; }
+    .card-row:last-child { border-bottom:none; }
+    .card-row .label { color:#6B7280; }
+    .card-row .value { font-weight:600; color:#111827; }
+    .badge { display:inline-block; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+    .badge-blue { background:#EEF2FF; color:#4338CA; }
+    .badge-green { background:#ECFDF5; color:#065F46; }
+    .badge-yellow { background:#FEF3C7; color:#92400E; }
+    .btn { display:inline-block; background:#6366F1; color:#fff !important; text-decoration:none; padding:12px 24px; border-radius:8px; font-weight:600; font-size:14px; margin-top:20px; }
+    .footer { padding:20px 32px; border-top:1px solid #E5E7EB; font-size:12px; color:#9CA3AF; text-align:center; }
+    .divider { height:1px; background:#E5E7EB; margin:24px 0; }
+    p { font-size:14px; line-height:1.6; color:#374151; margin:0 0 12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="header-logo">⚡ CoachFlow <span>— Votre espace coaching</span></div>
+    </div>
+    <div class="body">
+      {% block content %}{% endblock %}
+    </div>
+    <div class="footer">
+      Cet email a été envoyé par CoachFlow. © 2026 CoachFlow. Tous droits réservés.
+    </div>
+  </div>
+</body>
+</html>

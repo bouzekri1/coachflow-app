@@ -1,0 +1,37 @@
+{% extends "emails/base.html" %}
+{% block content %}
+<div class="title">Rappel : séance demain 🔔</div>
+<div class="subtitle">N'oubliez pas votre séance avec {{ coach_name }} demain.</div>
+
+<div class="card">
+  <div class="card-row">
+    <span class="label">Date</span>
+    <span class="value">{{ date }}</span>
+  </div>
+  <div class="card-row">
+    <span class="label">Heure</span>
+    <span class="value">{{ heure }}</span>
+  </div>
+  <div class="card-row">
+    <span class="label">Durée</span>
+    <span class="value">{{ duree }} min</span>
+  </div>
+  <div class="card-row">
+    <span class="label">Type</span>
+    <span class="value">
+      {% if type_seance == "presentiel" %}<span class="badge badge-green">Présentiel</span>
+      {% elif type_seance == "visio" %}<span class="badge badge-blue">Visio</span>
+      {% else %}<span class="badge badge-yellow">{{ type_seance }}</span>{% endif %}
+    </span>
+  </div>
+  {% if lieu %}
+  <div class="card-row">
+    <span class="label">Lieu</span>
+    <span class="value">{{ lieu }}</span>
+  </div>
+  {% endif %}
+</div>
+
+<p>Préparez-vous et soyez prêt(e) à l'heure. Bonne séance !</p>
+<p>Si vous avez besoin d'annuler, contactez votre coach dès que possible.</p>
+{% endblock %}
