@@ -227,12 +227,12 @@ export function Programmes() {
   const [showAssign, setShowAssign] = useState(null);
   const [showPlan, setShowPlan]     = useState(null);
   const [showTemplates, setShowTemplates] = useState(false);
-  const [f, setF] = useState({ nom:'', description:'', categorie:'force', duree_semaines:12, seances_par_semaine:3, prix:'' });
+  const [f, setF] = useState({ nom:'', description:'', categorie:'force', duree_semaines:12, seances_par_semaine:3 });
   const [af, setAf] = useState({ client_id:'', date_debut:'' });
   const s = (k, v) => setF(x => ({ ...x, [k]: v }));
 
   const applyTemplate = (tpl) => {
-    setF({ nom: tpl.nom === 'Programme personnalisé' ? '' : tpl.nom, description: tpl.description, categorie: tpl.categorie, duree_semaines: tpl.duree_semaines, seances_par_semaine: tpl.seances_par_semaine, prix: '' });
+    setF({ nom: tpl.nom === 'Programme personnalisé' ? '' : tpl.nom, description: tpl.description, categorie: tpl.categorie, duree_semaines: tpl.duree_semaines, seances_par_semaine: tpl.seances_par_semaine });
     setShowTemplates(false);
     setShowNew(true);
   };
@@ -243,7 +243,7 @@ export function Programmes() {
   useEffect(() => { load(); }, []); // eslint-disable-line
 
   const openEdit = (p) => {
-    setF({ nom: p.nom, description: p.description || '', categorie: p.categorie, duree_semaines: p.duree_semaines, seances_par_semaine: p.seances_par_semaine, prix: p.prix || '' });
+    setF({ nom: p.nom, description: p.description || '', categorie: p.categorie, duree_semaines: p.duree_semaines, seances_par_semaine: p.seances_par_semaine });
     setShowEdit(p);
   };
 
@@ -292,7 +292,6 @@ export function Programmes() {
         <div className="fg"><label className="fl">Durée (semaines)</label><input className="fi" type="number" value={f.duree_semaines} onChange={e => s('duree_semaines', e.target.value)} /></div>
         <div className="fg"><label className="fl">Séances / semaine</label><input className="fi" type="number" value={f.seances_par_semaine} onChange={e => s('seances_par_semaine', e.target.value)} /></div>
       </div>
-      <div className="fg"><label className="fl">Prix mensuel (€)</label><input className="fi" type="number" value={f.prix} onChange={e => s('prix', e.target.value)} /></div>
       <div className="fg"><label className="fl">Description</label><textarea className="fi fta" value={f.description} onChange={e => s('description', e.target.value)} /></div>
     </>
   );
@@ -308,7 +307,7 @@ export function Programmes() {
         </div>
         <div style={{ display:'flex', gap:8 }}>
           <button className="btn btn-s" onClick={() => setShowTemplates(t => !t)}>🎯 Modèles</button>
-          <button className="btn btn-p" onClick={() => { setF({ nom:'', description:'', categorie:'force', duree_semaines:12, seances_par_semaine:3, prix:'' }); setShowNew(true); }}><Ic n="plus" s={14} /> Nouveau</button>
+          <button className="btn btn-p" onClick={() => { setF({ nom:'', description:'', categorie:'force', duree_semaines:12, seances_par_semaine:3 }); setShowNew(true); }}><Ic n="plus" s={14} /> Nouveau</button>
         </div>
       </div>
 
@@ -359,7 +358,6 @@ export function Programmes() {
                 <span>⏱ {p.duree_semaines} semaines</span>
                 <span>🏃 {p.seances_par_semaine}×/sem.</span>
                 <span>👥 {p.nb_clients} client{p.nb_clients !== 1 ? 's' : ''}</span>
-                {p.prix && <span>💶 {p.prix} €/mois</span>}
               </div>
               {p.nb_clients > 0 && (
                 <div style={{ marginTop:10 }}>
