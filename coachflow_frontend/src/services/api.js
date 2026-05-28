@@ -77,6 +77,8 @@ export const api = {
     genererPlanIa: (id, params) => req('POST', `/clients/${id}/generer-plan-ia/`, params),
     sauvegarderPlanIa: (id, plan) => req('POST', `/clients/${id}/sauvegarder-plan-ia/`, plan),
     plans: (id) => req('GET', `/clients/${id}/plans/`),
+    genererProgrammeIa: (id, params) => req('POST', `/clients/${id}/generer-programme-ia/`, params),
+    sauvegarderProgrammeIa: (id, prog) => req('POST', `/clients/${id}/sauvegarder-programme-ia/`, prog),
   },
 
   programmes: {

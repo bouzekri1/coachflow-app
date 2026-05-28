@@ -2422,6 +2422,175 @@ def sauvegarder_plan_ia(request, client_id):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def generer_programme_ia(request, client_id):
+    import anthropic, json, re
+
+    client = get_object_or_404(Client, id=client_id, coach=request.user)
+    api_key = settings.ANTHROPIC_API_KEY
+    if not api_key:
+        return Response({'error': 'Clé API Anthropic non configurée.'}, status=503)
+
+    objectif          = request.data.get('objectif', 'force')
+    seances_par_sem   = min(int(request.data.get('seances_par_semaine', 3)), 6)
+    duree_semaines    = min(int(request.data.get('duree_semaines', 8)), 16)
+    materiel          = request.data.get('materiel', 'salle_complete')
+    notes_coach       = request.data.get('notes', '')
+
+    niveau = client.niveau or 'intermediaire'
+
+    OBJECTIF_LABELS = {
+        'force':        'Force & Musculation',
+        'perte_poids':  'Perte de poids / Circuit',
+        'remise_forme': 'Remise en forme',
+        'mobilite':     'Mobilité & Souplesse',
+        'cardio':       'Cardio & Endurance',
+    }
+    MATERIEL_LABELS = {
+        'salle_complete': 'Salle de sport complète (machines, barres, haltères)',
+        'halteres':       'Haltères & banc seulement',
+        'poids_corps':    'Poids du corps uniquement (aucun matériel)',
+    }
+    NOMS_JOURS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+    jours_choisis = NOMS_JOURS[:seances_par_sem]
+
+    exos_qs = Exercice.objects.filter(est_personnalise=False).order_by('groupe_musculaire', 'nom')
+    exos_list = [{'nom': e.nom, 'groupe': e.groupe_musculaire, 'cat': e.categorie} for e in exos_qs[:150]]
+
+    prompt = f"""Tu es un coach sportif expert. Génère un programme d'entraînement complet pour ce client.
+
+PROFIL CLIENT :
+- Prénom : {client.prenom}
+- Niveau : {niveau}
+- Objectif principal : {client.objectifs[0] if client.objectifs else objectif}
+- Blessures / contraintes : {client.blessures or 'Aucune'}
+- Contraintes médicales : {client.contraintes_medicales or 'Aucune'}
+
+PARAMÈTRES DU PROGRAMME :
+- Objectif : {OBJECTIF_LABELS.get(objectif, objectif)}
+- Matériel disponible : {MATERIEL_LABELS.get(materiel, materiel)}
+- Séances par semaine : {seances_par_sem} ({', '.join(jours_choisis)})
+- Durée totale : {duree_semaines} semaines
+{f'- Notes du coach : {notes_coach}' if notes_coach else ''}
+
+EXERCICES DISPONIBLES (utilise uniquement les noms exacts de cette liste) :
+{json.dumps(exos_list, ensure_ascii=False)}
+
+RÈGLES :
+1. Génère exactement {seances_par_sem} séances (une par jour indiqué)
+2. Chaque séance contient 5 à 8 exercices adaptés au niveau et au matériel
+3. Utilise UNIQUEMENT les noms d'exercices présents dans la liste
+4. Adapte les séries/reps à l'objectif : force (4×6-8), hypertrophie (3-4×10-15), endurance (3×15-20)
+5. Prévois des temps de repos adaptés
+6. Équilibre les groupes musculaires sur la semaine (push/pull/legs ou full body selon le nb de séances)
+
+Réponds UNIQUEMENT avec ce JSON (rien d'autre) :
+{{
+  "nom": "Programme {OBJECTIF_LABELS.get(objectif, objectif)} {seances_par_sem}J – {client.prenom}",
+  "description": "Description courte 1-2 phrases du programme et de ses bénéfices.",
+  "categorie": "{objectif}",
+  "duree_semaines": {duree_semaines},
+  "seances_par_semaine": {seances_par_sem},
+  "conseils": "Conseils généraux sur la progression (1-2 phrases).",
+  "jours": [
+    {{
+      "jour": "Lundi",
+      "titre": "Push – Pectoraux / Épaules / Triceps",
+      "exercices": [
+        {{"nom": "Développé couché", "series": 4, "reps": "8-10", "repos_sec": 90, "notes": ""}},
+        {{"nom": "Élévations latérales haltères", "series": 3, "reps": "12-15", "repos_sec": 60, "notes": ""}}
+      ]
+    }}
+  ]
+}}"""
+
+    try:
+        anth = anthropic.Anthropic(api_key=api_key)
+        msg  = anth.messages.create(
+            model='claude-opus-4-7',
+            max_tokens=8096,
+            messages=[{'role': 'user', 'content': prompt}],
+        )
+        raw = msg.content[0].text
+        m   = re.search(r'\{[\s\S]*\}', raw)
+        if not m:
+            return Response({'error': 'Réponse IA invalide (pas de JSON)'}, status=500)
+        return Response(json.loads(m.group()))
+    except anthropic.APIError as e:
+        return Response({'error': f'Erreur API Anthropic : {e}'}, status=500)
+    except json.JSONDecodeError:
+        return Response({'error': 'JSON invalide dans la réponse IA'}, status=500)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def sauvegarder_programme_ia(request, client_id):
+    from django.db import transaction
+
+    client   = get_object_or_404(Client, id=client_id, coach=request.user)
+    data     = request.data
+
+    JOUR_MAP = {'Lundi':'1','Mardi':'2','Mercredi':'3','Jeudi':'4','Vendredi':'5','Samedi':'6','Dimanche':'7'}
+
+    exo_cache = {e.nom.lower(): e for e in Exercice.objects.filter(est_personnalise=False)}
+
+    CAT_MAP = {
+        'force':'force', 'perte_poids':'perte_poids', 'remise_forme':'remise_forme',
+        'mobilite':'mobilite', 'cardio':'cardio',
+    }
+
+    with transaction.atomic():
+        prog = Programme.objects.create(
+            coach             = request.user,
+            nom               = data.get('nom', 'Programme IA'),
+            description       = data.get('description', ''),
+            categorie         = CAT_MAP.get(data.get('categorie', 'force'), 'custom'),
+            duree_semaines    = int(data.get('duree_semaines', 8)),
+            seances_par_semaine = int(data.get('seances_par_semaine', 3)),
+            est_template      = False,
+            genere_par_ia     = True,
+        )
+
+        for ordre, jour_data in enumerate(data.get('jours', [])):
+            jour = ProgrammeJour.objects.create(
+                programme = prog,
+                semaine   = 1,
+                jour      = JOUR_MAP.get(jour_data.get('jour', 'Lundi'), '1'),
+                titre     = jour_data.get('titre', ''),
+                ordre     = ordre,
+            )
+            for ex_ordre, ex_data in enumerate(jour_data.get('exercices', [])):
+                nom = ex_data.get('nom', '')
+                exercice_obj = exo_cache.get(nom.lower())
+                ProgrammeJourExercice.objects.create(
+                    jour       = jour,
+                    exercice   = exercice_obj,
+                    nom_libre  = '' if exercice_obj else nom,
+                    series     = int(ex_data.get('series', 3)),
+                    reps       = str(ex_data.get('reps', '10')),
+                    repos_sec  = int(ex_data.get('repos_sec', 60)),
+                    notes      = ex_data.get('notes', ''),
+                    ordre      = ex_ordre,
+                )
+
+        date_debut_str = date.today()
+        from datetime import timedelta
+        date_fin = date_debut_str + timedelta(weeks=prog.duree_semaines)
+        AssignationProgramme.objects.filter(client=client, statut='en_cours').update(statut='abandonne')
+        AssignationProgramme.objects.create(
+            client         = client,
+            programme      = prog,
+            date_debut     = date_debut_str,
+            date_fin_prevue= date_fin,
+        )
+        if client.statut in ['nouveau', 'inactif']:
+            client.statut = 'actif'
+            client.save(update_fields=['statut'])
+
+    return Response({'id': str(prog.id), 'nom': prog.nom}, status=201)
+
+
+@api_view(['POST'])
 def push_send_to_client(request, client_id):
     try:
         client = Client.objects.get(id=client_id, coach=request.user)

@@ -162,6 +162,7 @@ export function ClientDetail() {
   const [suiviNutrition, setSuiviNutrition] = useState(null);
   const [suiviCheckins, setSuiviCheckins] = useState(null);
   const [suiviPerfs, setSuiviPerfs] = useState(null);
+  const [showProgIa, setShowProgIa] = useState(false);
   const [compteModal, setCompteModal] = useState(false);
   const [compteInfo, setCompteInfo] = useState(null);
   const [pushModal, setPushModal] = useState(false);
@@ -325,6 +326,7 @@ export function ClientDetail() {
       <div className="tabs">
         {[
           { key: 'suivi', label: '📈 Suivi' },
+          { key: 'programme', label: '🏋️ Programme' },
           { key: 'infos', label: 'Infos' }, { key: 'notes', label: 'Notes' },
           { key: 'mesures', label: 'Mesures' }, { key: 'historique', label: 'Historique' },
           { key: 'objectifs', label: 'Objectifs' }, { key: 'nutrition', label: '🥗 Nutrition' },
@@ -641,6 +643,23 @@ export function ClientDetail() {
           nutrition={suiviNutrition}
           checkins={suiviCheckins}
           performances={suiviPerfs}
+        />
+      )}
+
+      {tab === 'programme' && (
+        <ClientProgrammeTab
+          client={client}
+          clientId={id}
+          onIaOpen={() => setShowProgIa(true)}
+        />
+      )}
+
+      {showProgIa && (
+        <ProgrammeIaModal
+          clientId={id}
+          client={client}
+          onClose={() => setShowProgIa(false)}
+          onSaved={() => { load(); setShowProgIa(false); }}
         />
       )}
     </div>
@@ -1023,6 +1042,331 @@ function PlanIaModal({ clientId, client, onClose, onSaved }) {
 }
 
 /* ── ONGLET NUTRITION CLIENT ───────────────────────────────────────────────── */
+/* ── MODAL GÉNÉRATION PROGRAMME IA ────────────────────────────────────────── */
+function ProgrammeIaModal({ clientId, client, onClose, onSaved }) {
+  const [step, setStep]           = useState('params');
+  const [params, setParams]       = useState({ objectif:'force', seances_par_semaine:3, duree_semaines:8, materiel:'salle_complete', notes:'' });
+  const [prog, setProg]           = useState(null);
+  const [err, setErr]             = useState('');
+  const [saving, setSaving]       = useState(false);
+  const [savedOk, setSavedOk]     = useState(false);
+  const [savePhase, setSavePhase] = useState(0);
+  const [activeDay, setActiveDay] = useState(0);
+
+  const OBJECTIFS = [
+    { val:'force',        label:'Force',         icon:'🏋️', desc:'Musculation & gains de force' },
+    { val:'perte_poids',  label:'Perte de poids',icon:'🔥', desc:'Circuit training, cardio-muscu' },
+    { val:'remise_forme', label:'Remise en forme',icon:'⚡', desc:'Équilibre fitness & bien-être' },
+    { val:'cardio',       label:'Cardio',         icon:'🏃', desc:'Endurance & capacité cardio' },
+  ];
+  const MATERIELS = [
+    { val:'salle_complete', label:'Salle complète', icon:'🏢' },
+    { val:'halteres',       label:'Haltères & banc', icon:'🏠' },
+    { val:'poids_corps',    label:'Poids du corps',  icon:'🌿' },
+  ];
+  const SAVE_PHASES = [
+    { icon:'📋', label:'Création du programme…' },
+    { icon:'📅', label:'Création des séances…' },
+    { icon:'👤', label:'Assignation au client…' },
+  ];
+
+  const generer = async () => {
+    setStep('loading'); setErr('');
+    try {
+      const result = await api.clients.genererProgrammeIa(clientId, params);
+      setProg(result); setStep('result'); setActiveDay(0);
+    } catch (e) {
+      setErr(e.message || 'Erreur lors de la génération');
+      setStep('params');
+    }
+  };
+
+  const sauvegarder = async () => {
+    setSaving(true); setSavePhase(1); setErr('');
+    const t1 = setTimeout(() => setSavePhase(2), 700);
+    const t2 = setTimeout(() => setSavePhase(3), 1400);
+    try {
+      await api.clients.sauvegarderProgrammeIa(clientId, prog);
+      clearTimeout(t1); clearTimeout(t2);
+      setSavePhase(4); setSavedOk(true);
+      onSaved && onSaved();
+    } catch (e) {
+      clearTimeout(t1); clearTimeout(t2);
+      setErr(e.message || 'Erreur lors de la sauvegarde');
+      setSaving(false); setSavePhase(0);
+    }
+  };
+
+  const sp = (k, v) => setParams(p => ({ ...p, [k]: v }));
+
+  return (
+    <div className="ov" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal" style={{ maxWidth: step === 'result' ? 700 : 500 }}>
+
+        <div className="mhd">
+          <div>
+            <div className="mttl">✨ Générer un programme d'entraînement avec l'IA</div>
+            {step === 'result' && prog && <div style={{ fontSize:12, color:'var(--t3)', marginTop:2 }}>{prog.description}</div>}
+          </div>
+          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', fontSize:20, color:'var(--t3)' }}>×</button>
+        </div>
+
+        <div className="mbd">
+
+          {/* ── PARAMS ── */}
+          {step === 'params' && (<>
+            <div className="fg">
+              <div className="fl">Objectif</div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+                {OBJECTIFS.map(o => (
+                  <button key={o.val} onClick={() => sp('objectif', o.val)} style={{
+                    border:`2px solid ${params.objectif===o.val ? 'var(--acc)' : 'var(--bdr)'}`,
+                    borderRadius:10, padding:'10px 8px', cursor:'pointer', textAlign:'center',
+                    background: params.objectif===o.val ? 'var(--acc2)' : 'var(--bg)',
+                  }}>
+                    <div style={{ fontSize:22, marginBottom:4 }}>{o.icon}</div>
+                    <div style={{ fontSize:12, fontWeight:700, color: params.objectif===o.val ? 'var(--acc3)' : 'var(--t1)' }}>{o.label}</div>
+                    <div style={{ fontSize:10, color:'var(--t3)', marginTop:2 }}>{o.desc}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="fg">
+              <div className="fl">Matériel disponible</div>
+              <div style={{ display:'flex', gap:8 }}>
+                {MATERIELS.map(m => (
+                  <button key={m.val} onClick={() => sp('materiel', m.val)} style={{
+                    flex:1, border:`2px solid ${params.materiel===m.val ? 'var(--acc)' : 'var(--bdr)'}`,
+                    borderRadius:10, padding:'8px 6px', cursor:'pointer', textAlign:'center',
+                    background: params.materiel===m.val ? 'var(--acc2)' : 'var(--bg)',
+                  }}>
+                    <div style={{ fontSize:18, marginBottom:4 }}>{m.icon}</div>
+                    <div style={{ fontSize:11, fontWeight:600, color: params.materiel===m.val ? 'var(--acc3)' : 'var(--t1)' }}>{m.label}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="fr2">
+              <div className="fg">
+                <label className="fl">Séances / semaine</label>
+                <select className="fi fsel" value={params.seances_par_semaine} onChange={e => sp('seances_par_semaine', Number(e.target.value))}>
+                  {[2,3,4,5,6].map(n => <option key={n} value={n}>{n} séances</option>)}
+                </select>
+              </div>
+              <div className="fg">
+                <label className="fl">Durée du programme</label>
+                <select className="fi fsel" value={params.duree_semaines} onChange={e => sp('duree_semaines', Number(e.target.value))}>
+                  {[4,6,8,10,12,16].map(n => <option key={n} value={n}>{n} semaines</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div className="fg mb0">
+              <label className="fl">Notes / contraintes supplémentaires (optionnel)</label>
+              <input className="fi" placeholder="Ex: focus bras, éviter les sauts, pas de squat…"
+                value={params.notes} onChange={e => sp('notes', e.target.value)} />
+            </div>
+
+            {err && <div style={{ marginTop:12, padding:'10px 12px', background:'var(--red-bg)', color:'var(--red)', borderRadius:8, fontSize:13 }}>{err}</div>}
+          </>)}
+
+          {/* ── LOADING ── */}
+          {step === 'loading' && (
+            <div style={{ textAlign:'center', padding:'40px 20px' }}>
+              <div style={{ fontSize:48, marginBottom:16 }}>✨</div>
+              <div style={{ fontWeight:700, fontSize:16, marginBottom:8 }}>Claude génère votre programme…</div>
+              <div style={{ color:'var(--t3)', fontSize:13 }}>Analyse du profil, sélection des exercices et équilibrage de la semaine en cours…</div>
+              <div style={{ marginTop:24 }}><div className="spin" style={{ margin:'0 auto' }} /></div>
+            </div>
+          )}
+
+          {/* ── RESULT ── */}
+          {step === 'result' && prog && (<>
+
+            {saving && !savedOk && (
+              <div style={{ background:'#f5f3ff', border:'1px solid #c4b5fd', borderRadius:12, padding:'14px 18px', marginBottom:16 }}>
+                <div style={{ fontWeight:700, fontSize:13, color:'#4c1d95', marginBottom:10 }}>Sauvegarde en cours…</div>
+                <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                  {SAVE_PHASES.map((ph, i) => {
+                    const done = savePhase > i + 1, active = savePhase === i + 1;
+                    return (
+                      <div key={i} style={{ display:'flex', alignItems:'center', gap:10, opacity: done || active ? 1 : 0.35 }}>
+                        <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center',
+                          background: done ? '#059669' : active ? '#7c3aed' : 'var(--bdr)' }}>
+                          {done ? <span style={{ color:'#fff', fontSize:12 }}>✓</span>
+                            : active ? <div style={{ width:10, height:10, border:'2px solid #fff', borderTopColor:'transparent', borderRadius:'50%', animation:'rot .6s linear infinite' }} />
+                            : <span style={{ color:'var(--t3)', fontSize:11 }}>{i+1}</span>}
+                        </div>
+                        <span style={{ fontSize:13, fontWeight: active ? 600 : 500, color: done ? '#059669' : active ? '#4c1d95' : 'var(--t3)' }}>
+                          {ph.icon} {ph.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {savedOk && (
+              <div style={{ background:'var(--acc2)', border:'1px solid #6ee7b7', borderRadius:12, padding:'14px 18px', marginBottom:16, display:'flex', gap:12, alignItems:'center' }}>
+                <div style={{ width:36, height:36, borderRadius:'50%', background:'#059669', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                  <span style={{ color:'#fff', fontSize:18 }}>✓</span>
+                </div>
+                <div>
+                  <div style={{ fontWeight:700, color:'var(--acc3)', fontSize:14 }}>Programme sauvegardé et assigné !</div>
+                  <div style={{ fontSize:12, color:'var(--t2)', marginTop:2 }}>Le client le verra dans son portail dès maintenant.</div>
+                </div>
+              </div>
+            )}
+
+            {/* Infos programme */}
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, marginBottom:16 }}>
+              {[
+                { label:'Durée',    val:`${prog.duree_semaines} semaines`, color:'#065f46', bg:'#ecfdf5' },
+                { label:'Séances',  val:`${prog.seances_par_semaine}×/sem`, color:'#1e40af', bg:'#eff6ff' },
+                { label:'Exercices',val:`${prog.jours?.reduce((s,j)=>s+(j.exercices?.length||0),0)||0} au total`, color:'#92400e', bg:'#fffbeb' },
+              ].map(m => (
+                <div key={m.label} style={{ background:m.bg, borderRadius:10, padding:'10px 12px', textAlign:'center' }}>
+                  <div style={{ fontSize:10, fontWeight:600, color:m.color, textTransform:'uppercase', letterSpacing:'.4px', marginBottom:4 }}>{m.label}</div>
+                  <div style={{ fontSize:15, fontWeight:800, color:m.color }}>{m.val}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Sélecteur jour */}
+            <div style={{ display:'flex', gap:4, flexWrap:'wrap', marginBottom:14 }}>
+              {prog.jours.map((j, i) => (
+                <button key={i} onClick={() => setActiveDay(i)}
+                  className={`btn btn-sm ${activeDay===i ? 'btn-p' : 'btn-s'}`}>{j.jour}</button>
+              ))}
+            </div>
+
+            {/* Détail du jour actif */}
+            {prog.jours[activeDay] && (() => {
+              const jour = prog.jours[activeDay];
+              return (
+                <div>
+                  <div style={{ fontWeight:700, fontSize:14, marginBottom:12, color:'var(--t2)' }}>{jour.titre}</div>
+                  <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+                    {jour.exercices.map((ex, i) => (
+                      <div key={i} style={{ display:'flex', alignItems:'center', gap:12, background:'var(--bg)', borderRadius:10, padding:'10px 14px', border:'1px solid var(--bdr)' }}>
+                        <div style={{ width:26, height:26, borderRadius:6, background:'var(--acc2)', color:'var(--acc3)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, fontWeight:800, flexShrink:0 }}>{i+1}</div>
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <div style={{ fontWeight:700, fontSize:13 }}>{ex.nom}</div>
+                          <div style={{ fontSize:11, color:'var(--t3)', marginTop:2 }}>
+                            {ex.series} séries × {ex.reps}
+                            {ex.repos_sec ? ` · repos ${ex.repos_sec}s` : ''}
+                            {ex.notes ? ` · ${ex.notes}` : ''}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {prog.conseils && (
+              <div style={{ marginTop:16, background:'#fffbeb', borderLeft:'3px solid #f59e0b', borderRadius:6, padding:'10px 14px', fontSize:13, color:'#92400e' }}>
+                💡 {prog.conseils}
+              </div>
+            )}
+
+            {err && <div style={{ marginTop:12, padding:'10px 12px', background:'var(--red-bg)', color:'var(--red)', borderRadius:8, fontSize:13 }}>{err}</div>}
+          </>)}
+        </div>
+
+        <div className="mft">
+          {step === 'params' && (<>
+            <button className="btn btn-s" onClick={onClose}>Annuler</button>
+            <button className="btn btn-p" onClick={generer}>✨ Générer le programme</button>
+          </>)}
+          {step === 'result' && !savedOk && (<>
+            <button className="btn btn-s" onClick={() => { setStep('params'); setProg(null); }} disabled={saving}>← Modifier</button>
+            <button className="btn btn-p" onClick={sauvegarder} disabled={saving} style={{ minWidth:230, justifyContent:'center' }}>
+              {saving
+                ? <><div className="spin" style={{ width:14, height:14, borderWidth:2 }} /> {SAVE_PHASES[savePhase-1]?.label || 'Sauvegarde…'}</>
+                : '💾 Sauvegarder & assigner au client'}
+            </button>
+          </>)}
+          {step === 'result' && savedOk && <button className="btn btn-p" onClick={onClose}>Fermer</button>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ClientProgrammeTab({ client, clientId, onIaOpen }) {
+  const prog = client.programme_actif;
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+
+      {/* Programme actif */}
+      {prog ? (
+        <div className="card">
+          <div className="card-t" style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+            Programme actif
+            <button className="btn btn-p btn-sm" onClick={onIaOpen}>✨ Nouveau programme IA</button>
+          </div>
+
+          <div style={{ display:'flex', gap:12, flexWrap:'wrap', marginTop:12, marginBottom:16 }}>
+            {[
+              { label:'Programme',   val: prog.nom },
+              { label:'Semaine',     val: `${prog.semaine_courante} / ${prog.duree_semaines}` },
+              { label:'Séances',     val: `${prog.seances_realisees} / ${prog.seances_total}` },
+            ].map(kpi => (
+              <div key={kpi.label} style={{ flex:'1 1 120px', background:'var(--bg)', borderRadius:10, padding:'10px 14px', minWidth:110 }}>
+                <div style={{ fontSize:11, color:'var(--t3)', fontWeight:600, textTransform:'uppercase', letterSpacing:'.4px', marginBottom:4 }}>{kpi.label}</div>
+                <div style={{ fontSize:15, fontWeight:800, color:'var(--t1)' }}>{kpi.val}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginBottom:6, display:'flex', justifyContent:'space-between', fontSize:12, color:'var(--t3)' }}>
+            <span>Progression globale</span>
+            <span style={{ fontWeight:700, color:'var(--acc3)' }}>{prog.progression_pct}%</span>
+          </div>
+          <div style={{ height:8, background:'var(--bdr)', borderRadius:4, overflow:'hidden' }}>
+            <div style={{ height:'100%', background:'var(--acc)', borderRadius:4, width:`${prog.progression_pct}%`, transition:'width .4s' }} />
+          </div>
+        </div>
+      ) : (
+        <div className="card" style={{ textAlign:'center', padding:'50px 20px' }}>
+          <div style={{ fontSize:48, marginBottom:12 }}>🏋️</div>
+          <div style={{ fontSize:15, fontWeight:700, marginBottom:8 }}>Aucun programme actif</div>
+          <div style={{ fontSize:13, color:'var(--t3)', marginBottom:24 }}>
+            Générez un programme d'entraînement personnalisé avec l'IA en quelques secondes.
+          </div>
+          <button className="btn btn-p" onClick={onIaOpen}>✨ Générer un programme avec l'IA</button>
+        </div>
+      )}
+
+      {/* Infos client utiles */}
+      <div className="card">
+        <div className="card-t">Profil sportif du client</div>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:10, marginTop:12 }}>
+          {[
+            { label:'Niveau', val: client.niveau || '—' },
+            { label:'Objectifs', val: (client.objectifs || []).join(', ') || '—' },
+            { label:'Blessures', val: client.blessures || 'Aucune' },
+            { label:'Taille', val: client.taille_cm ? `${client.taille_cm} cm` : '—' },
+            { label:'Poids actuel', val: client.poids_depart_kg ? `${client.poids_depart_kg} kg` : '—' },
+            { label:'Poids cible', val: client.poids_cible_kg ? `${client.poids_cible_kg} kg` : '—' },
+          ].map(item => (
+            <div key={item.label} style={{ background:'var(--bg)', borderRadius:8, padding:'8px 12px' }}>
+              <div style={{ fontSize:11, color:'var(--t3)', fontWeight:600, marginBottom:3 }}>{item.label}</div>
+              <div style={{ fontSize:13, fontWeight:600 }}>{item.val}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const REPAS_ICONS = { petit_dejeuner:'🌅', collation_matin:'🍎', dejeuner:'🍽️', collation_soir:'🥜', diner:'🌙' };
 const REPAS_ORDER_LIST = ['petit_dejeuner','collation_matin','dejeuner','collation_soir','diner'];
 

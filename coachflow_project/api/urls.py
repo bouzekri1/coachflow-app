@@ -61,4 +61,6 @@ urlpatterns = [
     path('clients/<uuid:client_id>/generer-plan-ia/', views.generer_plan_ia, name='generer-plan-ia'),
     path('clients/<uuid:client_id>/sauvegarder-plan-ia/', views.sauvegarder_plan_ia, name='sauvegarder-plan-ia'),
     path('clients/<uuid:client_id>/plans/', views.client_plans, name='client-plans'),
+    path('clients/<uuid:client_id>/generer-programme-ia/', views.generer_programme_ia, name='generer-programme-ia'),
+    path('clients/<uuid:client_id>/sauvegarder-programme-ia/', views.sauvegarder_programme_ia, name='sauvegarder-programme-ia'),
 ]
