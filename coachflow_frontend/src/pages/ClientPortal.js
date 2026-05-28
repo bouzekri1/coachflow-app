@@ -1065,6 +1065,107 @@ function PortalCarnet() {
   );
 }
 
+const GROUPE_LABELS = {
+  pectoraux:'Pectoraux', dorsaux:'Dorsaux', epaules:'Épaules',
+  biceps:'Biceps', triceps:'Triceps', abdominaux:'Abdominaux',
+  quadriceps:'Quadriceps', ischio:'Ischio-jambiers', fessiers:'Fessiers',
+  mollets:'Mollets', full_body:'Full body', cardio:'Cardio',
+};
+
+function ExerciceSearchInput({ value, onChange }) {
+  const [query, setQuery] = useState(value || '');
+  const [results, setResults] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const timerRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    setQuery(value || '');
+    setOpen(false);
+    setResults([]);
+  }, [value]);
+
+  const search = (q) => {
+    setQuery(q);
+    clearTimeout(timerRef.current);
+    if (q.length < 2) { setResults([]); setOpen(false); return; }
+    setLoading(true);
+    timerRef.current = setTimeout(async () => {
+      try {
+        const data = await api.portal.exercices(q);
+        setResults(data || []);
+        setOpen(true);
+      } catch { setResults([]); }
+      finally { setLoading(false); }
+    }, 250);
+  };
+
+  const select = (nom) => {
+    setQuery(nom);
+    onChange(nom);
+    setOpen(false);
+    setResults([]);
+  };
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative' }}>
+      <input
+        className="fi"
+        placeholder="Rechercher ou saisir un exercice…"
+        value={query}
+        onChange={e => search(e.target.value)}
+        onFocus={() => query.length >= 2 && results.length > 0 && setOpen(true)}
+        autoComplete="off"
+      />
+      {open && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
+          background: '#fff', border: '1px solid var(--bdr)', borderRadius: 10,
+          boxShadow: '0 8px 24px rgba(0,0,0,.14)', zIndex: 200,
+          maxHeight: 220, overflowY: 'auto',
+        }}>
+          {loading && (
+            <div style={{ padding: '10px 14px', color: 'var(--t3)', fontSize: 13 }}>Recherche…</div>
+          )}
+          {!loading && results.map(ex => (
+            <button key={ex.id} onMouseDown={() => select(ex.nom)} style={{
+              display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+              padding: '9px 14px', background: 'none', border: 'none',
+              borderBottom: '1px solid var(--bdr)', cursor: 'pointer', textAlign: 'left',
+            }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--t1)' }}>{ex.nom}</div>
+                <div style={{ fontSize: 11, color: 'var(--t3)' }}>{GROUPE_LABELS[ex.groupe] || ex.groupe}</div>
+              </div>
+            </button>
+          ))}
+          {!loading && query.trim() && (
+            <button onMouseDown={() => select(query.trim())} style={{
+              display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+              padding: '9px 14px', background: '#f8fafc', border: 'none', cursor: 'pointer', textAlign: 'left',
+            }}>
+              <span style={{ fontSize: 18, flexShrink: 0 }}>✏️</span>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600 }}>"{query.trim()}"</div>
+                <div style={{ fontSize: 11, color: 'var(--t3)' }}>Exercice personnalisé</div>
+              </div>
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function CarnetModal({ seanceId, onClose }) {
   const [detail, setDetail] = useState(null);
   const [logs, setLogs] = useState([]);
@@ -1201,8 +1302,10 @@ function CarnetModal({ seanceId, onClose }) {
       <div style={{ background: 'var(--bg)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--t2)', marginBottom: 12 }}>Enregistrer une série</div>
         <div className="fg" style={{ marginBottom: 10 }}>
-          <input className="fi" placeholder="Nom de l'exercice *" value={exo}
-            onChange={e => { setExo(e.target.value); setSerie(String(nextSerieNum(e.target.value))); }} />
+          <ExerciceSearchInput
+            value={exo}
+            onChange={nom => { setExo(nom); setSerie(String(nextSerieNum(nom))); }}
+          />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8, marginBottom: 10 }}>
           {[

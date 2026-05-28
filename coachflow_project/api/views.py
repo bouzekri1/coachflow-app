@@ -1379,6 +1379,22 @@ def portal_objectif_update(request, objectif_id):
 
 
 @api_view(['GET', 'POST'])
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def portal_exercices(request):
+    q = request.query_params.get('q', '').strip()
+    qs = Exercice.objects.filter(est_personnalise=False)
+    if q:
+        qs = qs.filter(nom__icontains=q)
+    qs = qs.order_by('groupe_musculaire', 'nom')[:50]
+    return Response([{
+        'id': str(e.id), 'nom': e.nom,
+        'groupe': e.groupe_musculaire, 'categorie': e.categorie,
+    } for e in qs])
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def portal_photos(request):
     client = _get_client_profile(request)
     if not client:

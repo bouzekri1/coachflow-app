@@ -140,6 +140,7 @@ export const api = {
     unreadMessages: () => req('GET', '/portal/messages/unread/'),
     demanderAnnulation: (id) => req('POST', `/portal/seances/${id}/demander-annulation/`, {}),
     seanceDetail: (id) => req('GET', `/portal/seances/${id}/detail/`),
+    exercices: (q = '') => req('GET', `/portal/exercices/${q ? '?q=' + encodeURIComponent(q) : ''}`),
     logSerie: (seanceId, d) => req('POST', `/portal/seances/${seanceId}/log/`, d),
     deleteSerie: (seanceId, logId) => req('DELETE', `/portal/seances/${seanceId}/log/${logId}/`),
     photos: () => req('GET', '/portal/photos/'),

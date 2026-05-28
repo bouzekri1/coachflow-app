@@ -37,6 +37,7 @@ urlpatterns = [
     path('portal/seances/<uuid:seance_id>/log/', views.portal_log_serie, name='portal-log-serie'),
     path('portal/seances/<uuid:seance_id>/log/<uuid:log_id>/', views.portal_delete_serie, name='portal-delete-serie'),
     path('portal/messages/unread/', views.portal_messages_unread, name='portal-messages-unread'),
+    path('portal/exercices/', views.portal_exercices, name='portal-exercices'),
     path('portal/photos/', views.portal_photos, name='portal-photos'),
     path('portal/photos/<uuid:photo_id>/', views.portal_photo_delete, name='portal-photo-delete'),
     path('portal/objectifs/<uuid:objectif_id>/', views.portal_objectif_update, name='portal-objectif-update'),
