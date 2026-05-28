@@ -161,6 +161,7 @@ export function ClientDetail() {
   const [suiviMesures, setSuiviMesures] = useState(null);
   const [suiviNutrition, setSuiviNutrition] = useState(null);
   const [suiviCheckins, setSuiviCheckins] = useState(null);
+  const [suiviPerfs, setSuiviPerfs] = useState(null);
   const [compteModal, setCompteModal] = useState(false);
   const [compteInfo, setCompteInfo] = useState(null);
   const [pushModal, setPushModal] = useState(false);
@@ -194,6 +195,7 @@ export function ClientDetail() {
       api.clients.mesures(id).then(d => setSuiviMesures((d.results || d).slice().reverse()));
       api.clients.nutritionHistorique(id, 60).then(setSuiviNutrition);
       api.clients.checkins(id).then(d => setSuiviCheckins((d.results || d).slice().reverse()));
+      api.clients.performances(id).then(setSuiviPerfs);
     }
   }, [tab, client]); // eslint-disable-line
 
@@ -638,6 +640,7 @@ export function ClientDetail() {
           mesures={suiviMesures}
           nutrition={suiviNutrition}
           checkins={suiviCheckins}
+          performances={suiviPerfs}
         />
       )}
     </div>
@@ -1803,7 +1806,93 @@ function NoData({ icon = '📊' }) {
   );
 }
 
-function ClientSuiviTab({ client, mesures, nutrition, checkins }) {
+function PerformancesChart({ data }) {
+  const [selected, setSelected] = useState(0);
+  const [mode, setMode] = useState('max_kg');
+
+  if (!data) return <div style={{ textAlign:'center', padding:40, color:'var(--t3)' }}>Chargement…</div>;
+  if (data.length === 0) return <NoData icon="🏋️" />;
+
+  const exo = data[selected];
+  const color = mode === 'max_kg' ? '#6366f1' : '#f59e0b';
+  const unit  = mode === 'max_kg' ? 'kg' : 'kg';
+  const label = mode === 'max_kg' ? 'Charge max' : 'Volume total';
+
+  return (
+    <div>
+      {/* Sélecteur exercice */}
+      <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:14 }}>
+        {data.map((e, i) => (
+          <button key={e.nom} onClick={() => setSelected(i)} style={{
+            padding:'4px 12px', borderRadius:20, fontSize:12, fontWeight:600, cursor:'pointer',
+            border:'1.5px solid', transition:'all .12s',
+            borderColor: selected === i ? '#6366f1' : 'var(--bdr)',
+            background:  selected === i ? '#6366f1' : '#fff',
+            color:       selected === i ? '#fff' : 'var(--t2)',
+          }}>{e.nom} <span style={{ opacity:.7 }}>({e.nb_sessions})</span></button>
+        ))}
+      </div>
+
+      {/* Sélecteur mode */}
+      <div style={{ display:'flex', gap:8, marginBottom:14 }}>
+        {[['max_kg','💪 Charge max'],['volume','📦 Volume']].map(([k, lbl]) => (
+          <button key={k} onClick={() => setMode(k)} style={{
+            padding:'4px 14px', borderRadius:6, fontSize:12, fontWeight:600, cursor:'pointer',
+            border:'1.5px solid',
+            borderColor: mode === k ? color : 'var(--bdr)',
+            background:  mode === k ? color : '#fff',
+            color:       mode === k ? '#fff' : 'var(--t2)',
+          }}>{lbl}</button>
+        ))}
+      </div>
+
+      {/* Résumé delta */}
+      {exo.data.length >= 2 && (() => {
+        const first = exo.data[0][mode];
+        const last  = exo.data[exo.data.length - 1][mode];
+        const delta = last - first;
+        return (
+          <div style={{ display:'flex', gap:12, background:'var(--bg)', borderRadius:10, padding:'10px 16px', marginBottom:14, flexWrap:'wrap' }}>
+            <div style={{ flex:'1 1 80px' }}>
+              <div style={{ fontSize:11, color:'var(--t3)' }}>Début</div>
+              <div style={{ fontSize:16, fontWeight:800 }}>{first} <span style={{ fontSize:11, color:'var(--t3)' }}>{unit}</span></div>
+            </div>
+            <div style={{ color:'var(--bdr)', fontSize:16 }}>→</div>
+            <div style={{ flex:'1 1 80px' }}>
+              <div style={{ fontSize:11, color:'var(--t3)' }}>Actuel</div>
+              <div style={{ fontSize:16, fontWeight:800 }}>{last} <span style={{ fontSize:11, color:'var(--t3)' }}>{unit}</span></div>
+            </div>
+            <div style={{ flex:'1 1 80px' }}>
+              <div style={{ fontSize:11, color:'var(--t3)' }}>Progression</div>
+              <div style={{ fontSize:16, fontWeight:800, color: delta > 0 ? '#1D9E75' : delta < 0 ? '#ef4444' : 'var(--t2)' }}>
+                {delta > 0 ? '+' : ''}{delta.toFixed(1)} <span style={{ fontSize:11 }}>{unit}</span>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {exo.data.length < 2 ? (
+        <div style={{ textAlign:'center', padding:'16px 0', color:'var(--t3)', fontSize:13 }}>Au moins 2 séances nécessaires pour afficher la courbe</div>
+      ) : (
+        <ResponsiveContainer width="100%" height={210}>
+          <LineChart data={exo.data} margin={{ top:8, right:16, left:0, bottom:0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#1e3a5f" />
+            <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontSize:10, fill:'#94a3b8' }} />
+            <YAxis tick={{ fontSize:10, fill:'#94a3b8' }} width={45} domain={['auto','auto']} unit={` ${unit}`} />
+            <Tooltip contentStyle={TOOLTIP_STYLE} formatter={v => [`${v} ${unit}`, label]} labelFormatter={fmtDate} />
+            <Line type="monotone" dataKey={mode} stroke={color} strokeWidth={2.5}
+              dot={{ r:4, fill:color, strokeWidth:2, stroke:'#fff' }}
+              activeDot={{ r:6, strokeWidth:2, stroke:'#fff' }}
+              name={label} />
+          </LineChart>
+        </ResponsiveContainer>
+      )}
+    </div>
+  );
+}
+
+function ClientSuiviTab({ client, mesures, nutrition, checkins, performances }) {
   const loading = mesures === null || nutrition === null || checkins === null;
 
   /* ── KPIs poids ─────────────────────────────────────────────────────────── */
@@ -1940,6 +2029,11 @@ function ClientSuiviTab({ client, mesures, nutrition, checkins }) {
               </ResponsiveContainer>
             </>
         }
+      </SuiviSection>
+
+      {/* ── Performances sportives ── */}
+      <SuiviSection title="💪 Performances sportives" loading={performances === null}>
+        <PerformancesChart data={performances} />
       </SuiviSection>
 
       {/* ── Bien-être (check-ins) ── */}

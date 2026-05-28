@@ -72,6 +72,7 @@ export const api = {
     addObjectif: (id, d) => req('POST', `/clients/${id}/objectifs/`, d),
     updateObjectif: (clientId, objId, d) => req('PATCH', `/clients/${clientId}/objectifs/${objId}/`, d),
     checkins: (id) => req('GET', `/clients/${id}/checkins/`),
+    performances: (id) => req('GET', `/clients/${id}/performances/`),
     nutritionHistorique: (id, days = 30) => req('GET', `/clients/${id}/nutrition/historique/?days=${days}`),
     genererPlanIa: (id, params) => req('POST', `/clients/${id}/generer-plan-ia/`, params),
     sauvegarderPlanIa: (id, plan) => req('POST', `/clients/${id}/sauvegarder-plan-ia/`, plan),

@@ -587,6 +587,39 @@ class ClientViewSet(viewsets.ModelViewSet):
         seances = client.seances.all()
         return Response(SeanceListSerializer(seances, many=True).data)
 
+    @action(detail=True, methods=['get'], url_path='performances')
+    def performances(self, request, pk=None):
+        from collections import defaultdict
+        client = self.get_object()
+        logs = (SerieLog.objects
+                .filter(seance__client=client, poids_kg__isnull=False, repetitions__isnull=False)
+                .select_related('seance')
+                .order_by('seance__date_heure'))
+
+        by_exercice = defaultdict(list)
+        for log in logs:
+            by_exercice[log.exercice_nom].append({
+                'date': log.seance.date_heure.date().isoformat(),
+                'poids_kg': float(log.poids_kg),
+                'reps': log.repetitions,
+            })
+
+        result = []
+        for nom, entries in by_exercice.items():
+            by_date = defaultdict(list)
+            for e in entries:
+                by_date[e['date']].append(e)
+            data = []
+            for date_str, day in sorted(by_date.items()):
+                max_kg = max(e['poids_kg'] for e in day)
+                volume = sum(e['poids_kg'] * e['reps'] for e in day)
+                data.append({'date': date_str, 'max_kg': round(max_kg, 1), 'volume': round(volume)})
+            if data:
+                result.append({'nom': nom, 'nb_sessions': len(data), 'data': data})
+
+        result.sort(key=lambda x: x['nb_sessions'], reverse=True)
+        return Response(result[:15])
+
     @action(detail=True, methods=['get', 'post'], url_path='objectifs')
     def objectifs(self, request, pk=None):
         client = self.get_object()
