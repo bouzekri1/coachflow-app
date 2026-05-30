@@ -2649,14 +2649,24 @@ def _compute_slots(coach, date_debut, date_fin):
         coach=coach, date__gte=date_debut, date__lte=date_fin,
     )}
 
-    seances_occ = set(
-        Seance.objects.filter(
-            coach=coach,
-            date_heure__date__gte=date_debut,
-            date_heure__date__lte=date_fin,
-            statut__in=['planifiee', 'realisee'],
-        ).values_list('date_heure', flat=True)
-    )
+    # Intervalles occupés par des séances existantes (overlap réel, pas match exact)
+    # Marge d'1 jour en amont pour capturer une séance longue débordant sur la fenêtre.
+    seances_intervals = []
+    for s in Seance.objects.filter(
+        coach=coach,
+        date_heure__date__gte=date_debut - timedelta(days=1),
+        date_heure__date__lte=date_fin,
+        statut__in=['planifiee', 'realisee'],
+    ).values('date_heure', 'duree_minutes'):
+        start = s['date_heure']
+        end = start + timedelta(minutes=s['duree_minutes'] or 60)
+        seances_intervals.append((start, end))
+
+    def _slot_overlaps_seance(slot_start, slot_end):
+        for ss, se in seances_intervals:
+            if slot_start < se and slot_end > ss:
+                return True
+        return False
 
     # Périodes occupées dans Google Calendar (silent si non connecté)
     try:
@@ -2689,7 +2699,9 @@ def _compute_slots(coach, date_debut, date_fin):
             fin = timezone.make_aware(datetime.combine(cur, h_fin))
             while curseur + timedelta(minutes=duree) <= fin:
                 slot_end = curseur + timedelta(minutes=duree)
-                if curseur >= limit_min and curseur not in seances_occ and not _slot_overlaps_gcal(curseur, slot_end):
+                if (curseur >= limit_min
+                        and not _slot_overlaps_seance(curseur, slot_end)
+                        and not _slot_overlaps_gcal(curseur, slot_end)):
                     slots.append({'date_heure': curseur.isoformat(), 'duree_min': duree})
                 curseur += timedelta(minutes=duree)
         cur += timedelta(days=1)
@@ -2928,25 +2940,34 @@ def portal_reserver_seance(request):
     except ValueError:
         return Response({'error': 'Format date_heure invalide.'}, status=400)
 
-    slots = _compute_slots(coach, dh.date(), dh.date())
-    if not any(s['date_heure'] == dh.isoformat() for s in slots):
-        return Response({'error': 'Ce créneau n\'est plus disponible.'}, status=409)
+    # Verrou pessimiste sur CoachProfile pour sérialiser les réservations concurrentes
+    # sur le même coach (évite la race entre check dispo et création séance).
+    from django.db import transaction
+    with transaction.atomic():
+        # Lock : seule UNE réservation à la fois passe pour ce coach
+        CoachProfile.objects.select_for_update().filter(user=coach).first()
 
-    seance = Seance.objects.create(
-        coach=coach, client=client, date_heure=dh,
-        duree_minutes=profile.reservation_duree_min,
-        type_seance='presentiel', statut='planifiee',
-        titre='Séance réservée par le client',
-    )
+        # Re-vérification INSIDE le lock — utilise la détection d'overlap correcte
+        slots = _compute_slots(coach, dh.date(), dh.date())
+        if not any(s['date_heure'] == dh.isoformat() for s in slots):
+            return Response({'error': 'Ce créneau n\'est plus disponible.'}, status=409)
 
-    Alerte.objects.create(
-        coach=coach, client=client,
-        type_alerte='nouvelle_reservation',
-        titre=f"{client.prenom} a réservé une séance",
-        description=f"Le {dh.strftime('%d/%m/%Y à %H:%M')} ({profile.reservation_duree_min} min)",
-        priorite='moyenne',
-    )
+        seance = Seance.objects.create(
+            coach=coach, client=client, date_heure=dh,
+            duree_minutes=profile.reservation_duree_min,
+            type_seance='presentiel', statut='planifiee',
+            titre='Séance réservée par le client',
+        )
 
+        Alerte.objects.create(
+            coach=coach, client=client,
+            type_alerte='nouvelle_reservation',
+            titre=f"{client.prenom} a réservé une séance",
+            description=f"Le {dh.strftime('%d/%m/%Y à %H:%M')} ({profile.reservation_duree_min} min)",
+            priorite='moyenne',
+        )
+
+    # Push notification hors transaction (I/O externe, ne doit pas bloquer le lock)
     subs = PushSubscription.objects.filter(user=coach)
     for sub in subs:
         _send_push(sub, 'Nouvelle réservation',
