@@ -254,6 +254,342 @@ BASE_RECETTES = [
         'img': _u('1547591049-9a47a86eb6f9'),
         'ingredients': [('Lentilles cuites', 400), ('Tomates', 200), ('Lait de coco', 150), ('Oignons', 80), ('Ail', 10), ('Gingembre frais', 8), ('Curcuma poudre', 5), ('Huile de coco', 8)],
     },
+
+    # ── PETITS-DÉJEUNERS DU MONDE ─────────────────────────────────────────────
+    {
+        'nom': 'Shakshuka œufs pochés à la tomate',
+        'desc': 'Plat israélo-maghrébin : œufs pochés dans une sauce tomate épicée. Petit-déj salé ou dîner léger.',
+        'instr': 'Faire revenir oignon et poivron 5 min. Ajouter tomates, paprika, cumin. Mijoter 10 min. Casser les œufs sur le dessus, couvrir et cuire 6-8 min.',
+        'portions': 2,
+        'img': _u('1590412200988-a436970781fa'),
+        'ingredients': [('Oeuf entier', 240), ('Tomates', 300), ('Poivron rouge', 150), ('Oignons', 80), ('Ail', 8), ('Paprika fume', 4), ('Huile d\'olive', 12)],
+    },
+    {
+        'nom': 'Bircher muesli pomme-noisettes',
+        'desc': 'Petit-déjeuner suisse préparé la veille : avoine trempée, pomme râpée, noisettes. Énergie longue durée.',
+        'instr': 'Mélanger flocons, lait, yaourt et miel. Laisser au frais une nuit. Au matin, ajouter pomme râpée et noisettes concassées.',
+        'portions': 1,
+        'img': _u('1517673132405-a56a62b18caf'),
+        'ingredients': [('Flocons d\'avoine', 60), ('Lait demi-ecreme', 120), ('Yaourt grec nature', 80), ('Pomme', 150), ('Noisettes', 15), ('Miel', 10), ('Cannelle', 2)],
+    },
+    {
+        'nom': 'Bowl quark fruits rouges et granola',
+        'desc': 'Petit-déj allemand riche en protéines (30g+), idéal après une séance matinale.',
+        'instr': 'Verser le quark dans un bol. Ajouter fruits rouges, granola, miel et graines de chia.',
+        'portions': 1,
+        'img': _u('1511690078903-71dc5a49f5e3'),
+        'ingredients': [('Quark nature', 200), ('Framboises', 60), ('Myrtilles', 60), ('Müesli sans sucre ajouté', 30), ('Miel', 8), ('Graines de chia', 8)],
+    },
+    {
+        'nom': 'Toast à l\'avocat et tomates cerises',
+        'desc': 'Petit-déj rapide tendance, bonnes graisses et fibres.',
+        'instr': 'Toaster les tranches de pain. Écraser l\'avocat avec citron et sel. Tartiner, disposer tomates et œuf dur en tranches. Saupoudrer de graines.',
+        'portions': 1,
+        'img': _u('1525351484163-7529414f2ded'),
+        'ingredients': [('Pain complet', 80), ('Avocat', 100), ('Tomates cerises', 80), ('Oeuf entier', 60), ('Citron vert jus', 5), ('Graines de sesame', 5)],
+    },
+    {
+        'nom': 'Pudding chia mangue-coco',
+        'desc': 'Préparé la veille : 3 ingrédients, riche en oméga-3 et fibres.',
+        'instr': 'Mélanger graines de chia avec lait de coco. Réfrigérer 4h minimum. Mixer la mangue en purée et déposer en couche au-dessus.',
+        'portions': 1,
+        'img': _u('1554998171-89445e31c52b'),
+        'ingredients': [('Graines de chia', 25), ('Lait de coco', 150), ('Mangue', 120), ('Miel', 8)],
+    },
+
+    # ── SALADES MONDIALES ────────────────────────────────────────────────────
+    {
+        'nom': 'Salade mexicaine maïs-haricots-avocat',
+        'desc': 'Salade colorée et complète, parfaite pour le déjeuner du bureau.',
+        'instr': 'Mélanger maïs, haricots noirs, poivron rouge en dés et oignon rouge émincé. Ajouter avocat, coriandre, jus de citron et huile d\'olive.',
+        'portions': 2,
+        'img': _u('1512621776951-a57ef1617f7a'),
+        'ingredients': [('Maïs en conserve', 200), ('Haricots noirs cuits', 200), ('Avocat', 120), ('Poivron rouge', 100), ('Oignon rouge', 50), ('Coriandre fraiche', 10), ('Citron vert jus', 15), ('Huile d\'olive', 10)],
+    },
+    {
+        'nom': 'Salade thaï bœuf-menthe-citron vert',
+        'desc': 'Inspiration "yam neua" thaï : bœuf grillé, herbes fraîches, sauce piquante.',
+        'instr': 'Griller le bœuf 2 min de chaque côté, laisser reposer. Trancher finement. Mélanger avec roquette, oignon rouge, menthe. Arroser de sauce soja, citron vert et sriracha.',
+        'portions': 1,
+        'img': _u('1546069901-ba9599a7e63c'),
+        'ingredients': [('Steak de boeuf maigre', 150), ('Roquette', 80), ('Oignon rouge', 40), ('Basilic frais', 5), ('Sauce soja legere', 10), ('Citron vert jus', 12), ('Sauce sriracha', 5)],
+    },
+    {
+        'nom': 'Salade de patate douce, feta et grenade',
+        'desc': 'Salade automnale équilibrée : sucré-salé-acidulé, fibres et antioxydants.',
+        'instr': 'Rôtir cubes de patate douce 25 min à 200°C avec huile et cumin. Disposer sur mâche, ajouter feta, grenade et noix.',
+        'portions': 2,
+        'img': _u('1604908176997-125f25cc6f3d'),
+        'ingredients': [('Patate douce cuite', 300), ('Feta', 60), ('Grenade arilles', 80), ('Mâche', 80), ('Noix', 20), ('Huile d\'olive', 12), ('Vinaigre balsamique', 8)],
+    },
+    {
+        'nom': 'Bowl Méditerranée poulet-houmous-pita',
+        'desc': 'Bol type "mezze" : poulet, légumes croquants, houmous et pain pita.',
+        'instr': 'Griller le poulet 6 min de chaque côté. Disposer sur lit de salade avec concombre, tomates, olives. Servir avec houmous et pain pita.',
+        'portions': 1,
+        'img': _u('1565299624946-b28f40a0ae38'),
+        'ingredients': [('Blanc de poulet', 150), ('Pain pita complet', 60), ('Concombre', 100), ('Tomates cerises', 100), ('Olives vertes', 30), ('Salade verte', 60), ('Tzatziki maison', 40)],
+    },
+    {
+        'nom': 'Salade japonaise saumon-edamame-avocat',
+        'desc': 'Salade inspirée du poke japonais : saumon cru mariné, edamame et avocat.',
+        'instr': 'Couper le saumon en dés, mariner 10 min dans sauce soja, sésame et vinaigre de riz. Disposer sur riz tiède avec edamame, avocat, oignons verts.',
+        'portions': 1,
+        'img': _u('1565958011703-44f9829ba187'),
+        'ingredients': [('Saumon frais', 120), ('Riz blanc cuit', 120), ('Edamame ecale', 60), ('Avocat', 80), ('Oignons verts', 15), ('Sauce soja legere', 12), ('Vinaigre de riz', 8), ('Graines de sesame', 5)],
+    },
+
+    # ── PLATS PRINCIPAUX INTERNATIONAUX ──────────────────────────────────────
+    {
+        'nom': 'Curry thaï vert poulet-courgette',
+        'desc': 'Curry parfumé au lait de coco, basilic thaï et légumes croquants.',
+        'instr': 'Faire revenir le poulet 5 min. Ajouter pâte de curry vert, lait de coco, courgettes et poivron. Mijoter 12 min. Servir sur riz jasmin.',
+        'portions': 2,
+        'img': _u('1455619452474-d2be8b1e70cd'),
+        'ingredients': [('Blanc de poulet', 250), ('Courgette', 200), ('Poivron vert', 100), ('Lait de coco', 200), ('Riz jasmin cru', 100), ('Basilic frais', 10), ('Gingembre frais', 8), ('Sauce soja legere', 10)],
+    },
+    {
+        'nom': 'Bibimbap coréen au bœuf et légumes',
+        'desc': 'Bol coréen : riz, bœuf, légumes sautés, œuf au plat. Plat complet équilibré.',
+        'instr': 'Cuire riz. Sauter séparément carottes, épinards, champignons. Griller bœuf assaisonné. Disposer sur riz, surmonter d\'un œuf au plat. Sauce soja et sésame.',
+        'portions': 1,
+        'img': _u('1583224994076-ae3a09b25c43'),
+        'ingredients': [('Steak de boeuf maigre', 120), ('Riz blanc cuit', 150), ('Carottes', 80), ('Epinards', 80), ('Champignons de Paris', 80), ('Oeuf entier', 60), ('Sauce soja legere', 12), ('Graines de sesame', 5), ('Huile d\'olive', 8)],
+    },
+    {
+        'nom': 'Poulet basquaise tomates-poivrons',
+        'desc': 'Classique du Sud-Ouest : poulet mijoté avec poivrons, tomates et piment.',
+        'instr': 'Dorer le poulet, réserver. Faire revenir oignon, poivrons et ail. Ajouter tomates, jambon, paprika. Remettre poulet, mijoter 35 min couvert.',
+        'portions': 2,
+        'img': _u('1546069901-ba9599a7e63c'),
+        'ingredients': [('Poulet cuisse sans peau', 300), ('Poivron rouge', 150), ('Poivron vert', 150), ('Tomates', 250), ('Oignons', 100), ('Jambon de Bayonne', 40), ('Ail', 10), ('Paprika fume', 4), ('Huile d\'olive', 12)],
+    },
+    {
+        'nom': 'Tacos bœuf, salsa avocat-coriandre',
+        'desc': 'Tacos maison frais et équilibrés, version healthy.',
+        'instr': 'Cuire le bœuf émietté avec cumin et paprika. Préparer salsa avocat-tomate-coriandre-citron. Garnir tortillas, ajouter salade et fromage.',
+        'portions': 2,
+        'img': _u('1565299585323-38d6b0865b47'),
+        'ingredients': [('Boeuf hache 5% MG', 250), ('Tortilla ble complet', 120), ('Avocat', 100), ('Tomates', 120), ('Coriandre fraiche', 10), ('Oignon rouge', 50), ('Salade verte', 60), ('Citron vert jus', 12), ('Paprika fume', 3)],
+    },
+    {
+        'nom': 'Boulettes de bœuf sauce tomate-basilic',
+        'desc': 'Plat familial italien : boulettes mijotées en sauce tomate, accompagnées de pâtes complètes.',
+        'instr': 'Mélanger bœuf, œuf, chapelure, ail et basilic. Façonner les boulettes, dorer à la poêle. Mijoter 15 min dans sauce tomate. Servir avec pâtes.',
+        'portions': 2,
+        'img': _u('1542444459-db63c47b4d2c'),
+        'ingredients': [('Boeuf hache 5% MG', 250), ('Pates completes crues', 140), ('Tomates', 300), ('Oeuf entier', 50), ('Chapelure', 30), ('Basilic frais', 10), ('Ail', 8), ('Parmesan rape', 20), ('Huile d\'olive', 10)],
+    },
+    {
+        'nom': 'Saumon laqué miso-érable au four',
+        'desc': 'Saumon glacé au miso et sirop d\'érable, accompagné de brocoli et riz complet.',
+        'instr': 'Mélanger miso, érable, sauce soja et gingembre. Badigeonner le saumon. Cuire 12 min à 200°C. Servir avec brocoli vapeur et riz.',
+        'portions': 1,
+        'img': _u('1485921325833-c519f76c4927'),
+        'ingredients': [('Saumon frais', 150), ('Brocoli', 150), ('Riz complet cuit', 150), ('Miso blanc', 15), ('Sirop d\'érable', 10), ('Sauce soja legere', 8), ('Gingembre frais', 5), ('Graines de sesame', 4)],
+    },
+    {
+        'nom': 'Tofu général Tso brocoli-riz',
+        'desc': 'Plat sino-américain végétal : tofu croustillant en sauce aigre-douce-épicée.',
+        'instr': 'Couper le tofu en cubes, dorer dans huile. Mélanger sauce soja, vinaigre, sucre, ail. Verser sur tofu, ajouter brocoli, cuire 5 min. Servir sur riz.',
+        'portions': 2,
+        'img': _u('1567620905732-2d1ec7ab7445'),
+        'ingredients': [('Tofu ferme', 250), ('Brocoli', 200), ('Riz blanc cuit', 200), ('Sauce soja legere', 20), ('Vinaigre de riz', 10), ('Ail', 8), ('Gingembre frais', 6), ('Sauce sriracha', 6), ('Huile d\'olive', 10)],
+    },
+    {
+        'nom': 'Tajine poulet-pruneaux-amandes',
+        'desc': 'Tajine marocain sucré-salé, parfumé au gingembre et cannelle.',
+        'instr': 'Dorer le poulet avec oignons et épices. Ajouter pruneaux, amandes, eau. Mijoter 40 min à couvert. Servir avec semoule.',
+        'portions': 2,
+        'img': _u('1549611016-3a1c5ba7a4f0'),
+        'ingredients': [('Poulet cuisse sans peau', 300), ('Figues sechees', 80), ('Amandes', 30), ('Semoule cuite', 200), ('Oignons', 80), ('Gingembre frais', 6), ('Cannelle', 3), ('Huile d\'olive', 12)],
+    },
+    {
+        'nom': 'Cabillaud sauce vierge tomate-olives',
+        'desc': 'Poisson blanc poêlé, sauce méditerranéenne froide aux tomates fraîches.',
+        'instr': 'Poêler cabillaud 4 min de chaque côté. Mélanger à froid tomates en dés, olives, basilic, huile d\'olive et citron. Servir sur le poisson chaud.',
+        'portions': 1,
+        'img': _u('1467003909585-2f8a72700288'),
+        'ingredients': [('Cabillaud', 180), ('Tomates', 150), ('Olives vertes', 30), ('Basilic frais', 8), ('Citron vert jus', 10), ('Huile d\'olive', 12), ('Quinoa cuit', 150)],
+    },
+
+    # ── SOUPES ──────────────────────────────────────────────────────────────
+    {
+        'nom': 'Velouté carottes-gingembre',
+        'desc': 'Soupe douce et réconfortante, riche en bêta-carotène.',
+        'instr': 'Faire revenir oignon et gingembre. Ajouter carottes en rondelles et bouillon. Cuire 25 min. Mixer avec un filet de crème.',
+        'portions': 3,
+        'img': _u('1547308283-b7f0c8f0e7c0'),
+        'ingredients': [('Carottes', 500), ('Oignons', 100), ('Gingembre frais', 15), ('Creme legere 15%', 60), ('Huile d\'olive', 10)],
+    },
+    {
+        'nom': 'Pho de poulet aux herbes fraîches',
+        'desc': 'Soupe vietnamienne traditionnelle : bouillon parfumé, vermicelles et herbes.',
+        'instr': 'Faire infuser gingembre, ail et anis dans bouillon de poulet 30 min. Cuire vermicelles. Dresser avec poulet effiloché, vermicelles, oignons verts et basilic.',
+        'portions': 2,
+        'img': _u('1569718212165-3a8278d5f624'),
+        'ingredients': [('Blanc de poulet', 200), ('Vermicelles de riz', 120), ('Gingembre frais', 15), ('Ail', 8), ('Oignons verts', 20), ('Basilic frais', 10), ('Sauce soja legere', 15), ('Citron vert jus', 12)],
+    },
+    {
+        'nom': 'Soupe courgettes-basilic crémeuse',
+        'desc': 'Soupe estivale légère, ricotta pour un effet velours sans crème.',
+        'instr': 'Faire fondre oignon. Ajouter courgettes en rondelles et bouillon. Cuire 15 min. Mixer avec ricotta et basilic.',
+        'portions': 3,
+        'img': _u('1547308283-b7f0c8f0e7c0'),
+        'ingredients': [('Courgette', 600), ('Oignons', 80), ('Ricotta', 100), ('Basilic frais', 15), ('Ail', 6), ('Huile d\'olive', 10)],
+    },
+
+    # ── PLATS VÉGÉTARIENS ───────────────────────────────────────────────────
+    {
+        'nom': 'Buddha bowl tempeh teriyaki',
+        'desc': 'Bol végétal complet : tempeh mariné, légumes rôtis et quinoa.',
+        'instr': 'Mariner tempeh 30 min dans sauce soja, érable, gingembre. Cuire à la poêle 8 min. Servir sur quinoa avec carottes, edamame et avocat.',
+        'portions': 1,
+        'img': _u('1512621776951-a57ef1617f7a'),
+        'ingredients': [('Tempeh', 120), ('Quinoa cuit', 150), ('Carottes', 80), ('Edamame ecale', 60), ('Avocat', 60), ('Sauce soja legere', 15), ('Sirop d\'érable', 8), ('Gingembre frais', 5)],
+    },
+    {
+        'nom': 'Galettes de lentilles aux herbes',
+        'desc': 'Galettes végétales riches en protéines, dorées à la poêle.',
+        'instr': 'Mixer lentilles avec œuf, ail et herbes. Façonner les galettes. Cuire 4 min de chaque côté à la poêle avec un filet d\'huile.',
+        'portions': 2,
+        'img': _u('1547591049-9a47a86eb6f9'),
+        'ingredients': [('Lentilles vertes cuites', 300), ('Oeuf entier', 60), ('Flocons d\'avoine', 40), ('Oignons', 50), ('Ail', 8), ('Basilic frais', 8), ('Huile d\'olive', 10)],
+    },
+    {
+        'nom': 'Curry indien pois chiches-épinards',
+        'desc': 'Channa palak végétalien, parfumé aux épices indiennes.',
+        'instr': 'Faire revenir oignon, ail, gingembre et épices. Ajouter tomates et pois chiches, mijoter 15 min. Incorporer épinards en fin de cuisson.',
+        'portions': 2,
+        'img': _u('1543339308-43e59d6b73a6'),
+        'ingredients': [('Pois chiches cuits', 400), ('Épinards', 200), ('Tomates', 200), ('Oignons', 100), ('Ail', 10), ('Gingembre frais', 8), ('Curcuma poudre', 4), ('Huile d\'olive', 10)],
+    },
+    {
+        'nom': 'Risotto champignons et noix de cajou',
+        'desc': 'Risotto crémeux végétarien : champignons sautés, parmesan et croquant des noix.',
+        'instr': 'Nacrer le riz arborio. Ajouter bouillon louche par louche en remuant. Incorporer champignons sautés, parmesan et noix de cajou en fin.',
+        'portions': 2,
+        'img': _u('1574484184081-afea8a62f9c6'),
+        'ingredients': [('Riz arborio', 160), ('Champignons de Paris', 250), ('Champignons shiitake', 80), ('Parmesan rape', 30), ('Noix de cajou', 30), ('Oignons', 50), ('Huile d\'olive', 12)],
+    },
+
+    # ── SNACKS / ENCAS ──────────────────────────────────────────────────────
+    {
+        'nom': 'Boules d\'énergie cacao-cranberries',
+        'desc': 'Encas sans cuisson, énergie longue : dattes, avoine, cacao et cranberries.',
+        'instr': 'Mixer flocons d\'avoine, dattes (ou autres fruits secs), cacao, beurre d\'amande. Former des boules. Rouler dans cranberries hachées. Réfrigérer 30 min.',
+        'portions': 8,
+        'img': _u('1610970881699-44a5587cb435'),
+        'ingredients': [('Flocons d\'avoine', 100), ('Figues sechees', 80), ('Beurre d\'amande', 60), ('Cacao en poudre non sucré', 15), ('Cranberries sechees', 40), ('Miel', 20)],
+    },
+    {
+        'nom': 'Houmous de betterave et bâtonnets',
+        'desc': 'Snack coloré et antioxydant : houmous rose servi avec crudités.',
+        'instr': 'Mixer betterave, pois chiches, tahini, ail et citron. Servir avec bâtonnets de carotte, concombre et endive.',
+        'portions': 4,
+        'img': _u('1604908176997-125f25cc6f3d'),
+        'ingredients': [('Betterave cuite', 250), ('Pois chiches cuits', 200), ('Tahini (puree sesame)', 30), ('Ail', 6), ('Citron vert jus', 15), ('Carottes', 150), ('Concombre', 150), ('Endive', 100)],
+    },
+    {
+        'nom': 'Crackers protéinés multi-graines',
+        'desc': 'Crackers maison croustillants, riches en fibres et bons gras.',
+        'instr': 'Mélanger graines (chia, lin, tournesol, sésame), farine et eau. Étaler très finement. Cuire 30 min à 160°C jusqu\'à doré.',
+        'portions': 6,
+        'img': _u('1568051243851-f9b136146e97'),
+        'ingredients': [('Graines de chia', 30), ('Graines de lin', 30), ('Graines tournesol', 30), ('Graines de sesame', 20), ('Farine d\'avoine', 50), ('Huile d\'olive', 15)],
+    },
+    {
+        'nom': 'Edamame pimentés sel-citron',
+        'desc': 'Snack japonais classique, riche en protéines végétales (11g pour 100g).',
+        'instr': 'Cuire edamame 5 min à l\'eau bouillante salée. Égoutter. Mélanger avec piment, sel et zeste de citron.',
+        'portions': 2,
+        'img': _u('1574484184081-afea8a62f9c6'),
+        'ingredients': [('Edamame', 250), ('Sauce sriracha', 5), ('Citron vert jus', 8), ('Graines de sesame', 5)],
+    },
+    {
+        'nom': 'Tartines ricotta-figues-miel',
+        'desc': 'Snack ou petit-déj sucré-salé : ricotta crémeuse, figues fraîches, miel.',
+        'instr': 'Toaster le pain. Tartiner ricotta. Disposer figues coupées en quartiers. Arroser de miel et parsemer de noix.',
+        'portions': 1,
+        'img': _u('1525351484163-7529414f2ded'),
+        'ingredients': [('Pain de seigle', 70), ('Ricotta', 60), ('Figue fraîche', 80), ('Miel', 10), ('Noix', 15)],
+    },
+
+    # ── DESSERTS / SUCRÉ HEALTHY ────────────────────────────────────────────
+    {
+        'nom': 'Mousse au chocolat-avocat',
+        'desc': 'Mousse végétale onctueuse : avocat + cacao + sirop d\'érable, sans œufs ni crème.',
+        'instr': 'Mixer avocats bien mûrs, cacao, sirop d\'érable et lait jusqu\'à consistance lisse. Réfrigérer 1h. Servir avec framboises fraîches.',
+        'portions': 3,
+        'img': _u('1551024506-0bccd828d307'),
+        'ingredients': [('Avocat', 300), ('Cacao en poudre non sucré', 30), ('Sirop d\'érable', 40), ('Lait demi-ecreme', 60), ('Framboises', 60)],
+    },
+    {
+        'nom': 'Cookies banane-avoine-chocolat',
+        'desc': '3 ingrédients de base, sans farine ni sucre ajouté.',
+        'instr': 'Écraser bananes très mûres avec flocons d\'avoine et beurre d\'amande. Ajouter pépites de chocolat. Former 12 cookies, cuire 12 min à 180°C.',
+        'portions': 12,
+        'img': _u('1499636136210-6f4ee915583e'),
+        'ingredients': [('Banane', 300), ('Flocons d\'avoine', 150), ('Beurre d\'amande', 40), ('Chocolat noir 70%', 50), ('Cannelle', 3)],
+    },
+    {
+        'nom': 'Yaourt grec, miel et noix grillées',
+        'desc': 'Dessert grec ultra simple : yaourt onctueux, miel parfumé, noix croquantes.',
+        'instr': 'Faire dorer noix concassées à sec 2 min. Verser yaourt dans bol. Arroser de miel, parsemer de noix.',
+        'portions': 1,
+        'img': _u('1488477181946-6428a0291777'),
+        'ingredients': [('Yaourt grec nature', 180), ('Miel', 15), ('Noix', 20), ('Cannelle', 1)],
+    },
+    {
+        'nom': 'Pommes au four cannelle-amandes',
+        'desc': 'Dessert d\'automne réconfortant, sans sucre ajouté (seulement le miel).',
+        'instr': 'Évider les pommes. Garnir d\'amandes effilées, cannelle et miel. Cuire 30 min à 180°C.',
+        'portions': 2,
+        'img': _u('1568702846914-96b305d2aaeb'),
+        'ingredients': [('Pomme', 300), ('Amandes', 30), ('Miel', 15), ('Cannelle', 3)],
+    },
+
+    # ── SHAKES / BOISSONS PROTÉINÉES ────────────────────────────────────────
+    {
+        'nom': 'Shake banane-cacao-cacahuète',
+        'desc': 'Shake post-entraînement gourmand : ~35g protéines, glucides rapides et lents.',
+        'instr': 'Mixer tous les ingrédients avec quelques glaçons jusqu\'à mousseux.',
+        'portions': 1,
+        'img': _u('1610970881699-44a5587cb435'),
+        'ingredients': [('Banane', 120), ('Lait demi-ecreme', 250), ('Whey proteine (vanille)', 30), ('Cacao en poudre non sucré', 8), ('Beurre de cacahuete', 15)],
+    },
+    {
+        'nom': 'Smoothie pêche-cardamome-amande',
+        'desc': 'Smoothie estival original, notes orientales de la cardamome.',
+        'instr': 'Mixer pêche dénoyautée, yaourt, lait d\'amande et cardamome. Servir bien frais.',
+        'portions': 1,
+        'img': _u('1610970881699-44a5587cb435'),
+        'ingredients': [('Pêche', 200), ('Yaourt grec nature', 100), ('Lait demi-ecreme', 150), ('Cardamome', 1), ('Miel', 8), ('Amandes', 15)],
+    },
+    {
+        'nom': 'Shake masse chocolat-avoine-banane',
+        'desc': 'Mass gainer maison : ~50g protéines et ~700 kcal pour prise de masse.',
+        'instr': 'Mixer flocons trempés, lait, banane, beurre de cacahuète, whey et cacao. Boisson épaisse type smoothie.',
+        'portions': 1,
+        'img': _u('1583224994076-ae3a09b25c43'),
+        'ingredients': [('Flocons d\'avoine', 60), ('Lait entier', 300), ('Banane', 150), ('Beurre de cacahuete', 25), ('Whey proteine (vanille)', 40), ('Cacao en poudre non sucré', 10)],
+    },
+    {
+        'nom': 'Lait d\'or curcuma-poivre',
+        'desc': 'Boisson ayurvédique du soir : curcuma anti-inflammatoire, parfait après séance.',
+        'instr': 'Chauffer le lait sans bouillir avec curcuma, cannelle, gingembre et miel. Fouetter 2 min pour mousser.',
+        'portions': 1,
+        'img': _u('1546069901-ba9599a7e63c'),
+        'ingredients': [('Lait demi-ecreme', 250), ('Curcuma poudre', 3), ('Cannelle', 2), ('Gingembre frais', 4), ('Miel', 10), ('Huile de coco', 5)],
+    },
+    {
+        'nom': 'Smoothie tropical mangue-ananas-coco',
+        'desc': 'Boisson rafraîchissante et exotique, riche en vitamine C.',
+        'instr': 'Mixer mangue, ananas, lait de coco et yaourt grec jusqu\'à lisse. Servir avec glace pilée.',
+        'portions': 1,
+        'img': _u('1610970881699-44a5587cb435'),
+        'ingredients': [('Mangue', 150), ('Ananas', 150), ('Lait de coco', 100), ('Yaourt grec nature', 80), ('Citron vert jus', 8)],
+    },
 ]
 
 
@@ -269,16 +605,21 @@ def create_base_recettes_global():
     created = 0
 
     for data in BASE_RECETTES:
-        recette, new = Recette.objects.get_or_create(
-            coach=None,
-            nom=data['nom'],
-            defaults=dict(
+        # filter().first() au lieu de get_or_create pour tolérer d'anciens doublons
+        existing = Recette.objects.filter(coach=None, nom=data['nom']).first()
+        if existing is None:
+            recette = Recette.objects.create(
+                coach=None,
+                nom=data['nom'],
                 description=data['desc'],
                 instructions=data['instr'],
                 portions=data['portions'],
                 image_url=data.get('img', ''),
-            ),
-        )
+            )
+            new = True
+        else:
+            recette = existing
+            new = False
         if new:
             for nom_ali, qte in data['ingredients']:
                 aliment = aliments.get(nom_ali)
