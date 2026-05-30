@@ -128,11 +128,18 @@ def _check_condition(client, cond):
         return (n >= seuil, min(1.0, n / seuil))
 
     if t == 'objectifs':
-        # Objectif "atteint" = valeur_actuelle >= valeur_cible
+        # Un objectif compte comme atteint si :
+        #  - statut explicitement 'atteint' (marqué manuellement, incl. objectifs qualitatifs)
+        #  - OU valeur_actuelle >= valeur_cible (numérique)
         n = 0
-        for o in Objectif.objects.filter(client=client, valeur_cible__isnull=False):
+        for o in Objectif.objects.filter(client=client):
+            if o.statut == 'atteint':
+                n += 1
+                continue
+            if o.valeur_cible is None or o.valeur_actuelle is None:
+                continue
             try:
-                if o.valeur_actuelle and float(o.valeur_actuelle) >= float(o.valeur_cible):
+                if float(o.valeur_actuelle) >= float(o.valeur_cible):
                     n += 1
             except (TypeError, ValueError):
                 pass
