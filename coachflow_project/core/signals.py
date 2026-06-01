@@ -1,6 +1,9 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from .models import Objectif, Alerte, Seance, User, Mesure, PhotoProgression, CheckinReponse, JournalAlimentaire
+from .models import (
+    Objectif, Alerte, Seance, User, Mesure, PhotoProgression,
+    CheckinReponse, JournalAlimentaire, IngredientRecette, Recette,
+)
 
 
 @receiver(post_save, sender=Objectif)
@@ -129,3 +132,28 @@ def checkin_eval_badges(sender, instance, **kwargs):
 @receiver(post_save, sender=JournalAlimentaire)
 def journal_eval_badges(sender, instance, **kwargs):
     _eval_badges_for_client(instance.client)
+
+
+# ─── AUTO-TAGGING DES RECETTES ────────────────────────────────────────────────
+
+def _retag_recipe(recette):
+    try:
+        from core.recipe_tags import compute_tags_for_recipe
+        new_tags = compute_tags_for_recipe(recette)
+        if set(new_tags) != set(recette.tags or []):
+            Recette.objects.filter(pk=recette.pk).update(tags=new_tags)
+    except Exception:
+        pass
+
+
+@receiver(post_save, sender=IngredientRecette)
+def ingredient_retag(sender, instance, **kwargs):
+    _retag_recipe(instance.recette)
+
+
+@receiver(post_delete, sender=IngredientRecette)
+def ingredient_retag_on_delete(sender, instance, **kwargs):
+    try:
+        _retag_recipe(instance.recette)
+    except Recette.DoesNotExist:
+        pass

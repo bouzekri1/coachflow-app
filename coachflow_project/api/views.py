@@ -1524,7 +1524,18 @@ class RecetteViewSet(viewsets.ModelViewSet):
     pagination_class = RecettePagination
 
     def get_queryset(self):
-        return _recette_queryset_for(self.request.user)
+        qs = _recette_queryset_for(self.request.user)
+        # Filtre par tags : ?tags=vegan,sans_gluten (ET — la recette doit avoir tous les tags demandés)
+        tags_param = self.request.query_params.get('tags', '').strip()
+        if tags_param:
+            wanted = [t.strip() for t in tags_param.split(',') if t.strip()]
+            for tag in wanted:
+                qs = qs.filter(tags__contains=[tag])
+        # Recherche texte ?q=...
+        q = self.request.query_params.get('q', '').strip()
+        if q:
+            qs = qs.filter(nom__icontains=q)
+        return qs
 
     def perform_create(self, serializer):
         serializer.save(coach=self.request.user)
@@ -1857,7 +1868,15 @@ def portal_recettes(request):
     client = _get_client_profile(request)
     if not client:
         return Response({'error': 'Accès réservé aux clients.'}, status=403)
-    recettes = _recette_queryset_for(client.coach)[:100]
+    qs = _recette_queryset_for(client.coach)
+    tags_param = request.query_params.get('tags', '').strip()
+    if tags_param:
+        for tag in [t.strip() for t in tags_param.split(',') if t.strip()]:
+            qs = qs.filter(tags__contains=[tag])
+    q = request.query_params.get('q', '').strip()
+    if q:
+        qs = qs.filter(nom__icontains=q)
+    recettes = qs[:100]
     return Response(RecetteSerializer(recettes, many=True, context={'request': request}).data)
 
 

@@ -333,7 +333,7 @@ class RecetteSerializer(serializers.ModelSerializer):
     class Meta:
         model  = Recette
         fields = ['id','nom','description','instructions','portions','photo','photo_url',
-                  'image_url','original','is_global','ingredients','macros_par_portion','created_at']
+                  'image_url','original','is_global','tags','ingredients','macros_par_portion','created_at']
         read_only_fields = ['id','created_at','photo_url','is_global']
 
     def get_macros_par_portion(self, obj):

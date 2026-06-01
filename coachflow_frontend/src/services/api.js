@@ -139,7 +139,7 @@ export const api = {
     conversation: (after) => req('GET', `/portal/conversation/${after ? '?after=' + after : ''}`),
     sendMessage: (contenu) => req('POST', '/portal/conversation/', { contenu }),
     sendImage: (file) => { const fd = new FormData(); fd.append('image', file); return req('POST', '/portal/conversation/', fd, true); },
-    recettes: () => req('GET', '/portal/nutrition/recettes/'),
+    recettes: (q = '') => req('GET', `/portal/nutrition/recettes/${q}`),
     unreadMessages: () => req('GET', '/portal/messages/unread/'),
     demanderAnnulation: (id) => req('POST', `/portal/seances/${id}/demander-annulation/`, {}),
     seanceDetail: (id) => req('GET', `/portal/seances/${id}/detail/`),

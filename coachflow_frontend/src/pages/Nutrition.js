@@ -769,21 +769,86 @@ function Aliments() {
 }
 
 /* ── PAGE RECETTES ───────────────────────────────────────────────────────── */
+const RECIPE_TAGS = [
+  { slug:'vegan',           label:'Vegan',          icon:'🌱', color:'#16a34a', bg:'#dcfce7' },
+  { slug:'vegetarien',      label:'Végétarien',     icon:'🥗', color:'#65a30d', bg:'#ecfccb' },
+  { slug:'sans_gluten',     label:'Sans gluten',    icon:'🌾', color:'#ca8a04', bg:'#fef9c3' },
+  { slug:'sans_lactose',    label:'Sans lactose',   icon:'🥛', color:'#0891b2', bg:'#cffafe' },
+  { slug:'low_fodmap',      label:'Low-FODMAP',     icon:'🫀', color:'#9333ea', bg:'#f3e8ff' },
+  { slug:'riche_proteines', label:'Riche protéines',icon:'💪', color:'#dc2626', bg:'#fee2e2' },
+  { slug:'low_carb',        label:'Low-carb',       icon:'🥩', color:'#ea580c', bg:'#ffedd5' },
+];
+
+function TagChips({ tags, onClick, size = 'sm' }) {
+  if (!tags || tags.length === 0) return null;
+  return (
+    <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>
+      {tags.map(t => {
+        const meta = RECIPE_TAGS.find(x => x.slug === t);
+        if (!meta) return null;
+        return (
+          <span key={t} onClick={onClick ? (e) => { e.stopPropagation(); onClick(t); } : undefined}
+            style={{
+              fontSize: size === 'sm' ? 10 : 11,
+              padding: size === 'sm' ? '1px 6px' : '2px 8px',
+              borderRadius: 4, fontWeight: 600,
+              background: meta.bg, color: meta.color,
+              cursor: onClick ? 'pointer' : 'default',
+            }}>
+            {meta.icon} {meta.label}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 function Recettes() {
   const [recettes, setRecettes]   = useState(null);
   const [editing, setEditing]     = useState(null);
   const [page, setPage]           = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [activeTags, setActiveTags] = useState([]);
+  const [searchQ, setSearchQ]     = useState('');
   const photoRef = useRef();
 
-  const load = (p = page) => api.nutrition.recettes(`?page=${p}`).then(d => {
+  const buildQuery = (p, tags = activeTags, q = searchQ) => {
+    const params = new URLSearchParams();
+    params.set('page', p);
+    if (tags.length > 0) params.set('tags', tags.join(','));
+    if (q.trim()) params.set('q', q.trim());
+    return '?' + params.toString();
+  };
+
+  const load = (p = page, tags = activeTags, q = searchQ) => api.nutrition.recettes(buildQuery(p, tags, q)).then(d => {
     const arr = d.results || [];
     setRecettes(arr);
     setTotalCount(d.count || 0);
     setTotalPages(Math.ceil((d.count || 0) / 8));
     if (editing?.id) setEditing(arr.find(r => r.id === editing.id) || null);
   }).catch(() => setRecettes([]));
+
+  const toggleTag = (slug) => {
+    const next = activeTags.includes(slug) ? activeTags.filter(t => t !== slug) : [...activeTags, slug];
+    setActiveTags(next);
+    setPage(1);
+    load(1, next, searchQ);
+  };
+
+  const clearFilters = () => {
+    setActiveTags([]);
+    setSearchQ('');
+    setPage(1);
+    load(1, [], '');
+  };
+
+  // Recherche avec debounce
+  useEffect(() => {
+    const t = setTimeout(() => { setPage(1); load(1, activeTags, searchQ); }, 300);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line
+  }, [searchQ]);
 
   const goPage = (p) => { setPage(p); load(p); };
 
@@ -872,12 +937,41 @@ function Recettes() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div>
           <div style={{ fontSize: 18, fontWeight: 800 }}>Bibliothèque de recettes</div>
-          <div style={{ fontSize: 12, color: 'var(--t3)', marginTop: 2 }}>{totalCount} recette{totalCount !== 1 ? 's' : ''}</div>
+          <div style={{ fontSize: 12, color: 'var(--t3)', marginTop: 2 }}>
+            {totalCount} recette{totalCount !== 1 ? 's' : ''}
+            {(activeTags.length > 0 || searchQ) && (
+              <button onClick={clearFilters} style={{ marginLeft:8, background:'none', border:'none', color:'var(--acc3)', cursor:'pointer', fontSize:11, fontWeight:600, textDecoration:'underline' }}>
+                Effacer les filtres
+              </button>
+            )}
+          </div>
         </div>
         <button className="btn btn-p" onClick={() => setEditing({})}>+ Nouvelle recette</button>
+      </div>
+
+      {/* Barre de recherche + filtres tags */}
+      <div className="card" style={{ marginBottom:14, padding:'12px 14px' }}>
+        <input className="fi" placeholder="🔍 Rechercher une recette..." value={searchQ}
+          onChange={e => setSearchQ(e.target.value)} style={{ marginBottom:10 }} />
+        <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+          {RECIPE_TAGS.map(t => {
+            const active = activeTags.includes(t.slug);
+            return (
+              <button key={t.slug} onClick={() => toggleTag(t.slug)} style={{
+                fontSize:12, fontWeight:600, padding:'5px 10px', borderRadius:16, cursor:'pointer',
+                border: `1.5px solid ${active ? t.color : 'var(--bdr)'}`,
+                background: active ? t.bg : 'transparent',
+                color: active ? t.color : 'var(--t2)',
+                transition: 'all .15s',
+              }}>
+                {t.icon} {t.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: editing ? '1fr 1fr' : '1fr', gap: 16 }}>
@@ -899,6 +993,11 @@ function Recettes() {
                         {r.ingredients?.length || 0} ingrédients · {r.portions} portion{r.portions > 1 ? 's' : ''}
                       </span>
                     </div>
+                    {r.tags && r.tags.length > 0 && (
+                      <div style={{ marginBottom: 6 }}>
+                        <TagChips tags={r.tags} onClick={toggleTag} />
+                      </div>
+                    )}
                     <MacroBadge macros={r.macros_par_portion} compact />
                   </div>
                 </div>

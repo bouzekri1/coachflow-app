@@ -519,6 +519,8 @@ class Recette(models.Model):
     portions     = models.PositiveSmallIntegerField(default=1)
     photo        = models.ImageField(upload_to='recettes/', null=True, blank=True)
     image_url    = models.URLField(max_length=500, blank=True, default='')
+    # Tags diététiques : ['vegan','vegetarien','sans_gluten','sans_lactose','low_fodmap','riche_proteines','low_carb']
+    tags         = models.JSONField(default=list, blank=True)
     created_at   = models.DateTimeField(auto_now_add=True)
     class Meta:
         db_table = 'recettes'
