@@ -190,6 +190,9 @@ GOOGLE_CALENDAR_REDIRECT_URI = os.environ.get('GOOGLE_CALENDAR_REDIRECT_URI', 'h
 # ── FRONTEND URL (utilisé pour redirections après OAuth) ──────────────────────
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
 
+# ── FEEDBACK / SUPPORT ────────────────────────────────────────────────────────
+FEEDBACK_EMAIL = os.environ.get('FEEDBACK_EMAIL', '')  # ex: ton email pour recevoir les retours beta
+
 # ── BACKUPS ────────────────────────────────────────────────────────────────────
 BACKUP_DIR         = os.environ.get('BACKUP_DIR', str(BASE_DIR / 'backups'))
 BACKUP_KEEP_DB     = int(os.environ.get('BACKUP_KEEP_DB', 14))    # 14 derniers backups DB

@@ -799,3 +799,31 @@ class GoogleCalendarToken(models.Model):
         db_table = 'google_calendar_tokens'
     def __str__(self):
         return f"Google Calendar — {self.user}"
+
+
+class Feedback(models.Model):
+    TYPE_CHOICES = [('bug','Bug'),('suggestion','Suggestion'),('question','Question')]
+    SEVERITY_CHOICES = [('low','Mineur'),('medium','Moyen'),('high','Critique')]
+    STATUS_CHOICES = [('open','Ouvert'),('in_progress','En cours'),('resolved','Résolu'),('rejected','Rejeté')]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='feedbacks')
+    user_email = models.EmailField(blank=True)  # backup si user supprimé ou anonyme
+    user_role = models.CharField(max_length=20, blank=True)  # 'coach' / 'client' au moment du feedback
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    severity = models.CharField(max_length=10, choices=SEVERITY_CHOICES, blank=True)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    url = models.URLField(max_length=500, blank=True)
+    user_agent = models.TextField(blank=True)
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='open')
+    admin_notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'feedbacks'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"[{self.type}] {self.title}"

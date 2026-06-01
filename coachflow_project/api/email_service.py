@@ -164,3 +164,40 @@ def envoyer_facture_email(facture, pdf_bytes):
         attachments=[(f'{facture.numero}.pdf', pdf_bytes, 'application/pdf')],
     )
     return True
+
+
+def envoyer_feedback_admin(feedback):
+    """Envoie un email plain-text à l'admin pour un nouveau feedback."""
+    from django.core.mail import send_mail
+    to = getattr(settings, 'FEEDBACK_EMAIL', '') or getattr(settings, 'BACKUP_ALERT_EMAIL', '')
+    if not to:
+        return
+    icons = {'bug': '🐛', 'suggestion': '💡', 'question': '❓'}
+    sev_label = {'low': 'Mineur', 'medium': 'Moyen', 'high': 'CRITIQUE'}
+    icon = icons.get(feedback.type, '📩')
+    sev = f' [{sev_label[feedback.severity]}]' if feedback.severity else ''
+    subject = f'[CoachFlow] {icon} {feedback.get_type_display()}{sev} : {feedback.title}'
+    user_info = (
+        f'{feedback.user.email} ({feedback.user_role})' if feedback.user
+        else (feedback.user_email or 'Anonyme')
+    )
+    body = (
+        f"Type     : {feedback.get_type_display()}\n"
+        f"Sévérité : {feedback.get_severity_display() if feedback.severity else '—'}\n"
+        f"De       : {user_info}\n"
+        f"URL      : {feedback.url or '—'}\n"
+        f"Quand    : {feedback.created_at.strftime('%d/%m/%Y %H:%M')}\n"
+        f"\n"
+        f"── Titre ──\n"
+        f"{feedback.title}\n\n"
+        f"── Description ──\n"
+        f"{feedback.description}\n\n"
+        f"── User-Agent ──\n"
+        f"{feedback.user_agent or '—'}\n\n"
+        f"── Lien admin ──\n"
+        f"/admin/core/feedback/{feedback.id}/change/\n"
+    )
+    try:
+        send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [to], fail_silently=True)
+    except Exception as e:
+        logger.error(f'Feedback email failed: {e}')

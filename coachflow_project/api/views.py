@@ -3063,3 +3063,56 @@ def coach_client_badges(request, client_id):
         'badges': list_badges_with_progress(client),
         'streaks': compute_streaks(client),
     })
+
+
+# ─── FEEDBACK BETA ────────────────────────────────────────────────────────────
+
+class FeedbackThrottle(AnonRateThrottle):
+    """Limite simple anti-spam : max 10 feedbacks par heure par IP."""
+    rate = '10/hour'
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@throttle_classes([FeedbackThrottle])
+def submit_feedback(request):
+    """Soumet un feedback (bug / suggestion / question). User auth optionnel."""
+    d = request.data
+    type_ = (d.get('type') or '').strip()
+    title = (d.get('title') or '').strip()
+    description = (d.get('description') or '').strip()
+
+    if type_ not in ('bug', 'suggestion', 'question'):
+        return Response({'error': 'Type invalide.'}, status=400)
+    if not title or len(title) > 200:
+        return Response({'error': 'Titre requis (max 200 caractères).'}, status=400)
+    if not description or len(description) > 5000:
+        return Response({'error': 'Description requise (max 5000 caractères).'}, status=400)
+
+    severity = (d.get('severity') or '').strip()
+    if type_ == 'bug':
+        if severity not in ('low', 'medium', 'high'):
+            severity = 'medium'
+    else:
+        severity = ''
+
+    user = request.user if request.user.is_authenticated else None
+    fb = Feedback.objects.create(
+        user=user,
+        user_email=(user.email if user else (d.get('user_email') or '')),
+        user_role=(getattr(user, 'role', '') if user else ''),
+        type=type_,
+        severity=severity,
+        title=title,
+        description=description,
+        url=(d.get('url') or '')[:500],
+        user_agent=request.META.get('HTTP_USER_AGENT', '')[:1000],
+    )
+
+    try:
+        from .email_service import envoyer_feedback_admin
+        envoyer_feedback_admin(fb)
+    except Exception:
+        pass
+
+    return Response({'id': str(fb.id), 'status': 'ok'}, status=201)

@@ -77,4 +77,5 @@ urlpatterns = [
     path('portal/gamification/', views.portal_gamification, name='portal-gamification'),
     path('portal/badges/',       views.portal_badges,       name='portal-badges'),
     path('clients/<uuid:client_id>/badges/', views.coach_client_badges, name='coach-client-badges'),
+    path('feedback/', views.submit_feedback, name='submit-feedback'),
 ]

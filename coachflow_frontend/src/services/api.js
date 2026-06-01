@@ -228,4 +228,8 @@ export const api = {
     portalBadges:  () => req('GET', '/portal/badges/'),
     coachClient:   (clientId) => req('GET', `/clients/${clientId}/badges/`),
   },
+
+  feedback: {
+    submit: (d) => req('POST', '/feedback/', d),
+  },
 };

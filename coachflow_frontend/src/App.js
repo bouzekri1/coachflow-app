@@ -20,6 +20,7 @@ import Nutrition from './pages/Nutrition';
 import Exercices from './pages/Exercices';
 import { api } from './services/api';
 import InstallPWA from './components/InstallPWA';
+import FeedbackWidget from './components/FeedbackWidget';
 
 /* ── LAYOUT COACH ─────────────────────────────────────────────────────────── */
 function CoachLayout() {
@@ -99,8 +100,12 @@ function Layout() {
   );
 
   if (!user) return <Navigate to="/login" replace />;
-  if (user.role === 'client') return <ClientPortalLayout />;
-  return <CoachLayout />;
+  return (
+    <>
+      {user.role === 'client' ? <ClientPortalLayout /> : <CoachLayout />}
+      <FeedbackWidget />
+    </>
+  );
 }
 
 /* ── ROUTE PUBLIQUE ───────────────────────────────────────────────────────── */

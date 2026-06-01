@@ -44,3 +44,14 @@ admin.site.register(Message)
 admin.site.register(TemplateMessage)
 admin.site.register(Contrat)
 admin.site.register(Alerte)
+
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ['title', 'type', 'severity', 'status', 'user_role', 'user_email', 'created_at']
+    list_filter = ['type', 'severity', 'status', 'user_role']
+    search_fields = ['title', 'description', 'user_email']
+    readonly_fields = ['created_at', 'url', 'user_agent', 'user', 'user_email', 'user_role',
+                       'type', 'severity', 'title', 'description']
+    fields = ['type', 'severity', 'title', 'description', 'user', 'user_email', 'user_role',
+              'url', 'user_agent', 'created_at', 'status', 'admin_notes', 'resolved_at']
