@@ -84,7 +84,7 @@ export default function FeedbackWidget() {
             <div style={{ padding: '18px 22px', borderBottom: '1px solid var(--bdr)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 800 }}>📩 Signaler un bug / suggérer</div>
-                <div style={{ fontSize: 12, color: 'var(--t3)', marginTop: 2 }}>Aide-moi à améliorer l'app — ton retour est précieux !</div>
+                <div style={{ fontSize: 12, color: 'var(--t3)', marginTop: 2 }}>Aidez-nous à améliorer l'application — votre retour est précieux !</div>
               </div>
               <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, color: 'var(--t3)' }}>×</button>
             </div>
@@ -151,7 +151,7 @@ export default function FeedbackWidget() {
                   placeholder={
                     type === 'bug'
                       ? 'Étapes pour reproduire :\n1. ...\n2. ...\n\nComportement attendu :\n\nComportement observé :'
-                      : 'Décris en détail ton idée ou ta question…'
+                      : 'Décrivez en détail votre idée ou votre question…'
                   }
                   maxLength={5000}
                   style={{ resize: 'vertical', fontFamily: 'inherit' }}
@@ -162,7 +162,7 @@ export default function FeedbackWidget() {
               </div>
 
               <div style={{ fontSize: 11, color: 'var(--t3)', background: 'var(--bg)', padding: '8px 12px', borderRadius: 8, lineHeight: 1.5 }}>
-                ℹ️ Pour t'aider à reproduire, on capture la page actuelle ({window.location.pathname}) et ton navigateur. Pas de données sensibles.
+                ℹ️ Pour nous aider à reproduire, nous capturons la page actuelle ({window.location.pathname}) et votre navigateur. Pas de données sensibles.
               </div>
             </div>
 

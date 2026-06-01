@@ -77,6 +77,15 @@ export function ClientsList() {
   const [modal, setModal] = useState(false);
   const nav = useNavigate();
 
+  // Auto-ouverture du modal Nouveau client si ?new=1 (depuis l'onboarding)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('new') === '1') {
+      setModal(true);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+
   const load = () => {
     setBusy(true);
     const q = [];

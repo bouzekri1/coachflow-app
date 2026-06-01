@@ -18,6 +18,145 @@ const MET_COLORS = {
   red:    { bg: 'linear-gradient(135deg,#fee2e2,#fca5a5)', shadow: 'rgba(239,68,68,.2)' },
 };
 
+/* ── ONBOARDING DASHBOARD (premier-utilisateur) ───────────────────────────── */
+function WelcomeHero({ user, onCreateClient }) {
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, #065f46 0%, #1D9E75 100%)',
+      borderRadius: 16, padding: '28px 32px', marginBottom: 22, color: '#fff',
+      position: 'relative', overflow: 'hidden',
+      boxShadow: '0 8px 30px rgba(29,158,117,.25)',
+    }}>
+      <div style={{
+        position: 'absolute', right: -10, top: '50%', transform: 'translateY(-50%)',
+        fontSize: 130, opacity: 0.08, lineHeight: 1, pointerEvents: 'none',
+      }}>🚀</div>
+      <div style={{ fontSize: 13, fontWeight: 600, opacity: .85, marginBottom: 6 }}>
+        Bienvenue sur CoachFlow{user?.first_name ? `, ${user.first_name}` : ''} 👋
+      </div>
+      <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, maxWidth: 600, lineHeight: 1.25 }}>
+        Lançons votre activité de coaching ensemble
+      </div>
+      <div style={{ fontSize: 13, opacity: .9, marginBottom: 20, maxWidth: 600 }}>
+        Vous êtes à 4 étapes simples pour avoir un coaching pro et automatisé.
+        Commencez par ajouter votre premier client — le reste se construit naturellement.
+      </div>
+      <button onClick={onCreateClient} style={{
+        padding: '11px 22px', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer',
+        border: 'none', background: '#fff', color: '#065f46',
+        boxShadow: '0 4px 12px rgba(0,0,0,.15)',
+      }}>
+        + Ajouter mon premier client
+      </button>
+    </div>
+  );
+}
+
+function QuickStartCard({ num, icon, title, desc, cta, color, onClick }) {
+  return (
+    <div onClick={onClick} className="card" style={{
+      cursor: 'pointer', padding: '18px 20px',
+      transition: 'transform .15s, box-shadow .15s',
+      display: 'flex', gap: 14, alignItems: 'flex-start',
+    }}
+      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,.08)'; }}
+      onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
+    >
+      <div style={{
+        width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+        background: color.bg, color: color.fg,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 800,
+      }}>{icon}</div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+          <span style={{
+            fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 10,
+            background: color.bg, color: color.fg,
+          }}>ÉTAPE {num}</span>
+        </div>
+        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{title}</div>
+        <div style={{ fontSize: 12, color: 'var(--t3)', lineHeight: 1.5, marginBottom: 10 }}>{desc}</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: color.fg }}>{cta} →</div>
+      </div>
+    </div>
+  );
+}
+
+function EmptyDashboard({ user, nav }) {
+  const TIPS = [
+    { icon: '🤖', title: 'Génération IA', text: 'Programmes et plans nutritionnels générés en quelques secondes, adaptés au profil de chaque client.' },
+    { icon: '📅', title: 'Réservation autonome', text: 'Vos clients réservent leurs séances sur vos créneaux disponibles, synchronisés avec Google Calendar.' },
+    { icon: '🏆', title: 'Engagement & motivation', text: 'Streaks, badges et notifications poussent vos clients à rester réguliers et atteindre leurs objectifs.' },
+  ];
+
+  return (
+    <div>
+      <WelcomeHero user={user} onCreateClient={() => nav('/clients?new=1')} />
+
+      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--t2)', marginBottom: 12, marginTop: 4 }}>
+        ✨ Vos 4 prochaines étapes
+      </div>
+      <div className="g2 mb24" style={{ gap: 12 }}>
+        <QuickStartCard
+          num={1} icon="👥" title="Ajoutez votre premier client"
+          desc="Créez sa fiche avec ses objectifs, mensurations et niveau. Il recevra automatiquement un accès à son portail personnel."
+          cta="Créer un client"
+          color={{ bg: '#dcfce7', fg: '#065f46' }}
+          onClick={() => nav('/clients?new=1')}
+        />
+        <QuickStartCard
+          num={2} icon="🏋️" title="Construisez un programme"
+          desc="Démarrez d'un template (Force, Cardio, Perte de poids…) ou laissez l'IA en générer un sur mesure pour votre client."
+          cta="Voir les programmes"
+          color={{ bg: '#dbeafe', fg: '#1e40af' }}
+          onClick={() => nav('/programmes')}
+        />
+        <QuickStartCard
+          num={3} icon="🗓️" title="Activez la réservation"
+          desc="Définissez vos disponibilités hebdomadaires. Vos clients réserveront eux-mêmes leurs séances. Synchro Google Calendar optionnelle."
+          cta="Configurer mon planning"
+          color={{ bg: '#f3e8ff', fg: '#7c3aed' }}
+          onClick={() => nav('/compte')}
+        />
+        <QuickStartCard
+          num={4} icon="🥗" title="Explorez la bibliothèque"
+          desc="220+ recettes pré-faites avec filtres diététiques (vegan, sans gluten, low-FODMAP…) et 300+ aliments + 200+ exercices."
+          cta="Découvrir les recettes"
+          color={{ bg: '#fef3c7', fg: '#92400e' }}
+          onClick={() => nav('/nutrition')}
+        />
+      </div>
+
+      {/* Tips fonctionnels */}
+      <div className="card" style={{ marginBottom: 20 }}>
+        <div className="card-t" style={{ marginBottom: 14 }}>💡 Ce que CoachFlow fait pour vous</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
+          {TIPS.map((t, i) => (
+            <div key={i} style={{ background: 'var(--bg)', borderRadius: 10, padding: '14px 16px' }}>
+              <div style={{ fontSize: 24, marginBottom: 8 }}>{t.icon}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 5 }}>{t.title}</div>
+              <div style={{ fontSize: 12, color: 'var(--t3)', lineHeight: 1.55 }}>{t.text}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Ressources */}
+      <div className="card" style={{ background: 'var(--bg)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ fontSize: 28 }}>📖</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 3 }}>Besoin d'aide ?</div>
+            <div style={{ fontSize: 12, color: 'var(--t3)' }}>
+              Utilisez le bouton <strong>💬</strong> en bas à droite pour signaler un bug, suggérer une fonctionnalité ou poser une question.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Met({ icon, label, value, delta, up = true, color = 'green', onClick }) {
   const c = MET_COLORS[color] || MET_COLORS.green;
   return (
@@ -81,6 +220,22 @@ export default function Dashboard() {
     );
   }
   if (!data) return <Loader />;
+
+  // État premier-utilisateur : pas de clients ni d'activité
+  const totalClients = (data.repartition_clients || []).reduce((s, r) => s + (r.n || 0), 0);
+  const isEmpty = totalClients === 0
+    && (data.seances_semaine || 0) === 0
+    && Number(data.revenus_mois || 0) === 0;
+  if (isEmpty) {
+    return (
+      <div>
+        {showOnboarding && (
+          <OnboardingWizard user={user} onDone={() => setShowOnboarding(false)} />
+        )}
+        <EmptyDashboard user={user} nav={nav} />
+      </div>
+    );
+  }
 
   const hr = new Date().getHours();
   const greet = hr < 12 ? 'Bonjour' : hr < 18 ? 'Bon après-midi' : 'Bonsoir';
