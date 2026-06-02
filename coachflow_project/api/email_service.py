@@ -127,6 +127,23 @@ def envoyer_reset_password(user, token):
     )
 
 
+def envoyer_bienvenue_coach(user):
+    """Welcome email envoyé après vérification de l'email (signup standard)."""
+    from django.conf import settings as s
+    app_url = getattr(s, 'FRONTEND_URL', 'http://localhost:3000')
+    prenom = user.first_name or user.username
+    _send(
+        subject='🎉 Bienvenue sur CoachFlow — vos premiers pas',
+        template='bienvenue_coach',
+        context={
+            'prenom': prenom,
+            'email': user.email,
+            'app_url': app_url,
+        },
+        to=user.email,
+    )
+
+
 def envoyer_bienvenue_coach_google(user):
     from django.conf import settings as s
     app_url = getattr(s, 'FRONTEND_URL', 'http://localhost:3000')

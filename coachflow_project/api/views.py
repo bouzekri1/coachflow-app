@@ -250,6 +250,13 @@ def verify_email_view(request):
     user.email_verified = True
     user.save(update_fields=['is_active', 'email_verified'])
 
+    if user.role == 'coach':
+        try:
+            from .email_service import envoyer_bienvenue_coach
+            envoyer_bienvenue_coach(user)
+        except Exception:
+            pass
+
     auth_token, _ = Token.objects.get_or_create(user=user)
     resp = Response({
         'status': 'verified',

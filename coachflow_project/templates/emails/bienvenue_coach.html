@@ -1,0 +1,74 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2 style="margin:0 0 8px;font-size:22px;color:#1e293b;">Bienvenue sur CoachFlow ! 🎉</h2>
+<p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.6;">
+  Bonjour <strong>{{ prenom }}</strong>,<br>
+  Votre compte coach est activé. On vous accompagne pour démarrer en moins de 5 minutes.
+</p>
+
+<div style="background:#F8FAFF;border:1px solid #C7D2FE;border-radius:10px;padding:20px 22px;margin:0 0 24px;">
+  <div style="font-size:13px;font-weight:700;color:#4338CA;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;">
+    🚀 Vos 4 premiers pas
+  </div>
+
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="font-size:14px;color:#1e293b;line-height:1.5;">
+    <tr>
+      <td valign="top" style="padding:8px 12px 8px 0;width:28px;">
+        <div style="width:24px;height:24px;background:#6366F1;color:#fff;border-radius:50%;text-align:center;line-height:24px;font-weight:700;font-size:13px;">1</div>
+      </td>
+      <td valign="top" style="padding:8px 0;">
+        <strong>Ajoutez votre premier client</strong><br>
+        <span style="color:#64748b;font-size:13px;">Nom, email, objectif — c'est tout pour commencer.</span>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" style="padding:8px 12px 8px 0;">
+        <div style="width:24px;height:24px;background:#6366F1;color:#fff;border-radius:50%;text-align:center;line-height:24px;font-weight:700;font-size:13px;">2</div>
+      </td>
+      <td valign="top" style="padding:8px 0;">
+        <strong>Générez un programme avec l'IA</strong><br>
+        <span style="color:#64748b;font-size:13px;">Adapté au profil, au matériel et aux disponibilités du client.</span>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" style="padding:8px 12px 8px 0;">
+        <div style="width:24px;height:24px;background:#6366F1;color:#fff;border-radius:50%;text-align:center;line-height:24px;font-weight:700;font-size:13px;">3</div>
+      </td>
+      <td valign="top" style="padding:8px 0;">
+        <strong>Activez la réservation en ligne</strong><br>
+        <span style="color:#64748b;font-size:13px;">Vos clients réservent leurs créneaux sans email ni appel.</span>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" style="padding:8px 12px 8px 0;">
+        <div style="width:24px;height:24px;background:#6366F1;color:#fff;border-radius:50%;text-align:center;line-height:24px;font-weight:700;font-size:13px;">4</div>
+      </td>
+      <td valign="top" style="padding:8px 0;">
+        <strong>Connectez Google Calendar</strong><br>
+        <span style="color:#64748b;font-size:13px;">Synchro bidirectionnelle : aucune double-réservation possible.</span>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div style="text-align:center;margin:28px 0 20px;">
+  <a href="{{ app_url }}/dashboard"
+     style="display:inline-block;background:#6366F1;color:#fff;text-decoration:none;
+            font-weight:600;font-size:15px;padding:14px 36px;border-radius:8px;">
+    Accéder à mon espace →
+  </a>
+</div>
+
+<div class="divider"></div>
+
+<p style="margin:0 0 8px;color:#475569;font-size:14px;line-height:1.6;">
+  💬 <strong>Une question ? Un bug ?</strong><br>
+  Utilisez le bouton « 💬 Signaler / suggérer » en bas à droite de l'app.
+  Chaque retour est lu personnellement — en beta, votre voix pèse double.
+</p>
+
+<p style="margin:18px 0 0;color:#94a3b8;font-size:12px;line-height:1.6;text-align:center;">
+  Support direct : <a href="mailto:support@coachflow.fr" style="color:#6366F1;text-decoration:none;">support@coachflow.fr</a>
+</p>
+{% endblock %}
