@@ -113,11 +113,33 @@ def coach_required(view_func):
 
 # ─── AUTH ─────────────────────────────────────────────────────────────────────
 
+def _set_auth_cookie(response, token_key):
+    """Pose le cookie d'auth httpOnly. Secure en prod uniquement."""
+    response.set_cookie(
+        'cf_auth',
+        token_key,
+        max_age=60 * 60 * 24 * 30,                 # 30 jours
+        httponly=True,
+        secure=not settings.DEBUG,
+        samesite='Lax',
+        path='/',
+    )
+    return response
+
+
+def _clear_auth_cookie(response):
+    response.delete_cookie('cf_auth', path='/')
+    return response
+
+
 class LoginRateThrottle(AnonRateThrottle):
     scope = 'login'
 
 class PasswordResetThrottle(AnonRateThrottle):
     scope = 'password_reset'
+
+class ResendVerificationThrottle(AnonRateThrottle):
+    scope = 'resend_verification'
 
 
 @api_view(['POST'])
@@ -135,12 +157,32 @@ def login_view(request):
         identifier = user_match.username
     user = authenticate(username=identifier, password=password)
     if not user:
+        # Compte existant mais bloqué : on distingue les cas
+        candidate = User.objects.filter(username=identifier).first() \
+            or User.objects.filter(email=identifier).first()
+        if candidate and candidate.check_password(password or ''):
+            if candidate.deleted_at:
+                return Response({'error': 'Ce compte a été supprimé. Contactez support@coachflow.fr pour le réactiver (sous 30 jours).'}, status=400)
+            if not candidate.email_verified:
+                return Response({
+                    'error': 'Vérifiez votre email avant de vous connecter. Un lien de confirmation vous a été envoyé.',
+                    'code': 'email_not_verified',
+                    'email': candidate.email,
+                }, status=403)
         return Response({'error': 'Identifiants invalides.'}, status=400)
     token, _ = Token.objects.get_or_create(user=user)
-    return Response({
-        'token': token.key,
-        'user': UserSerializer(user).data,
-    })
+    resp = Response({'user': UserSerializer(user).data})
+    return _set_auth_cookie(resp, token.key)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def logout_view(request):
+    """Supprime le token côté serveur + clear cookie."""
+    if request.user.is_authenticated:
+        Token.objects.filter(user=request.user).delete()
+    resp = Response({'status': 'ok'})
+    return _clear_auth_cookie(resp)
 
 
 @api_view(['POST'])
@@ -209,11 +251,31 @@ def verify_email_view(request):
     user.save(update_fields=['is_active', 'email_verified'])
 
     auth_token, _ = Token.objects.get_or_create(user=user)
-    return Response({
+    resp = Response({
         'status': 'verified',
-        'token': auth_token.key,
         'user': UserSerializer(user).data,
     })
+    return _set_auth_cookie(resp, auth_token.key)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@throttle_classes([ResendVerificationThrottle])
+def resend_verification_view(request):
+    from django.core import signing
+    from .email_service import envoyer_verification_email
+    email = (request.data.get('email') or '').strip().lower()
+    if not email:
+        return Response({'error': 'Email requis.'}, status=400)
+    user = User.objects.filter(email__iexact=email, deleted_at__isnull=True).first()
+    # Réponse identique si le user existe ou pas → évite l'énumération d'emails
+    if user and not user.email_verified:
+        token = signing.dumps({'user_id': str(user.id)}, salt='email-verification')
+        try:
+            envoyer_verification_email(user, token)
+        except Exception:
+            pass
+    return Response({'status': 'sent'})
 
 
 @api_view(['POST'])
@@ -275,6 +337,7 @@ def me_view(request):
     user = request.user
 
     if request.method == 'GET':
+        from core.ia_quota import quota_status
         data = UserSerializer(user).data
         if user.role == 'coach':
             profile, _ = CoachProfile.objects.get_or_create(user=user)
@@ -285,6 +348,7 @@ def me_view(request):
             data['reservation_horizon_j']= profile.reservation_horizon_j
             data['reservation_duree_min']= profile.reservation_duree_min
             data['gcal_block_allday']    = profile.gcal_block_allday
+            data['ia_quota']             = quota_status(user)
         return Response(data)
 
     if request.method == 'PATCH':
@@ -315,24 +379,48 @@ def me_view(request):
 
         data = UserSerializer(user).data
         if user.role == 'coach':
+            from core.ia_quota import quota_status
             data['plan'] = profile.plan
             data['reservation_active']   = profile.reservation_active
             data['reservation_preavis_h']= profile.reservation_preavis_h
             data['reservation_horizon_j']= profile.reservation_horizon_j
             data['reservation_duree_min']= profile.reservation_duree_min
             data['gcal_block_allday']    = profile.gcal_block_allday
-        # Renvoyer un nouveau token si le mot de passe a changé
+            data['ia_quota']             = quota_status(user)
+        # Renouveler le cookie d'auth si le mot de passe a changé
+        resp = Response(data)
         if old_pw and new_pw:
             token, _ = Token.objects.get_or_create(user=user)
-            data['new_token'] = token.key
-        return Response(data)
+            _set_auth_cookie(resp, token.key)
+        return resp
 
     if request.method == 'DELETE':
+        from core.rgpd import soft_delete_user
+        from api.email_service import envoyer_confirmation_suppression
         confirm = request.data.get('confirm', '')
         if confirm != 'SUPPRIMER':
             return Response({'error': 'Confirmation invalide.'}, status=400)
-        user.delete()
-        return Response(status=204)
+        try:
+            envoyer_confirmation_suppression(user)
+        except Exception:
+            pass
+        soft_delete_user(user)
+        resp = Response(status=204)
+        return _clear_auth_cookie(resp)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def export_data_view(request):
+    """Export RGPD : ZIP contenant toutes les données du user en JSON."""
+    from core.rgpd import build_user_export
+    from django.http import HttpResponse
+    from datetime import datetime
+    payload = build_user_export(request.user)
+    resp = HttpResponse(payload, content_type='application/zip')
+    fn = f"coachflow_export_{request.user.username}_{datetime.now().strftime('%Y%m%d')}.zip"
+    resp['Content-Disposition'] = f'attachment; filename="{fn}"'
+    return resp
 
 
 @api_view(['POST'])
@@ -397,10 +485,8 @@ def google_login_view(request):
             user.save(update_fields=['is_active', 'email_verified'])
 
     token, _ = Token.objects.get_or_create(user=user)
-    return Response({
-        'token': token.key,
-        'user': UserSerializer(user).data,
-    })
+    resp = Response({'user': UserSerializer(user).data})
+    return _set_auth_cookie(resp, token.key)
 
 
 # ─── DASHBOARD ────────────────────────────────────────────────────────────────
@@ -2261,6 +2347,7 @@ def client_plans(request, client_id):
 def generer_plan_ia(request, client_id):
     import anthropic, json, re
     from datetime import date as date_cls
+    from core.ia_quota import lookup_cache, check_quota, record_generation, quota_status
 
     client  = get_object_or_404(Client, id=client_id, coach=request.user)
     api_key = settings.ANTHROPIC_API_KEY
@@ -2271,6 +2358,24 @@ def generer_plan_ia(request, client_id):
     kcal_cible    = request.data.get('kcal_cible')
     restrictions  = request.data.get('restrictions', '')
     nb_jours      = min(int(request.data.get('nb_jours', 5)), 7)
+
+    cache_params = {
+        'objectif': objectif_type,
+        'kcal_cible': kcal_cible,
+        'restrictions': restrictions,
+        'nb_jours': nb_jours,
+    }
+    cache_entry, params_hash = lookup_cache(request.user, 'plan', client.id, cache_params)
+    if cache_entry:
+        return Response({**cache_entry.result, '_cached': True, '_quota': quota_status(request.user)})
+
+    ok, profile = check_quota(request.user)
+    if not ok:
+        qs = quota_status(request.user)
+        return Response({
+            'error': f"Quota IA mensuel atteint ({qs['utilise']}/{qs['quota']}). Réinitialisation le 1er du mois prochain.",
+            '_quota': qs,
+        }, status=429)
 
     last_mesure  = client.mesures.order_by('-date').first()
     poids_actuel = float(last_mesure.poids_kg) if last_mesure and last_mesure.poids_kg else float(client.poids_depart_kg or 70)
@@ -2335,7 +2440,8 @@ def generer_plan_ia(request, client_id):
         if not m:
             return Response({'error': 'Réponse IA invalide (pas de JSON)'}, status=500)
         plan_data = json.loads(m.group())
-        return Response(plan_data)
+        record_generation(request.user, 'plan', params_hash, plan_data, profile=profile)
+        return Response({**plan_data, '_cached': False, '_quota': quota_status(request.user)})
     except anthropic.APIError as e:
         return Response({'error': f'Erreur API Anthropic : {e}'}, status=500)
     except json.JSONDecodeError:
@@ -2412,6 +2518,7 @@ def sauvegarder_plan_ia(request, client_id):
 @permission_classes([IsAuthenticated])
 def generer_programme_ia(request, client_id):
     import anthropic, json, re
+    from core.ia_quota import lookup_cache, check_quota, record_generation, quota_status
 
     client  = get_object_or_404(Client, id=client_id, coach=request.user)
     api_key = settings.ANTHROPIC_API_KEY
@@ -2424,6 +2531,26 @@ def generer_programme_ia(request, client_id):
     materiel        = request.data.get('materiel', 'salle_complete')
     notes_coach     = request.data.get('notes', '')
     niveau          = client.niveau or 'intermediaire'
+
+    cache_params = {
+        'objectif': objectif,
+        'seances_par_semaine': seances_par_sem,
+        'duree_semaines': duree_semaines,
+        'materiel': materiel,
+        'notes': notes_coach,
+        'niveau': niveau,
+    }
+    cache_entry, params_hash = lookup_cache(request.user, 'programme', client.id, cache_params)
+    if cache_entry:
+        return Response({**cache_entry.result, '_cached': True, '_quota': quota_status(request.user)})
+
+    ok, profile = check_quota(request.user)
+    if not ok:
+        qs = quota_status(request.user)
+        return Response({
+            'error': f"Quota IA mensuel atteint ({qs['utilise']}/{qs['quota']}). Réinitialisation le 1er du mois prochain.",
+            '_quota': qs,
+        }, status=429)
 
     JOURS = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche']
 
@@ -2471,7 +2598,9 @@ def generer_programme_ia(request, client_id):
         m   = re.search(r'\{[\s\S]*\}', raw)
         if not m:
             return Response({'error': 'Réponse IA invalide (pas de JSON)'}, status=500)
-        return Response(json.loads(m.group()))
+        prog_data = json.loads(m.group())
+        record_generation(request.user, 'programme', params_hash, prog_data, profile=profile)
+        return Response({**prog_data, '_cached': False, '_quota': quota_status(request.user)})
     except anthropic.APIError as e:
         return Response({'error': f'Erreur API Anthropic : {e}'}, status=500)
     except json.JSONDecodeError:

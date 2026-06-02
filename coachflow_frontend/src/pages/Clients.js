@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 import { Av, Loader, PBar, STag, Ic, Modal, Empty, toast, Lightbox } from '../components/UI';
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
@@ -793,8 +794,40 @@ const REPAS_LABELS = {
 };
 const REPAS_ORDER = ['petit_dejeuner','collation_matin','dejeuner','collation_soir','diner'];
 
+/* ── QUOTA IA BADGE ────────────────────────────────────────────────────────── */
+function IaQuotaBadge({ quota }) {
+  if (!quota) return null;
+  const { utilise, quota: total, restant } = quota;
+  const pct = total > 0 ? Math.min(100, (utilise / total) * 100) : 0;
+  const low = restant <= Math.max(1, Math.round(total * 0.2));
+  const out = restant === 0;
+  const color = out ? '#dc2626' : low ? '#ca8a04' : '#16a34a';
+  const bg    = out ? '#fee2e2' : low ? '#fef9c3' : '#dcfce7';
+  return (
+    <div style={{
+      display:'flex', alignItems:'center', gap:10, padding:'8px 12px',
+      background:bg, borderRadius:10, marginBottom:14, fontSize:12,
+    }}>
+      <span style={{ fontSize:16 }}>🪙</span>
+      <div style={{ flex:1 }}>
+        <div style={{ fontWeight:700, color }}>
+          {out
+            ? `Quota IA atteint : ${utilise}/${total} ce mois-ci`
+            : `${restant} génération${restant>1?'s':''} IA restante${restant>1?'s':''} ce mois (${utilise}/${total})`}
+        </div>
+        <div style={{
+          height:4, background:'rgba(0,0,0,0.08)', borderRadius:2, marginTop:4, overflow:'hidden',
+        }}>
+          <div style={{ width:`${pct}%`, height:'100%', background:color }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── MODAL GÉNÉRATION IA ───────────────────────────────────────────────────── */
 function PlanIaModal({ clientId, client, onClose, onSaved }) {
+  const { user, updateUser }        = useAuth();
   const [step, setStep]             = useState('params'); // params | loading | result
   const [params, setParams]         = useState({ objectif:'equilibre', kcal_cible:'', restrictions:'', nb_jours:5 });
   const [plan, setPlan]             = useState(null);
@@ -819,6 +852,8 @@ function PlanIaModal({ clientId, client, onClose, onSaved }) {
         kcal_cible: params.kcal_cible ? Number(params.kcal_cible) : undefined,
         nb_jours: Number(params.nb_jours),
       });
+      if (result._quota) updateUser({ ia_quota: result._quota });
+      if (result._cached) toast('♻️ Résultat depuis le cache (gratuit, dans les 24h)');
       setPlan(result);
       setStep('result');
     } catch (e) {
@@ -866,6 +901,7 @@ function PlanIaModal({ clientId, client, onClose, onSaved }) {
         <div className="mbd">
           {/* ── ÉTAPE PARAMS ─────────────────────────────────────────────── */}
           {step === 'params' && (<>
+            <IaQuotaBadge quota={user?.ia_quota} />
             <div className="fg">
               <div className="fl">Objectif nutritionnel</div>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8 }}>
@@ -1033,7 +1069,9 @@ function PlanIaModal({ clientId, client, onClose, onSaved }) {
         <div className="mft">
           {step === 'params' && (<>
             <button className="btn btn-s" onClick={onClose}>Annuler</button>
-            <button className="btn btn-p" onClick={generer}>✨ Générer le plan</button>
+            <button className="btn btn-p" onClick={generer} disabled={user?.ia_quota?.restant === 0}>
+              {user?.ia_quota?.restant === 0 ? '🔒 Quota IA épuisé' : '✨ Générer le plan'}
+            </button>
           </>)}
           {step === 'result' && !savedOk && (<>
             <button className="btn btn-s" onClick={() => { setStep('params'); setPlan(null); }} disabled={saving}>← Modifier</button>
@@ -1057,6 +1095,7 @@ function PlanIaModal({ clientId, client, onClose, onSaved }) {
 /* ── ONGLET NUTRITION CLIENT ───────────────────────────────────────────────── */
 /* ── MODAL GÉNÉRATION PROGRAMME IA ────────────────────────────────────────── */
 function ProgrammeIaModal({ clientId, client, onClose, onSaved }) {
+  const { user, updateUser }      = useAuth();
   const [step, setStep]           = useState('params');
   const [params, setParams]       = useState({ objectif:'force', seances_par_semaine:3, duree_semaines:8, materiel:'salle_complete', notes:'' });
   const [prog, setProg]           = useState(null);
@@ -1088,6 +1127,8 @@ function ProgrammeIaModal({ clientId, client, onClose, onSaved }) {
     setStep('loading'); setErr('');
     try {
       const result = await api.clients.genererProgrammeIa(clientId, params);
+      if (result._quota) updateUser({ ia_quota: result._quota });
+      if (result._cached) toast('♻️ Résultat depuis le cache (gratuit, dans les 24h)');
       setProg(result); setStep('result'); setActiveDay(0);
     } catch (e) {
       setErr(e.message || 'Erreur lors de la génération');
@@ -1129,6 +1170,7 @@ function ProgrammeIaModal({ clientId, client, onClose, onSaved }) {
 
           {/* ── PARAMS ── */}
           {step === 'params' && (<>
+            <IaQuotaBadge quota={user?.ia_quota} />
             <div className="fg">
               <div className="fl">Objectif</div>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
@@ -1305,7 +1347,9 @@ function ProgrammeIaModal({ clientId, client, onClose, onSaved }) {
         <div className="mft">
           {step === 'params' && (<>
             <button className="btn btn-s" onClick={onClose}>Annuler</button>
-            <button className="btn btn-p" onClick={generer}>✨ Générer le programme</button>
+            <button className="btn btn-p" onClick={generer} disabled={user?.ia_quota?.restant === 0}>
+              {user?.ia_quota?.restant === 0 ? '🔒 Quota IA épuisé' : '✨ Générer le programme'}
+            </button>
           </>)}
           {step === 'result' && !savedOk && (<>
             <button className="btn btn-s" onClick={() => { setStep('params'); setProg(null); }} disabled={saving}>← Modifier</button>

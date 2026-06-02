@@ -19,9 +19,12 @@ router.register('exercices', views.ExerciceViewSet, basename='exercices')
 urlpatterns = [
     path('', include(router.urls)),
     path('auth/login/', views.login_view, name='login'),
+    path('auth/logout/', views.logout_view, name='logout'),
     path('auth/register/', views.register_view, name='register'),
     path('auth/verify-email/', views.verify_email_view, name='verify-email'),
+    path('auth/resend-verification/', views.resend_verification_view, name='resend-verification'),
     path('auth/me/', views.me_view, name='me'),   # GET / PATCH / DELETE
+    path('auth/export-data/', views.export_data_view, name='export-data'),
     path('auth/onboarding-done/', views.onboarding_done_view, name='onboarding-done'),
     path('auth/google/', views.google_login_view, name='google-login'),
     path('auth/password-reset/', views.password_reset_request_view, name='password-reset-request'),

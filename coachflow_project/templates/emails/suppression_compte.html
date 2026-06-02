@@ -1,0 +1,35 @@
+{% extends "emails/base.html" %}
+{% block content %}
+<div class="title">Votre compte a été supprimé</div>
+<div class="subtitle">Bonjour {{ prenom }},</div>
+
+<p>
+  Nous vous confirmons que votre demande de suppression du compte
+  <strong>{{ email }}</strong> a bien été prise en compte le {{ date_suppression }}.
+</p>
+
+<div class="card">
+  <p style="margin:0;">
+    <strong>⏳ Période de récupération de 30 jours</strong><br>
+    Votre compte est désactivé immédiatement, mais vos données seront définitivement
+    effacées sous <strong>30 jours</strong> ({{ date_purge }}).
+  </p>
+</div>
+
+<p>
+  <strong>Vous avez changé d'avis ?</strong><br>
+  Contactez-nous à <a href="mailto:support@coachflow.fr">support@coachflow.fr</a>
+  avant le {{ date_purge }} pour réactiver votre compte sans perte de données.
+</p>
+
+<div class="divider"></div>
+
+<p style="font-size:13px; color:#6B7280;">
+  Conformément au RGPD, certaines données peuvent être conservées plus longtemps
+  pour répondre à nos obligations légales (factures conservées 10 ans).
+</p>
+
+<p style="font-size:13px; color:#6B7280;">
+  Merci d'avoir utilisé CoachFlow. Nous sommes désolés de vous voir partir.
+</p>
+{% endblock %}

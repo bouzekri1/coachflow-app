@@ -3,6 +3,48 @@ import { useNavigate, Link } from 'react-router-dom';
 import { api } from '../services/api';
 import GoogleLoginButton from '../components/GoogleLoginButton';
 
+function PendingVerification({ email }) {
+  const [busy, setBusy] = useState(false);
+  const [msg,  setMsg]  = useState('');
+  const resend = async () => {
+    setBusy(true); setMsg('');
+    try {
+      await api.resendVerification(email);
+      setMsg('Email renvoyé. Vérifiez votre boîte mail (et vos spams).');
+    } catch (e) {
+      setMsg(e.message || 'Erreur lors de l\'envoi.');
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="lg-pg">
+      <div className="lg-box" style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>📧</div>
+        <div className="lg-h1" style={{ marginBottom: 8 }}>Vérifiez votre email</div>
+        <p style={{ color: '#64748b', fontSize: 15, lineHeight: 1.6, margin: '0 0 24px' }}>
+          Un lien de confirmation a été envoyé à <strong>{email}</strong>.<br />
+          Cliquez sur le lien pour activer votre compte.
+        </p>
+        <p style={{ color: '#94a3b8', fontSize: 13, marginBottom: 16 }}>
+          Pas reçu ? Vérifiez vos spams.
+        </p>
+        <button onClick={resend} disabled={busy} className="btn btn-s" style={{ fontSize: 13 }}>
+          {busy ? 'Envoi…' : '📧 Renvoyer le mail de vérification'}
+        </button>
+        {msg && (
+          <div style={{ marginTop: 12, fontSize: 12, color: msg.startsWith('Email') ? '#065F46' : '#991B1B' }}>
+            {msg}
+          </div>
+        )}
+        <Link to="/login" style={{ color: '#6366F1', fontSize: 14, textDecoration: 'none', display: 'block', marginTop: 24 }}>
+          ← Retour à la connexion
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 export default function Register() {
   const nav = useNavigate();
   const [form, setForm] = useState({
@@ -37,24 +79,7 @@ export default function Register() {
   };
 
   if (done) {
-    return (
-      <div className="lg-pg">
-        <div className="lg-box" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>📧</div>
-          <div className="lg-h1" style={{ marginBottom: 8 }}>Vérifiez votre email</div>
-          <p style={{ color: '#64748b', fontSize: 15, lineHeight: 1.6, margin: '0 0 24px' }}>
-            Un lien de confirmation a été envoyé à <strong>{form.email}</strong>.<br />
-            Cliquez sur le lien pour activer votre compte.
-          </p>
-          <p style={{ color: '#94a3b8', fontSize: 13 }}>
-            Pas reçu ? Vérifiez vos spams.
-          </p>
-          <Link to="/login" style={{ color: '#6366F1', fontSize: 14, textDecoration: 'none', display: 'block', marginTop: 24 }}>
-            ← Retour à la connexion
-          </Link>
-        </div>
-      </div>
-    );
+    return <PendingVerification email={form.email} />;
   }
 
   return (

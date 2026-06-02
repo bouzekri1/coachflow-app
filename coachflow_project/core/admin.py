@@ -10,7 +10,18 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(CoachProfile)
 class CoachProfileAdmin(admin.ModelAdmin):
-    list_display = ['user', 'plan', 'ville']
+    list_display = ['user', 'plan', 'ville', 'ia_quota_mensuel', 'ia_generations_count_mois', 'ia_quota_reset_at']
+    list_editable = ['ia_quota_mensuel']
+    search_fields = ['user__username', 'user__email']
+    readonly_fields = ['ia_generations_count_mois', 'ia_quota_reset_at']
+
+
+@admin.register(IACache)
+class IACacheAdmin(admin.ModelAdmin):
+    list_display = ['coach', 'endpoint', 'params_hash', 'created_at']
+    list_filter = ['endpoint']
+    search_fields = ['coach__username', 'params_hash']
+    readonly_fields = ['coach', 'endpoint', 'params_hash', 'result', 'created_at']
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):

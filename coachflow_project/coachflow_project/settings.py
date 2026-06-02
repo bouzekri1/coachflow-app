@@ -108,8 +108,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ── DJANGO REST FRAMEWORK ──────────────────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        'core.auth.CookieTokenAuthentication',
+        # SessionAuthentication retiré : inutile pour notre SPA et déclenche le check CSRF
+        # quand l'utilisateur a une session Django active (ex: connexion à /admin/).
+        # L'admin Django continue de fonctionner via son middleware propre.
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -125,6 +127,7 @@ REST_FRAMEWORK = {
         'user': '5000/hour',
         'login': '10/hour',           # 10 tentatives max par heure par IP
         'password_reset': '5/hour',   # 5 demandes max par heure par IP
+        'resend_verification': '5/hour', # 5 demandes max par heure par IP
     },
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',

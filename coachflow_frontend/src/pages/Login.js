@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { api } from '../services/api';
 import GoogleLoginButton from '../components/GoogleLoginButton';
 
 export default function Login() {
@@ -8,14 +9,34 @@ export default function Login() {
   const [p, setP] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+  const [resendBusy, setResendBusy] = useState(false);
+  const [resendMsg,  setResendMsg]  = useState('');
   const { login } = useAuth();
   const nav = useNavigate();
 
   const go = async e => {
-    e.preventDefault(); setErr(''); setBusy(true);
+    e.preventDefault(); setErr(''); setUnverifiedEmail(''); setResendMsg(''); setBusy(true);
     try { await login(u, p); nav('/dashboard'); }
-    catch (e) { setErr(e.message); }
+    catch (e) {
+      setErr(e.message);
+      if (e.data?.code === 'email_not_verified') {
+        setUnverifiedEmail(e.data.email || u);
+      }
+    }
     finally { setBusy(false); }
+  };
+
+  const resend = async () => {
+    setResendBusy(true); setResendMsg('');
+    try {
+      await api.resendVerification(unverifiedEmail);
+      setResendMsg('Email de vérification renvoyé. Vérifiez votre boîte mail (et vos spams).');
+    } catch (e) {
+      setResendMsg(e.message || 'Erreur lors de l\'envoi.');
+    } finally {
+      setResendBusy(false);
+    }
   };
 
   return (
@@ -44,6 +65,26 @@ export default function Login() {
           {err && (
             <div style={{ background: '#FEF2F2', color: '#991B1B', padding: '10px 12px', borderRadius: 6, fontSize: 13, marginBottom: 14 }}>
               {err}
+              {unverifiedEmail && (
+                <div style={{ marginTop: 10 }}>
+                  <button
+                    type="button"
+                    onClick={resend}
+                    disabled={resendBusy}
+                    style={{
+                      background: '#fff', color: '#991B1B',
+                      border: '1px solid #FECACA', borderRadius: 6,
+                      padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                    }}>
+                    {resendBusy ? 'Envoi…' : '📧 Renvoyer le mail de vérification'}
+                  </button>
+                  {resendMsg && (
+                    <div style={{ marginTop: 8, fontSize: 12, color: resendMsg.startsWith('Email') ? '#065F46' : '#991B1B' }}>
+                      {resendMsg}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
           <button className="btn btn-p w100" style={{ justifyContent: 'center', padding: 11 }} disabled={busy}>

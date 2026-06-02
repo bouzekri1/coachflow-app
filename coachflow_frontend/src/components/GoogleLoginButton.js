@@ -7,7 +7,7 @@ const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
 export default function GoogleLoginButton() {
   const divRef = useRef(null);
-  const { loginWithToken } = useAuth();
+  const { loginWithUser } = useAuth();
   const nav = useNavigate();
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
@@ -24,7 +24,7 @@ export default function GoogleLoginButton() {
           setBusy(true);
           try {
             const data = await api.googleLogin(response.credential);
-            loginWithToken(data.token, data.user);
+            loginWithUser(data.user);
             nav('/dashboard');
           } catch (e) {
             setErr(e.message || 'Erreur Google');
@@ -58,7 +58,7 @@ export default function GoogleLoginButton() {
         document.head.appendChild(s);
       }
     }
-  }, [loginWithToken, nav]);
+  }, [loginWithUser, nav]);
 
   if (!CLIENT_ID) return null;
 

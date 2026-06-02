@@ -1,15 +1,14 @@
-const BASE = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000/api';
-const tk = () => localStorage.getItem('cf_token');
+const BASE = process.env.REACT_APP_API_URL || '/api';
 
 async function req(method, path, body, opts = {}) {
   const isForm = opts === true || opts.isForm;
   const raw    = opts.raw || false;
-  const headers = {};
-  if (tk()) headers['Authorization'] = `Token ${tk()}`;
+  const headers = { 'X-Requested-With': 'XMLHttpRequest' };
   if (!isForm) headers['Content-Type'] = 'application/json';
   if (BASE.includes('loca.lt')) headers['bypass-tunnel-reminder'] = 'true';
   const res = await fetch(`${BASE}${path}`, {
     method, headers,
+    credentials: 'include',
     body: isForm ? body : body ? JSON.stringify(body) : undefined,
   });
   if (res.status === 204) return null;
@@ -29,22 +28,28 @@ async function req(method, path, body, opts = {}) {
           ? Object.entries(data).map(([k, v]) => `${k} : ${[].concat(v).join(', ')}`).join(' | ')
           : null)
       || 'Erreur serveur';
-    throw new Error(msg);
+    const err = new Error(msg);
+    err.status = res.status;
+    err.data   = data;
+    throw err;
   }
   return data;
 }
 
 export const api = {
   login: (u, p) => req('POST', '/auth/login/', { username: u, password: p }),
+  logout: () => req('POST', '/auth/logout/'),
   passwordResetRequest: (email) => req('POST', '/auth/password-reset/', { email }),
   passwordResetConfirm: (token, password) => req('POST', '/auth/password-reset/confirm/', { token, password }),
   googleLogin: (idToken) => req('POST', '/auth/google/', { id_token: idToken }),
   register: (d) => req('POST', '/auth/register/', d),
   verifyEmail: (token) => req('GET', `/auth/verify-email/?token=${encodeURIComponent(token)}`),
+  resendVerification: (email) => req('POST', '/auth/resend-verification/', { email }),
   me: () => req('GET', '/auth/me/'),
   onboardingDone: () => req('POST', '/auth/onboarding-done/'),
   updateMe: (d) => req('PATCH', '/auth/me/', d),
   deleteAccount: (confirm) => req('DELETE', '/auth/me/', { confirm }),
+  exportData: () => req('GET', '/auth/export-data/', null, { raw: true }),
   dashboard: () => req('GET', '/dashboard/'),
 
   clients: {

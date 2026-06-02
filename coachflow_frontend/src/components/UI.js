@@ -129,8 +129,7 @@ export function AuthImg({ src, alt = '', style = {}, className = '' }) {
   useEffect(() => {
     if (!src) return;
     let active = true;
-    const tk = localStorage.getItem('cf_token');
-    fetch(src, { headers: tk ? { Authorization: `Token ${tk}` } : {} })
+    fetch(src, { credentials: 'include' })
       .then(r => r.blob())
       .then(b => { if (active) setBlobUrl(URL.createObjectURL(b)); })
       .catch(() => {});

@@ -143,6 +143,25 @@ def envoyer_bienvenue_coach_google(user):
     )
 
 
+def envoyer_confirmation_suppression(user):
+    from datetime import timedelta
+    from django.utils import timezone
+    prenom = user.first_name or user.username
+    now = timezone.now()
+    purge = now + timedelta(days=30)
+    _send(
+        subject='Confirmation de suppression de votre compte CoachFlow',
+        template='suppression_compte',
+        context={
+            'prenom': prenom,
+            'email': user.email,
+            'date_suppression': now.strftime('%d/%m/%Y à %H:%M'),
+            'date_purge': purge.strftime('%d/%m/%Y'),
+        },
+        to=user.email,
+    )
+
+
 def envoyer_facture_email(facture, pdf_bytes):
     client = facture.client
     if not client.email:

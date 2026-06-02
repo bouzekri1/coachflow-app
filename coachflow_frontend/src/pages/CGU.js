@@ -30,7 +30,7 @@ export default function CGU() {
         Politique de confidentialité — Conformité RGPD
       </p>
       <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 32 }}>
-        Dernière mise à jour : mai 2026
+        Dernière mise à jour : juin 2026
       </p>
 
       <div className="card">
@@ -95,7 +95,7 @@ export default function CGU() {
         <H2>5. Durée de conservation</H2>
         <Ul items={[
           'Données de compte actif : conservées pendant toute la durée de l\'abonnement',
-          'Après suppression du compte : suppression définitive dans un délai de 30 jours',
+          'Après suppression du compte : désactivation immédiate puis purge définitive sous 30 jours (période de récupération)',
           'Données de facturation : conservées 10 ans conformément aux obligations comptables françaises',
           'Logs de connexion : conservés 12 mois',
         ]} />
@@ -116,9 +116,18 @@ export default function CGU() {
           Vous pouvez également introduire une réclamation auprès de la CNIL (www.cnil.fr).
         </P>
         <P>
+          <strong>Portabilité — Export de vos données :</strong> vous pouvez télécharger l'intégralité
+          de vos données au format JSON depuis la page « Mon compte » → « Exporter mes données ».
+          L'archive ZIP générée contient toutes les informations associées à votre compte
+          dans un format structuré et lisible par machine.
+        </P>
+        <P>
           <strong>Suppression du compte :</strong> vous pouvez supprimer votre compte directement depuis la page
-          « Mon compte » de l'application. Toutes vos données seront effacées de façon irréversible,
-          à l'exception des données de facturation conservées par obligation légale.
+          « Mon compte ». Votre compte est désactivé immédiatement, puis vos données sont effacées
+          définitivement après un délai de 30 jours. Pendant cette période, vous pouvez nous contacter
+          à <strong>support@coachflow.fr</strong> pour réactiver le compte sans perte de données.
+          Un email de confirmation est envoyé à chaque demande de suppression.
+          Les données de facturation sont conservées par obligation légale (10 ans).
         </P>
 
         {/* ── 7. SÉCURITÉ ── */}

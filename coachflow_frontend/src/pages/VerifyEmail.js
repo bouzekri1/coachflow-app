@@ -6,7 +6,7 @@ import { api } from '../services/api';
 export default function VerifyEmail() {
   const [params]   = useSearchParams();
   const nav        = useNavigate();
-  const { loginWithToken } = useAuth();
+  const { loginWithUser } = useAuth();
   const [state, setState] = useState('loading'); // loading | success | error | already
   const [errMsg, setErrMsg] = useState('');
 
@@ -20,7 +20,7 @@ export default function VerifyEmail() {
           setState('already');
           return;
         }
-        loginWithToken(data.token, data.user);
+        loginWithUser(data.user);
         setState('success');
         setTimeout(() => nav('/dashboard'), 2000);
       })

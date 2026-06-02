@@ -13,6 +13,7 @@ class User(AbstractUser):
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     phone = models.CharField(max_length=20, blank=True)
     email_verified = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True, help_text="Soft delete : purge définitive 30 jours après cette date")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     class Meta:
@@ -39,6 +40,9 @@ class CoachProfile(models.Model):
     reservation_horizon_j = models.PositiveSmallIntegerField(default=30)
     reservation_duree_min = models.PositiveSmallIntegerField(default=60)
     gcal_block_allday = models.BooleanField(default=True, help_text="Bloquer les events all-day Google même marqués 'Disponible'")
+    ia_quota_mensuel = models.PositiveSmallIntegerField(default=10, help_text="Générations IA autorisées par mois")
+    ia_generations_count_mois = models.PositiveIntegerField(default=0)
+    ia_quota_reset_at = models.DateField(null=True, blank=True)
     class Meta:
         db_table = 'coach_profiles'
     def __str__(self):
@@ -827,3 +831,23 @@ class Feedback(models.Model):
 
     def __str__(self):
         return f"[{self.type}] {self.title}"
+
+
+class IACache(models.Model):
+    ENDPOINT_CHOICES = [('plan','Plan alimentaire'),('programme','Programme entraînement')]
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    coach = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ia_cache')
+    endpoint = models.CharField(max_length=20, choices=ENDPOINT_CHOICES)
+    params_hash = models.CharField(max_length=64)
+    result = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'ia_cache'
+        indexes = [
+            models.Index(fields=['coach', 'endpoint', 'params_hash', '-created_at']),
+        ]
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"IACache {self.endpoint} {self.coach_id}"

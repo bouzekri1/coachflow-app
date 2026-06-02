@@ -385,7 +385,7 @@ function Field({ label, children }) {
 }
 
 export default function Compte() {
-  const { user, logout, loginWithToken, updateUser } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const nav = useNavigate();
 
   const [profile, setProfile] = useState({ first_name: user?.first_name || '', last_name: user?.last_name || '' });
@@ -401,15 +401,17 @@ export default function Compte() {
   const [deleteErr,  setDeleteErr]  = useState('');
   const [showDelete, setShowDelete] = useState(false);
 
+  const [exportBusy, setExportBusy] = useState(false);
+  const [exportMsg,  setExportMsg]  = useState(null);
+
   const isGoogle = user?.email_verified && !user?.has_password;
 
   const saveProfile = async e => {
     e.preventDefault();
     setProfileBusy(true); setProfileMsg(null);
     try {
-      const data = await api.updateMe({ first_name: profile.first_name, last_name: profile.last_name });
+      await api.updateMe({ first_name: profile.first_name, last_name: profile.last_name });
       setProfileMsg({ ok: true, text: 'Profil mis à jour.' });
-      if (data.new_token) loginWithToken(data.new_token);
     } catch (e) {
       setProfileMsg({ ok: false, text: e.message });
     } finally {
@@ -424,16 +426,32 @@ export default function Compte() {
     if (pw.new_password.length < 8)     { setPwMsg({ ok: false, text: 'Minimum 8 caractères.' }); return; }
     setPwBusy(true);
     try {
-      const data = await api.updateMe({ old_password: pw.old_password, new_password: pw.new_password });
-      setPwMsg({ ok: true, text: 'Mot de passe modifié. Reconnexion…' });
+      await api.updateMe({ old_password: pw.old_password, new_password: pw.new_password });
+      setPwMsg({ ok: true, text: 'Mot de passe modifié.' });
       setPw({ old_password: '', new_password: '', confirm: '' });
-      if (data.new_token) {
-        setTimeout(() => loginWithToken(data.new_token), 1200);
-      }
     } catch (e) {
       setPwMsg({ ok: false, text: e.message });
     } finally {
       setPwBusy(false);
+    }
+  };
+
+  const exportData = async () => {
+    setExportBusy(true); setExportMsg(null);
+    try {
+      const blob = await api.exportData();
+      const url  = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      a.href = url;
+      a.download = `coachflow_export_${user?.username || 'compte'}_${date}.zip`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+      setExportMsg({ ok: true, text: 'Export téléchargé. Vous trouverez vos données dans le fichier ZIP.' });
+    } catch (e) {
+      setExportMsg({ ok: false, text: e.message || 'Erreur lors de l\'export.' });
+    } finally {
+      setExportBusy(false);
     }
   };
 
@@ -533,8 +551,28 @@ export default function Compte() {
       <Section title="Données & confidentialité">
         <div style={{ fontSize: 14, color: 'var(--t2)', lineHeight: 1.7, marginBottom: 14 }}>
           Vos données sont hébergées en France et ne sont jamais revendues à des tiers.
-          Vous disposez d'un droit d'accès, de rectification et d'effacement conformément au RGPD.
+          Vous disposez d'un droit d'accès, de rectification, d'effacement et de portabilité conformément au RGPD.
         </div>
+
+        <div style={{
+          background: '#F8FAFC', border: '1px solid var(--bdr)', borderRadius: 10,
+          padding: '14px 16px', marginBottom: 14,
+        }}>
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>
+            📦 Exporter mes données (RGPD article 20)
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--t3)', marginBottom: 12, lineHeight: 1.5 }}>
+            Téléchargez l'intégralité de vos données au format JSON dans une archive ZIP.
+          </div>
+          <button onClick={exportData} disabled={exportBusy} style={{
+            background: '#6366F1', color: '#fff', border: 'none',
+            borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+          }}>
+            {exportBusy ? 'Préparation…' : 'Télécharger mes données'}
+          </button>
+          <Msg msg={exportMsg} />
+        </div>
+
         <Link to="/cgu" style={{ fontSize: 14, color: '#6366F1', textDecoration: 'none', fontWeight: 600 }}>
           Consulter les CGU et la politique de confidentialité →
         </Link>
@@ -546,8 +584,10 @@ export default function Compte() {
           Zone de danger
         </div>
         <div style={{ fontSize: 13, color: '#64748b', marginBottom: 16, lineHeight: 1.6 }}>
-          La suppression de votre compte est <strong>irréversible</strong>. Tous vos clients, séances, factures,
-          recettes et messages seront définitivement effacés.
+          Votre compte sera désactivé immédiatement puis définitivement effacé après un délai
+          de <strong>30 jours</strong>. Pendant cette période, vous pouvez nous contacter à
+          <strong> support@coachflow.fr</strong> pour le réactiver sans perte de données.
+          Vous recevrez un email de confirmation.
         </div>
 
         {!showDelete ? (

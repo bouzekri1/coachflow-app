@@ -8,35 +8,30 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const t = localStorage.getItem('cf_token');
-    if (t) {
-      api.me()
-        .then(u => { setUser(u); setLoading(false); })
-        .catch(() => { localStorage.removeItem('cf_token'); setLoading(false); });
-    } else {
-      setLoading(false);
-    }
+    api.me()
+      .then(u => { setUser(u); })
+      .catch(() => { setUser(null); })
+      .finally(() => setLoading(false));
   }, []);
 
   const login = async (username, password) => {
     const d = await api.login(username, password);
-    localStorage.setItem('cf_token', d.token);
     setUser(d.user);
   };
 
-  const loginWithToken = (token, userData) => {
-    localStorage.setItem('cf_token', token);
+  // Utilisé après vérification email / Google : le cookie est déjà posé côté serveur
+  const loginWithUser = (userData) => {
     if (userData) setUser(userData);
   };
 
   const updateUser = (patch) => setUser(u => ({ ...u, ...patch }));
 
-  const logout = () => {
-    localStorage.removeItem('cf_token');
+  const logout = async () => {
+    try { await api.logout(); } catch (e) { /* ignore */ }
     setUser(null);
   };
 
-  return <Ctx.Provider value={{ user, login, loginWithToken, logout, loading, updateUser }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ user, login, loginWithUser, logout, loading, updateUser }}>{children}</Ctx.Provider>;
 }
 
 export const useAuth = () => useContext(Ctx);
