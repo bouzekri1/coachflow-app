@@ -15,6 +15,34 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
+# ── SENTRY (monitoring d'erreurs) ──────────────────────────────────────────────
+# Activé uniquement si SENTRY_DSN est défini.
+SENTRY_DSN = os.environ.get('SENTRY_DSN', '').strip()
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    def _before_send(event, hint):
+        # Scrub des champs sensibles supplémentaires au cas où.
+        req = event.get('request') or {}
+        data = req.get('data')
+        if isinstance(data, dict):
+            for k in ('password', 'new_password', 'old_password', 'confirm', 'id_token', 'token'):
+                if k in data:
+                    data[k] = '[Filtered]'
+        return event
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        environment=os.environ.get('SENTRY_ENVIRONMENT', 'production' if not DEBUG else 'development'),
+        release=os.environ.get('SENTRY_RELEASE', None),
+        send_default_pii=True,             # user.id / username pour triager — pas le password
+        traces_sample_rate=float(os.environ.get('SENTRY_TRACES_SAMPLE_RATE', '0.1')),
+        profiles_sample_rate=0.0,          # désactivé (économise les events)
+        before_send=_before_send,
+    )
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
