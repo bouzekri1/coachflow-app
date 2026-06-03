@@ -29,7 +29,7 @@ def build_user_export(user) -> bytes:
     out = {
         '_export': {
             'generated_at': datetime.now(dt_tz.utc).isoformat(),
-            'app': 'CoachFlow',
+            'app': 'TrainFlow',
             'rgpd_article': 'Article 20 RGPD — Droit à la portabilité',
         },
         'profil': {
@@ -112,12 +112,12 @@ def build_user_export(user) -> bytes:
         )
         zf.writestr(
             'README.txt',
-            "Export CoachFlow — Article 20 RGPD\n"
+            "Export TrainFlow — Article 20 RGPD\n"
             f"Généré le : {datetime.now(dt_tz.utc).isoformat()}\n"
             f"Compte : {user.email}\n\n"
             "Le fichier coachflow_export.json contient l'intégralité des données associées\n"
             "à votre compte au format JSON structuré et lisible par machine.\n\n"
-            "Pour toute question : support@coachflow.fr\n",
+            "Pour toute question : support@trainflow.fr\n",
         )
     return buf.getvalue()
 

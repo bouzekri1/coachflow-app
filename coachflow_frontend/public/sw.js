@@ -154,7 +154,7 @@ self.addEventListener('message', e => {
 self.addEventListener('push', e => {
   const data = e.data?.json() ?? {};
   e.waitUntil(
-    self.registration.showNotification(data.title || 'CoachFlow', {
+    self.registration.showNotification(data.title || 'TrainFlow', {
       body: data.body || '',
       icon: '/icons/icon.svg',
       badge: '/icons/icon.svg',

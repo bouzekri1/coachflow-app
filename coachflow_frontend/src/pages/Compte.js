@@ -528,7 +528,7 @@ export default function Compte() {
         <Section title="Sécurité">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: '#F8FAFF', borderRadius: 8, border: '1px solid #C7D2FE', fontSize: 14, color: '#4338CA' }}>
             <span>🔗</span>
-            <span>Connexion via Google — aucun mot de passe CoachFlow associé à ce compte.</span>
+            <span>Connexion via Google — aucun mot de passe TrainFlow associé à ce compte.</span>
           </div>
         </Section>
       )}
@@ -586,7 +586,7 @@ export default function Compte() {
         <div style={{ fontSize: 13, color: '#64748b', marginBottom: 16, lineHeight: 1.6 }}>
           Votre compte sera désactivé immédiatement puis définitivement effacé après un délai
           de <strong>30 jours</strong>. Pendant cette période, vous pouvez nous contacter à
-          <strong> support@coachflow.fr</strong> pour le réactiver sans perte de données.
+          <strong> support@trainflow.fr</strong> pour le réactiver sans perte de données.
           Vous recevrez un email de confirmation.
         </div>
 

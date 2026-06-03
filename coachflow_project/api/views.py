@@ -162,7 +162,7 @@ def login_view(request):
             or User.objects.filter(email=identifier).first()
         if candidate and candidate.check_password(password or ''):
             if candidate.deleted_at:
-                return Response({'error': 'Ce compte a été supprimé. Contactez support@coachflow.fr pour le réactiver (sous 30 jours).'}, status=400)
+                return Response({'error': 'Ce compte a été supprimé. Contactez support@trainflow.fr pour le réactiver (sous 30 jours).'}, status=400)
             if not candidate.email_verified:
                 return Response({
                     'error': 'Vérifiez votre email avant de vous connecter. Un lien de confirmation vous a été envoyé.',
@@ -1057,7 +1057,7 @@ class FactureViewSet(viewsets.ModelViewSet):
         statut_labels = {'brouillon':'BROUILLON','envoyee':'ENVOYÉE','payee':'PAYÉE','retard':'EN RETARD','annulee':'ANNULÉE'}
         elements = []
         header = Table([[
-            Paragraph('CoachFlow', s_titre),
+            Paragraph('TrainFlow', s_titre),
             Paragraph(f'FACTURE<br/><font size="14">{facture.numero}</font>',
                       ParagraphStyle('fnum', fontSize=9, textColor=gris, alignment=TA_RIGHT, fontName='Helvetica-Bold'))
         ]], colWidths=[90*mm, 80*mm])
@@ -1115,7 +1115,7 @@ class FactureViewSet(viewsets.ModelViewSet):
             elements += [Spacer(1, 8*mm), HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#E5E7EB')),
                          Spacer(1, 4*mm), Paragraph('<b>Notes</b>', s_h2), Paragraph(facture.notes, s_small)]
         elements += [Spacer(1, 12*mm), HRFlowable(width='100%', thickness=0.5, color=colors.HexColor('#E5E7EB')),
-                     Spacer(1, 3*mm), Paragraph('Généré par CoachFlow', s_small)]
+                     Spacer(1, 3*mm), Paragraph('Généré par TrainFlow', s_small)]
         doc.build(elements)
         return buf.getvalue()
 
@@ -2685,7 +2685,7 @@ def push_send_to_client(request, client_id):
         return Response({'error': 'Client introuvable.'}, status=404)
     if not client.user_account:
         return Response({'error': 'Ce client n\'a pas de compte portail.'}, status=400)
-    title = request.data.get('title', 'CoachFlow')
+    title = request.data.get('title', 'TrainFlow')
     body  = request.data.get('body', '')
     url   = request.data.get('url', '/')
     subs  = PushSubscription.objects.filter(user=client.user_account)

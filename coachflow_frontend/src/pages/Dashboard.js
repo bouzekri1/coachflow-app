@@ -32,7 +32,7 @@ function WelcomeHero({ user, onCreateClient }) {
         fontSize: 130, opacity: 0.08, lineHeight: 1, pointerEvents: 'none',
       }}>🚀</div>
       <div style={{ fontSize: 13, fontWeight: 600, opacity: .85, marginBottom: 6 }}>
-        Bienvenue sur CoachFlow{user?.first_name ? `, ${user.first_name}` : ''} 👋
+        Bienvenue sur TrainFlow{user?.first_name ? `, ${user.first_name}` : ''} 👋
       </div>
       <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, maxWidth: 600, lineHeight: 1.25 }}>
         Lançons votre activité de coaching ensemble
@@ -129,7 +129,7 @@ function EmptyDashboard({ user, nav }) {
 
       {/* Tips fonctionnels */}
       <div className="card" style={{ marginBottom: 20 }}>
-        <div className="card-t" style={{ marginBottom: 14 }}>💡 Ce que CoachFlow fait pour vous</div>
+        <div className="card-t" style={{ marginBottom: 14 }}>💡 Ce que TrainFlow fait pour vous</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
           {TIPS.map((t, i) => (
             <div key={i} style={{ background: 'var(--bg)', borderRadius: 10, padding: '14px 16px' }}>

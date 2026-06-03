@@ -12,7 +12,7 @@ export default class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
-    console.error('[CoachFlow] Erreur non gérée :', error, info);
+    console.error('[TrainFlow] Erreur non gérée :', error, info);
     if (process.env.REACT_APP_SENTRY_DSN) {
       Sentry.captureException(error, { contexts: { react: { componentStack: info.componentStack } } });
     }

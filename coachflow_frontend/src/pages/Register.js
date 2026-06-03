@@ -88,7 +88,7 @@ export default function Register() {
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <div className="lg-ico">⚡</div>
           <div className="lg-h1">Créer un compte</div>
-          <div className="lg-sub">Rejoignez CoachFlow gratuitement</div>
+          <div className="lg-sub">Rejoignez TrainFlow gratuitement</div>
         </div>
 
         <form onSubmit={submit}>

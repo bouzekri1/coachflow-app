@@ -125,7 +125,7 @@ export function ClientPortalLayout() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 16, color: '#fff', flexShrink: 0,
           }}>⚡</div>
-          <div style={{ fontWeight: 800, fontSize: 16, letterSpacing: '-0.3px' }}>CoachFlow</div>
+          <div style={{ fontWeight: 800, fontSize: 16, letterSpacing: '-0.3px' }}>TrainFlow</div>
         </div>
 
         {/* Tabs desktop */}

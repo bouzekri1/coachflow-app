@@ -176,7 +176,7 @@ export function ClientDetail() {
   const [compteModal, setCompteModal] = useState(false);
   const [compteInfo, setCompteInfo] = useState(null);
   const [pushModal, setPushModal] = useState(false);
-  const [pushForm, setPushForm] = useState({ title: 'CoachFlow', body: '', url: '/' });
+  const [pushForm, setPushForm] = useState({ title: 'TrainFlow', body: '', url: '/' });
   const [pushBusy, setPushBusy] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [editData, setEditData] = useState({});

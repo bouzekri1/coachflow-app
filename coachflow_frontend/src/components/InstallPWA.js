@@ -78,7 +78,7 @@ export default function InstallPWA() {
           display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
         }}>⚡</div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700 }}>Installer CoachFlow</div>
+          <div style={{ fontWeight: 700 }}>Installer TrainFlow</div>
           <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Accès rapide depuis l'écran d'accueil</div>
         </div>
         <button onClick={install} style={{

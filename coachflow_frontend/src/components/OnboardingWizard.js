@@ -100,7 +100,7 @@ export default function OnboardingWizard({ user, onDone }) {
           <>
             <div style={{ fontSize: 40, marginBottom: 12, textAlign: 'center' }}>👋</div>
             <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', textAlign: 'center', marginBottom: 10 }}>
-              Bienvenue sur CoachFlow, {prenom} !
+              Bienvenue sur TrainFlow, {prenom} !
             </h2>
             <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.7, textAlign: 'center', marginBottom: 28 }}>
               En moins de 2 minutes, nous allons créer votre premier client et vous montrer l'essentiel.
@@ -180,7 +180,7 @@ export default function OnboardingWizard({ user, onDone }) {
               {created ? `${created.prenom} ${created.nom} est créé !` : 'Vous êtes prêt !'}
             </h2>
             <p style={{ fontSize: 14, color: '#64748b', textAlign: 'center', lineHeight: 1.7, marginBottom: 28 }}>
-              Votre espace CoachFlow est prêt. Que voulez-vous faire maintenant ?
+              Votre espace TrainFlow est prêt. Que voulez-vous faire maintenant ?
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
@@ -213,7 +213,7 @@ export default function OnboardingWizard({ user, onDone }) {
                 <span style={{ fontSize: 24 }}>🏠</span>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>Aller au tableau de bord</div>
-                  <div style={{ fontSize: 12, color: '#64748b' }}>Explorer CoachFlow à mon rythme</div>
+                  <div style={{ fontSize: 12, color: '#64748b' }}>Explorer TrainFlow à mon rythme</div>
                 </div>
               </button>
             </div>

@@ -6,7 +6,7 @@ from .models import *
 class UserAdmin(BaseUserAdmin):
     list_display = ['username', 'email', 'get_full_name', 'role', 'created_at']
     list_filter = ['role']
-    fieldsets = BaseUserAdmin.fieldsets + (('CoachFlow', {'fields': ('role', 'avatar', 'phone')}),)
+    fieldsets = BaseUserAdmin.fieldsets + (('TrainFlow', {'fields': ('role', 'avatar', 'phone')}),)
 
 @admin.register(CoachProfile)
 class CoachProfileAdmin(admin.ModelAdmin):

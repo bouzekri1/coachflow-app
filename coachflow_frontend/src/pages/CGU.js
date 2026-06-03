@@ -38,9 +38,9 @@ export default function CGU() {
         {/* ── 1. OBJET ── */}
         <H2>1. Objet</H2>
         <P>
-          CoachFlow est une plateforme SaaS destinée aux coachs sportifs professionnels, leur permettant de gérer leurs clients,
+          TrainFlow est une plateforme SaaS destinée aux coachs sportifs professionnels, leur permettant de gérer leurs clients,
           planifier des séances, suivre la nutrition et la progression, et communiquer via une messagerie intégrée.
-          Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation du service CoachFlow.
+          Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation du service TrainFlow.
         </P>
         <P>
           En créant un compte, vous acceptez sans réserve les présentes CGU. Si vous n'acceptez pas ces conditions,
@@ -55,13 +55,13 @@ export default function CGU() {
           Vous vous engagez à fournir des informations exactes et à les maintenir à jour.
         </P>
         <P>
-          CoachFlow se réserve le droit de suspendre ou supprimer tout compte en cas de violation des présentes CGU,
+          TrainFlow se réserve le droit de suspendre ou supprimer tout compte en cas de violation des présentes CGU,
           de fausse identité, ou d'utilisation frauduleuse du service.
         </P>
 
         {/* ── 3. DONNÉES COLLECTÉES ── */}
         <H2>3. Données personnelles collectées</H2>
-        <P>CoachFlow collecte et traite les données suivantes dans le cadre de la fourniture du service :</P>
+        <P>TrainFlow collecte et traite les données suivantes dans le cadre de la fourniture du service :</P>
         <Ul items={[
           'Données d\'identification : nom, prénom, adresse email, nom d\'utilisateur',
           'Données clients des coachs : nom, prénom, email, numéro de téléphone des clients',
@@ -80,7 +80,7 @@ export default function CGU() {
         <H2>4. Finalités du traitement</H2>
         <P>Les données sont collectées pour les finalités suivantes :</P>
         <Ul items={[
-          'Fourniture et amélioration du service CoachFlow',
+          'Fourniture et amélioration du service TrainFlow',
           'Gestion des comptes utilisateurs et authentification',
           'Suivi de la progression et des objectifs des clients',
           'Envoi d\'emails transactionnels (confirmations, rappels, factures)',
@@ -112,7 +112,7 @@ export default function CGU() {
           'Droit à la limitation : demander la suspension temporaire du traitement de vos données',
         ]} />
         <P>
-          Pour exercer ces droits, contactez-nous à <strong>support@coachflow.fr</strong>.
+          Pour exercer ces droits, contactez-nous à <strong>support@trainflow.fr</strong>.
           Vous pouvez également introduire une réclamation auprès de la CNIL (www.cnil.fr).
         </P>
         <P>
@@ -125,7 +125,7 @@ export default function CGU() {
           <strong>Suppression du compte :</strong> vous pouvez supprimer votre compte directement depuis la page
           « Mon compte ». Votre compte est désactivé immédiatement, puis vos données sont effacées
           définitivement après un délai de 30 jours. Pendant cette période, vous pouvez nous contacter
-          à <strong>support@coachflow.fr</strong> pour réactiver le compte sans perte de données.
+          à <strong>support@trainflow.fr</strong> pour réactiver le compte sans perte de données.
           Un email de confirmation est envoyé à chaque demande de suppression.
           Les données de facturation sont conservées par obligation légale (10 ans).
         </P>
@@ -133,7 +133,7 @@ export default function CGU() {
         {/* ── 7. SÉCURITÉ ── */}
         <H2>7. Sécurité des données</H2>
         <P>
-          CoachFlow met en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données :
+          TrainFlow met en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données :
           chiffrement HTTPS, authentification par token sécurisé, accès restreint aux données par rôle,
           hébergement en Europe. Malgré ces mesures, aucun système n'est infaillible.
           En cas de violation de données vous concernant, vous en serez informé dans les délais légaux.
@@ -142,7 +142,7 @@ export default function CGU() {
         {/* ── 8. COOKIES ── */}
         <H2>8. Cookies</H2>
         <P>
-          CoachFlow n'utilise pas de cookies de traçage publicitaire. Seuls des cookies techniques strictement
+          TrainFlow n'utilise pas de cookies de traçage publicitaire. Seuls des cookies techniques strictement
           nécessaires au fonctionnement du service sont utilisés (authentification, préférences utilisateur).
           Ces cookies ne nécessitent pas votre consentement explicite.
         </P>
@@ -150,20 +150,20 @@ export default function CGU() {
         {/* ── 9. RESPONSABLE DU TRAITEMENT ── */}
         <H2>9. Responsable du traitement</H2>
         <P>
-          Le responsable du traitement est CoachFlow. Pour toute question relative à vos données personnelles :
-          <br /><strong>Email :</strong> support@coachflow.fr
+          Le responsable du traitement est TrainFlow. Pour toute question relative à vos données personnelles :
+          <br /><strong>Email :</strong> support@trainflow.fr
         </P>
 
         {/* ── 10. MODIFICATIONS ── */}
         <H2>10. Modifications des CGU</H2>
         <P>
-          CoachFlow se réserve le droit de modifier les présentes CGU à tout moment. En cas de modification substantielle,
+          TrainFlow se réserve le droit de modifier les présentes CGU à tout moment. En cas de modification substantielle,
           les utilisateurs seront informés par email au moins 15 jours avant l'entrée en vigueur des nouvelles conditions.
           La poursuite de l'utilisation du service après notification vaut acceptation des nouvelles CGU.
         </P>
 
         <div style={{ marginTop: 28, paddingTop: 16, borderTop: '1px solid var(--bdr)', fontSize: 12, color: '#94a3b8' }}>
-          Pour toute question : <strong>support@coachflow.fr</strong>
+          Pour toute question : <strong>support@trainflow.fr</strong>
         </div>
       </div>
     </div>

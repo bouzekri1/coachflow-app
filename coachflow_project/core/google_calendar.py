@@ -1,6 +1,6 @@
 """
 Helpers pour synchroniser le calendrier d'un coach avec Google Calendar.
-Bidirectionnel : push des séances CoachFlow vers Google + lecture des
+Bidirectionnel : push des séances TrainFlow vers Google + lecture des
 événements Google pour bloquer les créneaux de réservation.
 """
 import logging
@@ -129,7 +129,7 @@ def list_busy(coach, date_start, date_end):
     """
     Retourne les périodes occupées dans Google Calendar du coach entre deux dates.
     Format : [(datetime_start, datetime_end), ...]
-    Exclut les événements créés par CoachFlow (pour éviter de bloquer nos propres créneaux).
+    Exclut les événements créés par TrainFlow (pour éviter de bloquer nos propres créneaux).
 
     Respecte le toggle CoachProfile.gcal_block_allday :
     - True (défaut)  → bloque tous les events all-day, peu importe leur transparency

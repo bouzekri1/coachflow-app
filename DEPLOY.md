@@ -1,4 +1,4 @@
-# Déploiement CoachFlow — Hetzner + Cloudflare Pages
+# Déploiement TrainFlow — Hetzner + Cloudflare Pages
 
 Setup cible : **~4,50 €/mois** + nom de domaine.
 
@@ -11,7 +11,7 @@ Setup cible : **~4,50 €/mois** + nom de domaine.
 
 ## 1. Pré-requis
 
-- [ ] Un nom de domaine (ex: `coachflow.fr` chez OVH/Cloudflare)
+- [ ] Un nom de domaine (ex: `trainflow.fr` chez OVH/Cloudflare)
 - [ ] Compte Hetzner ([accounts.hetzner.com](https://accounts.hetzner.com))
 - [ ] Compte Cloudflare ([cloudflare.com](https://cloudflare.com))
 - [ ] Compte Sentry (optionnel, [sentry.io](https://sentry.io))
@@ -70,15 +70,15 @@ nano .env
 À renseigner impérativement :
 - `SECRET_KEY` (génère avec `python3 -c "import secrets;print(secrets.token_urlsafe(50))"`)
 - `DEBUG=False`
-- `ALLOWED_HOSTS=api.coachflow.fr`
-- `API_DOMAIN=api.coachflow.fr`
+- `ALLOWED_HOSTS=api.trainflow.fr`
+- `API_DOMAIN=api.trainflow.fr`
 - `DB_PASSWORD=<un mot de passe long>`
-- `CORS_ALLOWED_ORIGINS=https://app.coachflow.fr`
-- `FRONTEND_URL=https://app.coachflow.fr`
+- `CORS_ALLOWED_ORIGINS=https://app.trainflow.fr`
+- `FRONTEND_URL=https://app.trainflow.fr`
 - `EMAIL_*` (cf. section Brevo plus bas)
 - `ANTHROPIC_API_KEY=`
 - `GOOGLE_OAUTH_CLIENT_ID/SECRET=`
-- `GOOGLE_CALENDAR_REDIRECT_URI=https://api.coachflow.fr/api/auth/google-calendar/callback/`
+- `GOOGLE_CALENDAR_REDIRECT_URI=https://api.trainflow.fr/api/auth/google-calendar/callback/`
 - `SENTRY_DSN=` (optionnel)
 
 ### 4.2 Premier démarrage
@@ -88,7 +88,7 @@ cd /opt/coachflow
 docker compose --env-file coachflow_project/.env up -d --build
 ```
 
-Caddy obtient un certificat Let's Encrypt automatiquement (vérifier que `api.coachflow.fr` pointe bien sur l'IP avant).
+Caddy obtient un certificat Let's Encrypt automatiquement (vérifier que `api.trainflow.fr` pointe bien sur l'IP avant).
 
 Suivre les logs :
 ```bash
@@ -97,7 +97,7 @@ docker compose logs -f
 
 Tester :
 ```bash
-curl https://api.coachflow.fr/api/auth/me/
+curl https://api.trainflow.fr/api/auth/me/
 # → 401 Unauthorized (normal sans token = la stack marche)
 ```
 
@@ -107,7 +107,7 @@ curl https://api.coachflow.fr/api/auth/me/
 docker compose exec backend python manage.py createsuperuser
 ```
 
-→ Admin Django accessible sur `https://api.coachflow.fr/admin/`.
+→ Admin Django accessible sur `https://api.trainflow.fr/admin/`.
 
 ### 4.4 Installer les crons
 
@@ -131,9 +131,9 @@ EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_HOST_USER=<email du compte Brevo>
 EMAIL_HOST_PASSWORD=<SMTP key Brevo>
-DEFAULT_FROM_EMAIL=CoachFlow <noreply@coachflow.fr>
+DEFAULT_FROM_EMAIL=TrainFlow <noreply@trainflow.fr>
 ```
-4. Brevo → Senders & IPs → ajoute `noreply@coachflow.fr` et suis la procédure SPF/DKIM (TXT records à ajouter au DNS)
+4. Brevo → Senders & IPs → ajoute `noreply@trainflow.fr` et suis la procédure SPF/DKIM (TXT records à ajouter au DNS)
 5. Redémarre le backend : `docker compose restart backend`
 
 ---
@@ -147,12 +147,12 @@ DEFAULT_FROM_EMAIL=CoachFlow <noreply@coachflow.fr>
    - Build command : `cd coachflow_frontend && npm install && npm run build`
    - Build output directory : `coachflow_frontend/build`
 4. **Environment variables** :
-   - `REACT_APP_API_URL` = `https://api.coachflow.fr/api`
+   - `REACT_APP_API_URL` = `https://api.trainflow.fr/api`
    - `REACT_APP_GOOGLE_CLIENT_ID` = ton Client ID Google
    - `REACT_APP_SENTRY_DSN` = (optionnel)
    - `REACT_APP_SENTRY_ENVIRONMENT` = `production`
 5. Save & Deploy
-6. Custom domain : `app.coachflow.fr` → suis les instructions Cloudflare (ils créent un CNAME pour toi)
+6. Custom domain : `app.trainflow.fr` → suis les instructions Cloudflare (ils créent un CNAME pour toi)
 
 ---
 
@@ -196,10 +196,10 @@ scp coachflow@IP_HETZNER:/opt/coachflow/coachflow_project/backups/latest.sql.gz 
 
 ## 10. Checklist post-déploiement
 
-- [ ] `https://api.coachflow.fr/admin/` accessible avec ton superuser
-- [ ] `https://app.coachflow.fr/login` charge le frontend
+- [ ] `https://api.trainflow.fr/admin/` accessible avec ton superuser
+- [ ] `https://app.trainflow.fr/login` charge le frontend
 - [ ] Inscription + email de vérification reçu
-- [ ] Login Google fonctionnel (penser à ajouter `https://app.coachflow.fr` dans les origines JS autorisées Google Cloud Console + `https://api.coachflow.fr/api/auth/google-calendar/callback/` comme redirect URI)
+- [ ] Login Google fonctionnel (penser à ajouter `https://app.trainflow.fr` dans les origines JS autorisées Google Cloud Console + `https://api.trainflow.fr/api/auth/google-calendar/callback/` comme redirect URI)
 - [ ] Cron `send_rappels` testé : `docker compose exec backend python manage.py send_rappels`
 - [ ] Sentry reçoit un event test (créer une erreur volontaire)
 - [ ] Backup créé : `docker compose exec backend python manage.py backup_db`

@@ -65,7 +65,7 @@ function CoachLayout() {
           </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg,#065f46,#1D9E75)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: '#fff' }}>⚡</div>
-            <span style={{ fontWeight: 800, fontSize: 15 }}>CoachFlow</span>
+            <span style={{ fontWeight: 800, fontSize: 15 }}>TrainFlow</span>
           </div>
         </div>
         <main className="page">

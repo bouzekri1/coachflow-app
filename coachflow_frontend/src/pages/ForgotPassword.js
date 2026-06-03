@@ -25,7 +25,7 @@ export default function ForgotPassword() {
       <div className="lg-box">
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <div className="lg-ico">⚡</div>
-          <div className="lg-h1">CoachFlow</div>
+          <div className="lg-h1">TrainFlow</div>
           <div className="lg-sub">Réinitialisation du mot de passe</div>
         </div>
 

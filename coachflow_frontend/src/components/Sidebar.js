@@ -33,7 +33,7 @@ export default function Sidebar({ badges = {}, open = false, onClose = () => {} 
       <div className="sb-logo">
         <div className="sb-mark">
           <div className="sb-ico">⚡</div>
-          <span className="sb-nm">CoachFlow</span>
+          <span className="sb-nm">TrainFlow</span>
         </div>
         <span className="sb-plan">{user?.plan === 'pro' ? '✦ Plan Pro' : '◇ Plan Free'}</span>
       </div>

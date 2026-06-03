@@ -43,7 +43,7 @@ class Command(BaseCommand):
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         errors = []
 
-        self.stdout.write(f'\n── Backup CoachFlow {timestamp} ──')
+        self.stdout.write(f'\n── Backup TrainFlow {timestamp} ──')
 
         # ── 1. Base de données ──────────────────────────────────────────────
         db_cfg    = settings.DATABASES['default']
@@ -187,12 +187,12 @@ class Command(BaseCommand):
         try:
             from django.core.mail import send_mail
             body = (
-                f'Le backup CoachFlow du {timestamp} a échoué :\n\n'
+                f'Le backup TrainFlow du {timestamp} a échoué :\n\n'
                 + '\n'.join(f'• {e}' for e in errors)
                 + '\n\nVérifiez les logs du serveur.'
             )
             send_mail(
-                subject=f'[CoachFlow] Échec backup {timestamp}',
+                subject=f'[TrainFlow] Échec backup {timestamp}',
                 message=body,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[alert_email],

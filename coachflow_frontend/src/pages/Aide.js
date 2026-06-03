@@ -62,11 +62,11 @@ const SECTIONS = [
       },
       {
         q: 'Comment ça marche avec Google Calendar ?',
-        a: <p>Une fois Google Calendar connecté&nbsp;: <br/>① toute séance créée dans CoachFlow apparaît dans votre Google Calendar ;<br/>② tout événement « occupé » dans votre Google Calendar bloque automatiquement le créneau côté client. Aucune double-réservation possible.</p>,
+        a: <p>Une fois Google Calendar connecté&nbsp;: <br/>① toute séance créée dans TrainFlow apparaît dans votre Google Calendar ;<br/>② tout événement « occupé » dans votre Google Calendar bloque automatiquement le créneau côté client. Aucune double-réservation possible.</p>,
       },
       {
         q: 'Faut-il choisir entre planning interne et Google Calendar ?',
-        a: <p>Non — les deux cohabitent. Le planning hebdomadaire CoachFlow définit vos plages <em>habituellement</em> disponibles, Google Calendar bloque les <em>exceptions</em> ponctuelles (rendez-vous médical, journée bloquée…).</p>,
+        a: <p>Non — les deux cohabitent. Le planning hebdomadaire TrainFlow définit vos plages <em>habituellement</em> disponibles, Google Calendar bloque les <em>exceptions</em> ponctuelles (rendez-vous médical, journée bloquée…).</p>,
       },
       {
         q: 'Un événement « toute la journée » dans Google bloque-t-il les créneaux ?',
@@ -240,7 +240,7 @@ export default function Aide() {
           Toujours bloqué ?
         </div>
         <div style={{ fontSize: 13, color: 'var(--t2)', lineHeight: 1.6 }}>
-          Écrivez-nous à <a href="mailto:support@coachflow.fr" style={{ color: '#6366F1', fontWeight: 600, textDecoration: 'none' }}>support@coachflow.fr</a><br/>
+          Écrivez-nous à <a href="mailto:support@trainflow.fr" style={{ color: '#6366F1', fontWeight: 600, textDecoration: 'none' }}>support@trainflow.fr</a><br/>
           Réponse sous 24h ouvrées.
         </div>
       </div>

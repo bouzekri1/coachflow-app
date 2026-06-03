@@ -101,7 +101,7 @@ def envoyer_verification_email(user, token):
     frontend_url = getattr(s, 'FRONTEND_URL', 'http://localhost:3000')
     verification_url = f'{frontend_url}/verify-email?token={token}'
     _send(
-        subject='Confirmez votre adresse email – CoachFlow',
+        subject='Confirmez votre adresse email – TrainFlow',
         template='verification_email',
         context={
             'prenom': user.first_name or user.username,
@@ -117,7 +117,7 @@ def envoyer_reset_password(user, token):
     reset_url = f'{frontend_url}/reset-password?token={token}'
     prenom = user.first_name or user.username
     _send(
-        subject='Réinitialisation de votre mot de passe – CoachFlow',
+        subject='Réinitialisation de votre mot de passe – TrainFlow',
         template='reset_password',
         context={
             'prenom': prenom,
@@ -133,7 +133,7 @@ def envoyer_bienvenue_coach(user):
     app_url = getattr(s, 'FRONTEND_URL', 'http://localhost:3000')
     prenom = user.first_name or user.username
     _send(
-        subject='🎉 Bienvenue sur CoachFlow — vos premiers pas',
+        subject='🎉 Bienvenue sur TrainFlow — vos premiers pas',
         template='bienvenue_coach',
         context={
             'prenom': prenom,
@@ -149,7 +149,7 @@ def envoyer_bienvenue_coach_google(user):
     app_url = getattr(s, 'FRONTEND_URL', 'http://localhost:3000')
     prenom = user.first_name or user.username
     _send(
-        subject='Bienvenue sur CoachFlow ! Votre compte est prêt',
+        subject='Bienvenue sur TrainFlow ! Votre compte est prêt',
         template='bienvenue_coach_google',
         context={
             'prenom': prenom,
@@ -167,7 +167,7 @@ def envoyer_confirmation_suppression(user):
     now = timezone.now()
     purge = now + timedelta(days=30)
     _send(
-        subject='Confirmation de suppression de votre compte CoachFlow',
+        subject='Confirmation de suppression de votre compte TrainFlow',
         template='suppression_compte',
         context={
             'prenom': prenom,
@@ -212,7 +212,7 @@ def envoyer_feedback_admin(feedback):
     sev_label = {'low': 'Mineur', 'medium': 'Moyen', 'high': 'CRITIQUE'}
     icon = icons.get(feedback.type, '📩')
     sev = f' [{sev_label[feedback.severity]}]' if feedback.severity else ''
-    subject = f'[CoachFlow] {icon} {feedback.get_type_display()}{sev} : {feedback.title}'
+    subject = f'[TrainFlow] {icon} {feedback.get_type_display()}{sev} : {feedback.title}'
     user_info = (
         f'{feedback.user.email} ({feedback.user_role})' if feedback.user
         else (feedback.user_email or 'Anonyme')

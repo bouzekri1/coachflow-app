@@ -1,6 +1,6 @@
 {
-  "name": "CoachFlow",
-  "short_name": "CoachFlow",
+  "name": "TrainFlow",
+  "short_name": "TrainFlow",
   "description": "Plateforme de coaching sportif professionnel",
   "start_url": "/dashboard",
   "scope": "/",
