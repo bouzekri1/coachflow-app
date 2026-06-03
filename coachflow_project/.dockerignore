@@ -1,0 +1,16 @@
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+db.sqlite3
+db.sqlite3-journal
+.env
+.env.local
+venv
+.venv
+staticfiles
+media
+.git
+.gitignore
+*.log
+.DS_Store
