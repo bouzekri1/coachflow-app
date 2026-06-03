@@ -14,6 +14,8 @@ const NAV = [
   { path: '/revenus',   icon: 'revenus',   label: 'Revenus' },
   { path: '/messages',  icon: 'messages',  label: 'Messages',  badge: 'messages' },
   { path: '/alertes',   icon: 'alertes',   label: 'Alertes',   badge: 'alertes' },
+  { sec: 'Support' },
+  { path: '/aide',      icon: 'help',      label: 'Aide' },
 ];
 
 export default function Sidebar({ badges = {}, open = false, onClose = () => {} }) {

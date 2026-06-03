@@ -9,6 +9,7 @@ import VerifyEmail from './pages/VerifyEmail';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Compte from './pages/Compte';
+import Aide from './pages/Aide';
 import CGU from './pages/CGU';
 import NotFound from './pages/NotFound';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -80,6 +81,7 @@ function CoachLayout() {
             <Route path="/messages"     element={<Messages />} />
             <Route path="/alertes"      element={<Alertes />} />
             <Route path="/compte"       element={<Compte />} />
+            <Route path="/aide"         element={<Aide />} />
             <Route path="/cgu"          element={<CGU />} />
             <Route path="*"             element={<NotFound />} />
           </Routes>
