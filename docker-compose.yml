@@ -30,14 +30,13 @@ services:
       - media:/app/media
       - static:/app/staticfiles
     # collectstatic + migrate à chaque démarrage, puis gunicorn
-    command: >
-      sh -c "python manage.py migrate --noinput &&
-             python manage.py collectstatic --noinput &&
-             gunicorn coachflow_project.wsgi:application
-               --bind 0.0.0.0:8000
-               --workers 3
-               --access-logfile -
-               --error-logfile -"
+    command:
+      - sh
+      - -c
+      - |
+        python manage.py migrate --noinput && \
+        python manage.py collectstatic --noinput && \
+        exec gunicorn coachflow_project.wsgi:application --bind 0.0.0.0:8000 --workers 3 --access-logfile - --error-logfile -
 
   caddy:
     image: caddy:2-alpine
@@ -45,6 +44,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      API_DOMAIN: ${API_DOMAIN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

@@ -17,9 +17,11 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt \
  && apt-get purge -y --auto-remove build-essential libpq-dev libjpeg-dev zlib1g-dev libfreetype6-dev libwebp-dev
 
-# User non-root
+# User non-root + dossiers writeables (staticfiles + media en volumes nommés)
 RUN useradd --create-home --shell /bin/bash app
 COPY --chown=app:app . /app
+RUN mkdir -p /app/staticfiles /app/media /app/static \
+ && chown -R app:app /app/staticfiles /app/media /app/static
 
 USER app
 
