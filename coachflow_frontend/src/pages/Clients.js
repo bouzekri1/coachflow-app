@@ -792,7 +792,6 @@ const REPAS_LABELS = {
   collation_soir: '🥜 Collation soir',
   diner: '🌙 Dîner',
 };
-const REPAS_ORDER = ['petit_dejeuner','collation_matin','dejeuner','collation_soir','diner'];
 
 /* ── QUOTA IA BADGE ────────────────────────────────────────────────────────── */
 function IaQuotaBadge({ quota }) {
@@ -1812,7 +1811,7 @@ function ClientNutritionTab({ clientId, client, data, date, onDateChange }) {
 
   if (!data) return <div style={{ textAlign:'center', padding:40, color:'var(--t3)' }}>Chargement…</div>;
 
-  const { entries = [], eau = [], eau_total_ml = 0 } = data;
+  const { entries = [], eau_total_ml = 0 } = data;
 
   const totals = entries.reduce((acc, e) => {
     const m = e.macros || {};

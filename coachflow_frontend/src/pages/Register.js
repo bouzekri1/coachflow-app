@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import GoogleLoginButton from '../components/GoogleLoginButton';
 
@@ -46,7 +46,6 @@ function PendingVerification({ email }) {
 }
 
 export default function Register() {
-  const nav = useNavigate();
   const [form, setForm] = useState({
     first_name: '', last_name: '', username: '', email: '', password: '', password2: '',
   });

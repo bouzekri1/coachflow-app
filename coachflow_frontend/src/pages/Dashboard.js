@@ -6,7 +6,7 @@ import { Av, Loader, PBar } from '../components/UI';
 import OnboardingWizard from '../components/OnboardingWizard';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend,
+  Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
 } from 'recharts';
 
 /* ── METRIC CARD ──────────────────────────────────────────────────────────── */

@@ -1411,7 +1411,7 @@ function CarnetModal({ seanceId, onClose }) {
       setLogs(d.series_log || []);
     }).catch(() => {});
 
-  useEffect(() => { load(); }, [seanceId]);
+  useEffect(() => { load(); }, [seanceId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const nextSerieNum = (nom) => logs.filter(l => l.exercice_nom.toLowerCase() === nom.toLowerCase()).length + 1;
 

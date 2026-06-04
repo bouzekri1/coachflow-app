@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { api } from '../services/api';
-import { Loader, Empty, Modal, toast, Ic } from '../components/UI';
+import { Loader, Empty, Modal, toast } from '../components/UI';
 
 /* ── VISUEL RECETTE ─────────────────────────────────────────────────────── */
 function recipeVisual(nom = '') {
@@ -88,13 +88,6 @@ const CAT_LABELS = {
   matieres_grasses: '🫒 Matières grasses',
   legumineuses:     '🫘 Légumineuses',
   autres:           '📦 Autres',
-};
-
-const MACRO_COLORS = {
-  calories:  '#1D9E75',
-  proteines: '#3B82F6',
-  glucides:  '#F59E0B',
-  lipides:   '#EF4444',
 };
 
 /* ── BADGE MACRO ─────────────────────────────────────────────────────────── */
