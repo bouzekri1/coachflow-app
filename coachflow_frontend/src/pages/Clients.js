@@ -549,7 +549,7 @@ export function ClientDetail() {
             ⚠️ L'identifiant est sensible à la casse — il doit être saisi <strong>exactement</strong> comme affiché ci-dessus.
           </div>
           <p style={{ fontSize:11, color:'var(--t3)' }}>
-            URL de connexion : <strong>http://localhost:3000/login</strong>
+            URL de connexion : <strong>{window.location.origin}/login</strong>
           </p>
         </Modal>
       )}
