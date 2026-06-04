@@ -8,19 +8,27 @@ function urlBase64ToUint8Array(base64String) {
   return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
 }
 
+const isSupported = () =>
+  typeof window !== 'undefined' &&
+  'Notification' in window &&
+  'serviceWorker' in navigator &&
+  'PushManager' in window;
+
 export default function usePushNotifications() {
-  const [permission, setPermission] = useState(Notification.permission);
+  const [permission, setPermission] = useState(
+    isSupported() ? Notification.permission : 'denied'
+  );
   const [subscribed, setSubscribed] = useState(false);
 
   useEffect(() => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    if (!isSupported()) return;
     navigator.serviceWorker.ready.then(reg => {
       reg.pushManager.getSubscription().then(sub => setSubscribed(!!sub));
     });
   }, []);
 
   const subscribe = useCallback(async () => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    if (!isSupported()) return;
     const perm = await Notification.requestPermission();
     setPermission(perm);
     if (perm !== 'granted') return;
@@ -37,6 +45,7 @@ export default function usePushNotifications() {
   }, []);
 
   const unsubscribe = useCallback(async () => {
+    if (!isSupported()) return;
     const reg = await navigator.serviceWorker.ready;
     const sub = await reg.pushManager.getSubscription();
     if (!sub) return;
