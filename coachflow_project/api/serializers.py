@@ -3,9 +3,17 @@ from core.models import *
 
 
 class UserSerializer(serializers.ModelSerializer):
+    ia_quota = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'role', 'avatar', 'phone']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'role', 'avatar', 'phone', 'ia_quota']
+
+    def get_ia_quota(self, obj):
+        if obj.role != 'coach':
+            return None
+        from core.ia_quota import quota_status
+        return quota_status(obj)
 
 
 class CoachProfileSerializer(serializers.ModelSerializer):
