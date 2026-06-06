@@ -56,13 +56,13 @@ function RecipeThumbBanner({ recette }) {
   if (src && !failed) {
     return (
       <img src={src} alt={recette.nom}
-        style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 10, display: 'block' }}
+        style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', objectPosition: 'center', borderRadius: 10, display: 'block', background: '#F1F5F9' }}
         onError={() => setFailed(true)}
       />
     );
   }
   return (
-    <div style={{ width:'100%', height:120, background: vis.bg, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', fontSize:44 }}>
+    <div style={{ width:'100%', aspectRatio: '16/9', background: vis.bg, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', fontSize:64 }}>
       {vis.e}
     </div>
   );
