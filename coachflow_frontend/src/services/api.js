@@ -73,6 +73,7 @@ export const api = {
     mesures: (id) => req('GET', `/clients/${id}/mesures/`),
     addMesure: (id, d) => req('POST', `/clients/${id}/mesures/`, d),
     historique: (id) => req('GET', `/clients/${id}/historique-seances/`),
+    facturationPrefill: (id, periode = 'mois_courant') => req('GET', `/clients/${id}/facturation-prefill/?periode=${periode}`),
     objectifs: (id) => req('GET', `/clients/${id}/objectifs/`),
     addObjectif: (id, d) => req('POST', `/clients/${id}/objectifs/`, d),
     updateObjectif: (clientId, objId, d) => req('PATCH', `/clients/${clientId}/objectifs/${objId}/`, d),

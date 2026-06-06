@@ -698,6 +698,53 @@ class ClientViewSet(viewsets.ModelViewSet):
         seances = client.seances.all()
         return Response(SeanceListSerializer(seances, many=True).data)
 
+    @action(detail=True, methods=['get'], url_path='facturation-prefill')
+    def facturation_prefill(self, request, pk=None):
+        from datetime import date
+        client = self.get_object()
+        periode = request.query_params.get('periode', 'mois_courant')
+
+        today = date.today()
+        if periode == 'mois_precedent':
+            mois_fin = today.replace(day=1)
+            mois_debut = (mois_fin - timedelta(days=1)).replace(day=1)
+        else:
+            periode = 'mois_courant'
+            mois_debut = today.replace(day=1)
+            mois_fin = (mois_debut.replace(day=28) + timedelta(days=4)).replace(day=1)
+
+        mois_label = mois_debut.strftime('%B %Y').capitalize()
+        tarif = float(client.tarif) if client.tarif else 0.0
+
+        if client.mode_facturation == 'seance':
+            nb = client.seances.filter(
+                statut='realisee',
+                date_heure__date__gte=mois_debut,
+                date_heure__date__lt=mois_fin,
+            ).count()
+            montant = round(tarif * nb, 2)
+            description = f'Coaching — {nb} séance{"s" if nb != 1 else ""} en {mois_label}'
+            lignes = [{'description': description, 'quantite': nb, 'prix_unitaire': tarif}]
+        else:
+            nb = 1
+            montant = tarif
+            description = f'Forfait coaching mensuel — {mois_label}'
+            lignes = [{'description': description, 'quantite': 1, 'prix_unitaire': tarif}]
+
+        return Response({
+            'mode_facturation': client.mode_facturation,
+            'tarif': tarif,
+            'nb_seances': nb,
+            'montant_ht': montant,
+            'montant_ttc': montant,
+            'description': description,
+            'lignes': lignes,
+            'periode': periode,
+            'periode_label': mois_label,
+            'periode_debut': mois_debut.isoformat(),
+            'periode_fin': (mois_fin - timedelta(days=1)).isoformat(),
+        })
+
     @action(detail=True, methods=['get'], url_path='performances')
     def performances(self, request, pk=None):
         from collections import defaultdict

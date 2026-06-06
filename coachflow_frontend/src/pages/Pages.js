@@ -1229,7 +1229,11 @@ export function Revenus() {
   const [clients, setClients] = useState([]);
   const [busy, setBusy]       = useState(true);
   const [showNew, setShowNew] = useState(false);
-  const [f, setF] = useState({ client:'', montant_ht:'', date_emission:'', date_echeance:'', statut:'envoyee', notes:'' });
+  const todayISO = () => new Date().toISOString().slice(0, 10);
+  const plusDaysISO = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
+  const emptyForm = () => ({ client:'', montant_ht:'', date_emission: todayISO(), date_echeance: plusDaysISO(14), statut:'envoyee', notes:'', periode: 'mois_courant' });
+  const [f, setF] = useState(emptyForm());
+  const [prefill, setPrefill] = useState(null);
   const s = (k, v) => setF(x => ({ ...x, [k]: v }));
 
   const load = () => Promise.all([api.factures.stats(), api.factures.list(), api.clients.list()]).then(([st, fa, cl]) => {
@@ -1237,12 +1241,31 @@ export function Revenus() {
   });
   useEffect(() => { load(); }, []); // eslint-disable-line
 
+  // Prefill montant + lignes quand client ou période change
+  useEffect(() => {
+    if (!f.client) { setPrefill(null); return; }
+    let cancelled = false;
+    api.clients.facturationPrefill(f.client, f.periode)
+      .then(p => { if (!cancelled) { setPrefill(p); setF(x => ({ ...x, montant_ht: p.montant_ht })); } })
+      .catch(() => { if (!cancelled) setPrefill(null); });
+    return () => { cancelled = true; };
+  }, [f.client, f.periode]);
+
+  const openNew = () => { setF(emptyForm()); setPrefill(null); setShowNew(true); };
+
   const create = async () => {
     if (!f.client || !f.montant_ht) return toast('Client et montant requis', 'err');
     if (!f.date_emission || !f.date_echeance) return toast('Dates d\'émission et d\'échéance requises', 'err');
     const m = Number(f.montant_ht);
+    const lignes = prefill?.lignes && Number(prefill.montant_ht) === m
+      ? prefill.lignes
+      : [{ description: 'Coaching', quantite: 1, prix_unitaire: m }];
     try {
-      await api.factures.create({ ...f, montant_ht:m, montant_ttc:m, taux_tva:0, lignes:[{ description:'Coaching', quantite:1, prix_unitaire:m }] });
+      await api.factures.create({
+        client: f.client, date_emission: f.date_emission, date_echeance: f.date_echeance,
+        statut: f.statut, notes: f.notes,
+        montant_ht: m, montant_ttc: m, taux_tva: 0, lignes,
+      });
       toast('Facture créée !'); setShowNew(false); load();
     } catch (e) { toast(e.message, 'err'); }
   };
@@ -1273,7 +1296,7 @@ export function Revenus() {
           <div className="page-title">Revenus</div>
           <div className="page-sub">Suivi financier et facturation</div>
         </div>
-        <button className="btn btn-p" onClick={() => setShowNew(true)}><Ic n="plus" s={14} /> Nouvelle facture</button>
+        <button className="btn btn-p" onClick={openNew}><Ic n="plus" s={14} /> Nouvelle facture</button>
       </div>
 
       <div className="mets rev-mets">
@@ -1383,8 +1406,60 @@ export function Revenus() {
               <option value="">Sélectionner</option>
               {clients.map(c => <option key={c.id} value={c.id}>{c.nom_complet}</option>)}
             </select></div>
+
+          {prefill && prefill.mode_facturation === 'seance' && (
+            <div className="fg">
+              <label className="fl">Période facturée</label>
+              <div style={{ display:'flex', gap:8 }}>
+                <button type="button"
+                  className={`btn btn-sm ${f.periode==='mois_courant' ? 'btn-p' : 'btn-s'}`}
+                  style={{ flex:1, justifyContent:'center' }}
+                  onClick={() => s('periode','mois_courant')}>
+                  Mois en cours
+                </button>
+                <button type="button"
+                  className={`btn btn-sm ${f.periode==='mois_precedent' ? 'btn-p' : 'btn-s'}`}
+                  style={{ flex:1, justifyContent:'center' }}
+                  onClick={() => s('periode','mois_precedent')}>
+                  Mois précédent
+                </button>
+              </div>
+            </div>
+          )}
+
+          {prefill && (
+            <div style={{ background:'#F0FDF4', border:'1px solid #BBF7D0', borderRadius:8, padding:'10px 12px', marginBottom:12, fontSize:13 }}>
+              {prefill.mode_facturation === 'seance' ? (
+                <>
+                  <div style={{ color:'#065F46', fontWeight:600 }}>📊 {prefill.periode_label}</div>
+                  <div style={{ color:'#047857', marginTop:4 }}>
+                    {prefill.nb_seances} séance{prefill.nb_seances !== 1 ? 's' : ''} × {prefill.tarif.toLocaleString('fr-FR')} € = <strong>{prefill.montant_ttc.toLocaleString('fr-FR')} €</strong>
+                  </div>
+                  {prefill.nb_seances === 0 && (
+                    <div style={{ color:'#92400E', marginTop:6, fontSize:12 }}>
+                      ⚠ Aucune séance réalisée — montant à 0 €.
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div style={{ color:'#065F46', fontWeight:600 }}>📅 Forfait mensuel</div>
+                  <div style={{ color:'#047857', marginTop:4 }}>
+                    {prefill.tarif.toLocaleString('fr-FR')} € — {prefill.periode_label}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
           <div className="fg"><label className="fl">Montant HT (€) *</label>
-            <input className="fi" type="number" value={f.montant_ht} onChange={e => s('montant_ht', e.target.value)} /></div>
+            <input className="fi" type="number" step="0.01" value={f.montant_ht} onChange={e => s('montant_ht', e.target.value)} />
+            {prefill && Number(f.montant_ht) !== Number(prefill.montant_ht) && (
+              <div style={{ fontSize:11, color:'var(--t3)', marginTop:4 }}>
+                Montant modifié manuellement (suggéré : {Number(prefill.montant_ht).toLocaleString('fr-FR')} €)
+              </div>
+            )}
+          </div>
           <div className="fr2">
             <div className="fg"><label className="fl">Date d&apos;émission</label><input className="fi" type="date" value={f.date_emission} onChange={e => s('date_emission', e.target.value)} /></div>
             <div className="fg"><label className="fl">Date d&apos;échéance</label><input className="fi" type="date" value={f.date_echeance} onChange={e => s('date_echeance', e.target.value)} /></div>
