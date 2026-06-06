@@ -2500,6 +2500,61 @@ def client_plans(request, client_id):
     return Response(data)
 
 
+def _extract_json(raw: str):
+    """Extrait un objet JSON depuis une réponse texte IA.
+
+    Gère les fences markdown (```json ... ```), les espaces, le texte
+    en préambule/postambule, et tente une réparation par troncature
+    si la fin du JSON est coupée (max_tokens atteint).
+    """
+    import json, re
+    if not raw:
+        return None
+    # Strip markdown code fences
+    s = raw.strip()
+    s = re.sub(r'^```(?:json)?\s*', '', s, flags=re.IGNORECASE)
+    s = re.sub(r'\s*```\s*$', '', s)
+    # Cherche le premier { ouvrant
+    start = s.find('{')
+    if start == -1:
+        return None
+    candidate = s[start:]
+    # Essai 1 : parse tel quel
+    try:
+        return json.loads(candidate)
+    except json.JSONDecodeError:
+        pass
+    # Essai 2 : tronquer au dernier } équilibré (utile si la réponse a été coupée)
+    depth = 0
+    last_ok = -1
+    in_str = False
+    esc = False
+    for i, ch in enumerate(candidate):
+        if esc:
+            esc = False
+            continue
+        if ch == '\\':
+            esc = True
+            continue
+        if ch == '"':
+            in_str = not in_str
+            continue
+        if in_str:
+            continue
+        if ch == '{':
+            depth += 1
+        elif ch == '}':
+            depth -= 1
+            if depth == 0:
+                last_ok = i
+    if last_ok > 0:
+        try:
+            return json.loads(candidate[:last_ok + 1])
+        except json.JSONDecodeError:
+            return None
+    return None
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def generer_plan_ia(request, client_id):
@@ -2590,20 +2645,19 @@ def generer_plan_ia(request, client_id):
         anth = anthropic.Anthropic(api_key=api_key)
         msg  = anth.messages.create(
             model='claude-haiku-4-5-20251001',
-            max_tokens=1800,
+            max_tokens=4000,
             messages=[{'role': 'user', 'content': prompt}],
         )
         raw = msg.content[0].text
-        m   = re.search(r'\{[\s\S]*\}', raw)
-        if not m:
-            return Response({'error': 'Réponse IA invalide (pas de JSON)'}, status=500)
-        plan_data = json.loads(m.group())
+        plan_data = _extract_json(raw)
+        if plan_data is None:
+            import logging
+            logging.warning('IA plan: JSON parse failed. Raw response (first 500 chars): %s', raw[:500])
+            return Response({'error': 'Réponse IA invalide. Réessayez dans quelques secondes.'}, status=500)
         record_generation(request.user, 'plan', params_hash, plan_data, profile=profile)
         return Response({**plan_data, '_cached': False, '_quota': quota_status(request.user)})
     except anthropic.APIError as e:
         return Response({'error': f'Erreur API Anthropic : {e}'}, status=500)
-    except json.JSONDecodeError:
-        return Response({'error': 'JSON invalide dans la réponse IA'}, status=500)
 
 
 @api_view(['POST'])
@@ -2753,16 +2807,15 @@ def generer_programme_ia(request, client_id):
             messages=[{'role': 'user', 'content': prompt}],
         )
         raw = msg.content[0].text
-        m   = re.search(r'\{[\s\S]*\}', raw)
-        if not m:
-            return Response({'error': 'Réponse IA invalide (pas de JSON)'}, status=500)
-        prog_data = json.loads(m.group())
+        prog_data = _extract_json(raw)
+        if prog_data is None:
+            import logging
+            logging.warning('IA programme: JSON parse failed. Raw response (first 500 chars): %s', raw[:500])
+            return Response({'error': 'Réponse IA invalide. Réessayez dans quelques secondes.'}, status=500)
         record_generation(request.user, 'programme', params_hash, prog_data, profile=profile)
         return Response({**prog_data, '_cached': False, '_quota': quota_status(request.user)})
     except anthropic.APIError as e:
         return Response({'error': f'Erreur API Anthropic : {e}'}, status=500)
-    except json.JSONDecodeError:
-        return Response({'error': 'JSON invalide dans la réponse IA'}, status=500)
 
 
 @api_view(['POST'])
