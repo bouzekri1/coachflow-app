@@ -609,6 +609,38 @@ def dashboard_view(request):
             'clients': count,
         })
 
+    # MRR estimé (12 derniers mois) : clients mensuels créés avant la fin du mois
+    # + clients séance × séances réalisées ce mois-là
+    mrr_par_mois = []
+    clients_mensuels = list(Client.objects.filter(
+        coach=user, mode_facturation='mensuel', tarif__isnull=False,
+    ).values('id', 'tarif', 'created_at', 'statut'))
+    clients_seance = list(Client.objects.filter(
+        coach=user, mode_facturation='seance', tarif__isnull=False,
+    ).values('id', 'tarif'))
+    for i in range(11, -1, -1):
+        m_start = (now - timedelta(days=30 * i)).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        m_end   = (m_start.replace(day=28) + timedelta(days=4)).replace(day=1)
+        # Récurrent : clients existant avant la fin du mois et non-inactifs
+        recurrent = sum(
+            float(c['tarif']) for c in clients_mensuels
+            if c['created_at'] < m_end and c['statut'] != 'inactif'
+        )
+        # Variable séance : count des séances réalisées ce mois × tarif
+        variable = 0.0
+        for c in clients_seance:
+            nb = Seance.objects.filter(
+                client_id=c['id'], statut='realisee',
+                date_heure__gte=m_start, date_heure__lt=m_end,
+            ).count()
+            variable += float(c['tarif']) * nb
+        mrr_par_mois.append({
+            'mois': m_start.strftime('%b %y'),
+            'recurrent': round(recurrent, 2),
+            'seance': round(variable, 2),
+            'total': round(recurrent + variable, 2),
+        })
+
     # Revenus mensuels (6 derniers mois)
     revenus_par_mois = []
     for i in range(5, -1, -1):
@@ -655,6 +687,7 @@ def dashboard_view(request):
         'prochaines_seances': SeanceListSerializer(prochaines, many=True).data,
         'clients_avancement': ClientListSerializer(clients_avancement, many=True).data,
         'clients_par_mois': clients_par_mois,
+        'mrr_par_mois': mrr_par_mois,
         'revenus_par_mois': revenus_par_mois,
         'seances_par_semaine': seances_par_semaine,
         'repartition_clients': repartition,

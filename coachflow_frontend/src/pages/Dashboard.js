@@ -6,7 +6,7 @@ import { Av, Loader, PBar } from '../components/UI';
 import OnboardingWizard from '../components/OnboardingWizard';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
+  Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from 'recharts';
 
 /* ── METRIC CARD ──────────────────────────────────────────────────────────── */
@@ -341,6 +341,40 @@ export default function Dashboard() {
                   <Tooltip contentStyle={TIP} formatter={v => [`${v} €`, 'Revenus']} />
                   <Bar dataKey="revenus" fill="#1D9E75" radius={[6, 6, 0, 0]} name="Revenus (€)" />
                 </BarChart>
+              </ResponsiveContainer>
+          }
+        </div>
+
+        {/* MRR évolution */}
+        <div className="card">
+          <div className="card-t">
+            📈 MRR estimé — évolution
+            <span style={{ fontSize: 11, color: 'var(--t3)', fontWeight: 500 }}>12 derniers mois</span>
+          </div>
+          {(data.mrr_par_mois || []).every(d => d.total === 0)
+            ? <div style={{ textAlign: 'center', padding: '30px 0', color: 'var(--t3)', fontSize: 13 }}>
+                Pas encore de MRR — renseigne un tarif pour tes clients
+              </div>
+            : <ResponsiveContainer width="100%" height={200}>
+                <AreaChart data={data.mrr_par_mois || []} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="gRecurrent" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366F1" stopOpacity={0.45} />
+                      <stop offset="95%" stopColor="#6366F1" stopOpacity={0.05} />
+                    </linearGradient>
+                    <linearGradient id="gSeance" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.45} />
+                      <stop offset="95%" stopColor="#F59E0B" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--bdr)" />
+                  <XAxis dataKey="mois" tick={{ fontSize: 10 }} />
+                  <YAxis tick={{ fontSize: 10 }} tickFormatter={v => `${v}€`} width={50} />
+                  <Tooltip contentStyle={TIP} formatter={v => [`${Number(v).toLocaleString('fr-FR')} €`]} />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                  <Area type="monotone" dataKey="recurrent" stackId="1" stroke="#6366F1" fill="url(#gRecurrent)" strokeWidth={2} name="Forfaits mensuels" />
+                  <Area type="monotone" dataKey="seance"    stackId="1" stroke="#F59E0B" fill="url(#gSeance)"    strokeWidth={2} name="Séances" />
+                </AreaChart>
               </ResponsiveContainer>
           }
         </div>
