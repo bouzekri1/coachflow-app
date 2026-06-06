@@ -85,7 +85,9 @@ class Command(BaseCommand):
         parser.add_argument('--api-key', required=False, default=os.environ.get('PEXELS_API_KEY'),
                             help='Pexels API key (ou via PEXELS_API_KEY env var)')
         parser.add_argument('--limit', type=int, default=None, help='Limiter à N recettes')
-        parser.add_argument('--overwrite', action='store_true', help='Remplacer les photos existantes')
+        parser.add_argument('--overwrite', action='store_true', help='Remplacer toutes les photos existantes')
+        parser.add_argument('--replace-placeholders', action='store_true',
+                            help='Remplacer aussi les placeholders générés (photos < 50 KB)')
 
     def handle(self, *args, **opts):
         api_key = opts['api_key']
@@ -96,11 +98,22 @@ class Command(BaseCommand):
 
         qs = Recette.objects.all()
         if not opts['overwrite']:
-            # Skip uniquement si une photo locale a déjà été téléchargée.
-            # image_url (URL externe) peut être cassé → on télécharge quand même.
             qs = qs.filter(photo='')
         if opts['limit']:
             qs = qs[:opts['limit']]
+
+        # Mode --replace-placeholders : ajoute les recettes avec photo placeholder (< 50 KB)
+        if opts['replace_placeholders'] and not opts['overwrite']:
+            placeholder_ids = []
+            for r in Recette.objects.exclude(photo=''):
+                try:
+                    if r.photo.size < 50 * 1024:
+                        placeholder_ids.append(r.id)
+                except (FileNotFoundError, ValueError):
+                    placeholder_ids.append(r.id)
+            extra = Recette.objects.filter(id__in=placeholder_ids)
+            qs = (qs | extra).distinct()
+            self.stdout.write(f'  ℹ  {extra.count()} placeholders détectés (photo < 50 KB)')
 
         total = qs.count()
         self.stdout.write(f'▶ {total} recettes à traiter…\n')
