@@ -70,6 +70,7 @@ function CoachLayout() {
         </div>
         <main className="page">
           <Routes>
+            <Route path="/"             element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard"    element={<Dashboard />} />
             <Route path="/clients"      element={<ClientsList />} />
             <Route path="/clients/:id"  element={<ClientDetail />} />
