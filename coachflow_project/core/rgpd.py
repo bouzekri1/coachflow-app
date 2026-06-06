@@ -59,7 +59,7 @@ def build_user_export(user) -> bytes:
         out['clients']     = _serialize(Client.objects.filter(coach=user),
             ['id','prenom','nom','email','phone','date_naissance','genre','statut',
              'date_debut','taille_cm','poids_depart_kg','poids_cible_kg','niveau',
-             'objectifs','blessures','contraintes_medicales','alimentation','tarif_mensuel','created_at'])
+             'objectifs','blessures','contraintes_medicales','alimentation','tarif','mode_facturation','created_at'])
         out['seances']     = _serialize(Seance.objects.filter(client__coach=user),
             ['id','date_heure','duree_minutes','type_seance','statut','notes','created_at'])
         out['programmes']  = _serialize(Programme.objects.filter(coach=user),

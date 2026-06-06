@@ -18,7 +18,7 @@ const METRICS = [
 
 /* ── MODAL NOUVEAU CLIENT ─────────────────────────────────────────────────── */
 function NouveauClient({ onClose, onDone }) {
-  const [f, setF] = useState({ prenom:'', nom:'', email:'', phone:'', statut:'nouveau', genre:'', taille_cm:'', poids_depart_kg:'', poids_cible_kg:'', niveau:'debutant', ville:'', tarif_mensuel:'' });
+  const [f, setF] = useState({ prenom:'', nom:'', email:'', phone:'', statut:'nouveau', genre:'', taille_cm:'', poids_depart_kg:'', poids_cible_kg:'', niveau:'debutant', ville:'', mode_facturation:'mensuel', tarif:'' });
   const [busy, setBusy] = useState(false);
   const s = (k, v) => setF(x => ({ ...x, [k]: v }));
 
@@ -27,7 +27,7 @@ function NouveauClient({ onClose, onDone }) {
     setBusy(true);
     try {
       const p = { ...f };
-      ['taille_cm','poids_depart_kg','poids_cible_kg','tarif_mensuel'].forEach(k => { if (!p[k]) delete p[k]; });
+      ['taille_cm','poids_depart_kg','poids_cible_kg','tarif'].forEach(k => { if (!p[k]) delete p[k]; });
       await api.clients.create(p);
       toast('Client créé !'); onDone();
     } catch (e) { toast(e.message, 'err'); } finally { setBusy(false); }
@@ -61,9 +61,31 @@ function NouveauClient({ onClose, onDone }) {
         <div className="fg"><label className="fl">Taille (cm)</label><input className="fi" type="number" value={f.taille_cm} onChange={e => s('taille_cm', e.target.value)} /></div>
         <div className="fg"><label className="fl">Poids départ (kg)</label><input className="fi" type="number" step="0.1" value={f.poids_depart_kg} onChange={e => s('poids_depart_kg', e.target.value)} /></div>
       </div>
-      <div className="fr2">
-        <div className="fg"><label className="fl">Poids cible (kg)</label><input className="fi" type="number" step="0.1" value={f.poids_cible_kg} onChange={e => s('poids_cible_kg', e.target.value)} /></div>
-        <div className="fg"><label className="fl">Tarif mensuel (€)</label><input className="fi" type="number" value={f.tarif_mensuel} onChange={e => s('tarif_mensuel', e.target.value)} /></div>
+      <div className="fg"><label className="fl">Poids cible (kg)</label><input className="fi" type="number" step="0.1" value={f.poids_cible_kg} onChange={e => s('poids_cible_kg', e.target.value)} /></div>
+      <div className="fg">
+        <label className="fl">Mode de facturation</label>
+        <div style={{ display:'flex', gap:8 }}>
+          <button type="button"
+            className={`btn btn-sm ${f.mode_facturation==='mensuel' ? 'btn-p' : 'btn-s'}`}
+            style={{ flex:1, justifyContent:'center' }}
+            onClick={() => s('mode_facturation','mensuel')}>
+            📅 Forfait mensuel
+          </button>
+          <button type="button"
+            className={`btn btn-sm ${f.mode_facturation==='seance' ? 'btn-p' : 'btn-s'}`}
+            style={{ flex:1, justifyContent:'center' }}
+            onClick={() => s('mode_facturation','seance')}>
+            🎯 Par séance
+          </button>
+        </div>
+      </div>
+      <div className="fg">
+        <label className="fl">
+          {f.mode_facturation === 'mensuel' ? 'Tarif mensuel (€/mois)' : 'Prix par séance (€/séance)'}
+        </label>
+        <input className="fi" type="number" step="0.01"
+          placeholder={f.mode_facturation === 'mensuel' ? 'ex : 120' : 'ex : 45'}
+          value={f.tarif} onChange={e => s('tarif', e.target.value)} />
       </div>
     </Modal>
   );
@@ -239,7 +261,8 @@ export function ClientDetail() {
       ville: client.ville || '', statut: client.statut || 'nouveau',
       niveau: client.niveau || '', taille_cm: client.taille_cm || '',
       poids_depart_kg: client.poids_depart_kg || '', poids_cible_kg: client.poids_cible_kg || '',
-      tarif_mensuel: client.tarif_mensuel || '', blessures: client.blessures || '',
+      mode_facturation: client.mode_facturation || 'mensuel',
+      tarif: client.tarif || '', blessures: client.blessures || '',
       contraintes_medicales: client.contraintes_medicales || '', alimentation: client.alimentation || '',
     });
     setEditModal(true);
@@ -250,7 +273,7 @@ export function ClientDetail() {
     setEditBusy(true);
     try {
       const payload = { ...editData };
-      ['taille_cm','poids_depart_kg','poids_cible_kg','tarif_mensuel'].forEach(k => {
+      ['taille_cm','poids_depart_kg','poids_cible_kg','tarif'].forEach(k => {
         if (payload[k] === '' || payload[k] === null) delete payload[k];
         else if (payload[k]) payload[k] = Number(payload[k]);
       });
@@ -376,7 +399,9 @@ export function ClientDetail() {
                 ['Poids cible', client.poids_cible_kg ? `${client.poids_cible_kg} kg` : '—'],
                 ['Taille', client.taille_cm ? `${client.taille_cm} cm` : '—'],
                 ['IMC', client.imc || '—'],
-                ['Tarif', client.tarif_mensuel ? `${client.tarif_mensuel} €/mois` : '—']].map(([l, v]) => (
+                ['Tarif', client.tarif
+                    ? `${client.tarif} €${client.mode_facturation === 'seance' ? '/séance' : '/mois'}`
+                    : '—']].map(([l, v]) => (
                 <div key={l} className="ir"><span className="irl">{l}</span><span className="irv">{v}</span></div>
               ))}
             </div>
@@ -498,9 +523,31 @@ export function ClientDetail() {
           </div>
 
           <div style={{ fontSize:12, fontWeight:700, color:'var(--t3)', textTransform:'uppercase', letterSpacing:'.5px', margin:'16px 0 10px' }}>Données physiques</div>
-          <div className="fr2">
-            <div className="fg"><label className="fl">Taille (cm)</label><input className="fi" type="number" value={editData.taille_cm} onChange={e => se('taille_cm', e.target.value)} /></div>
-            <div className="fg"><label className="fl">Tarif mensuel (€)</label><input className="fi" type="number" value={editData.tarif_mensuel} onChange={e => se('tarif_mensuel', e.target.value)} /></div>
+          <div className="fg"><label className="fl">Taille (cm)</label><input className="fi" type="number" value={editData.taille_cm} onChange={e => se('taille_cm', e.target.value)} /></div>
+          <div className="fg">
+            <label className="fl">Mode de facturation</label>
+            <div style={{ display:'flex', gap:8 }}>
+              <button type="button"
+                className={`btn btn-sm ${editData.mode_facturation==='mensuel' ? 'btn-p' : 'btn-s'}`}
+                style={{ flex:1, justifyContent:'center' }}
+                onClick={() => se('mode_facturation','mensuel')}>
+                📅 Forfait mensuel
+              </button>
+              <button type="button"
+                className={`btn btn-sm ${editData.mode_facturation==='seance' ? 'btn-p' : 'btn-s'}`}
+                style={{ flex:1, justifyContent:'center' }}
+                onClick={() => se('mode_facturation','seance')}>
+                🎯 Par séance
+              </button>
+            </div>
+          </div>
+          <div className="fg">
+            <label className="fl">
+              {editData.mode_facturation === 'mensuel' ? 'Tarif mensuel (€/mois)' : 'Prix par séance (€/séance)'}
+            </label>
+            <input className="fi" type="number" step="0.01"
+              placeholder={editData.mode_facturation === 'mensuel' ? 'ex : 120' : 'ex : 45'}
+              value={editData.tarif} onChange={e => se('tarif', e.target.value)} />
           </div>
           <div className="fr2">
             <div className="fg">

@@ -66,6 +66,7 @@ class Client(models.Model):
     ]
     GENRE_CHOICES = [('homme','Homme'),('femme','Femme'),('autre','Autre')]
     NIVEAU_CHOICES = [('debutant','Débutant'),('intermediaire','Intermédiaire'),('avance','Avancé')]
+    MODE_FACTURATION_CHOICES = [('mensuel','Forfait mensuel'),('seance','Par séance')]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     coach = models.ForeignKey(User, on_delete=models.CASCADE, related_name='clients')
@@ -89,7 +90,8 @@ class Client(models.Model):
     contraintes_medicales = models.TextField(blank=True)
     disponibilites = models.JSONField(default=list, blank=True)
     alimentation = models.CharField(max_length=100, blank=True)
-    tarif_mensuel = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
+    mode_facturation = models.CharField(max_length=10, choices=MODE_FACTURATION_CHOICES, default='mensuel')
+    tarif = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
     parraine_par = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='filleuls')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

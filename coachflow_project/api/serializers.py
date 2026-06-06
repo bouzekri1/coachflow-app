@@ -26,7 +26,7 @@ class ClientListSerializer(serializers.ModelSerializer):
         model = Client
         fields = ['id','prenom','nom','nom_complet','initiales','email','phone','statut',
                   'age','imc','taille_cm','poids_depart_kg','poids_cible_kg','niveau',
-                  'photo','ville','date_debut','tarif_mensuel','objectifs','programme_actif',
+                  'photo','ville','date_debut','tarif','mode_facturation','objectifs','programme_actif',
                   'user_account','created_at']
 
     def get_programme_actif(self, obj):
