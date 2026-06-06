@@ -96,7 +96,9 @@ class Command(BaseCommand):
 
         qs = Recette.objects.all()
         if not opts['overwrite']:
-            qs = qs.filter(photo='', image_url='')
+            # Skip uniquement si une photo locale a déjà été téléchargée.
+            # image_url (URL externe) peut être cassé → on télécharge quand même.
+            qs = qs.filter(photo='')
         if opts['limit']:
             qs = qs[:opts['limit']]
 
