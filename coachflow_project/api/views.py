@@ -101,6 +101,29 @@ def generer_alertes(coach):
                     priorite='moyenne',
                 )
 
+    # Facture mensuelle manquante (clients en mode 'mensuel' actifs, à partir du 5 du mois)
+    if today.day >= 5:
+        month_start = today.replace(day=1)
+        for c in Client.objects.filter(
+            coach=coach,
+            statut__in=['actif', 'nouveau'],
+            mode_facturation='mensuel',
+            tarif__isnull=False,
+        ):
+            has_facture = Facture.objects.filter(
+                coach=coach, client=c, date_emission__gte=month_start,
+            ).exists()
+            if not has_facture and not Alerte.objects.filter(
+                coach=coach, client=c, type_alerte='facture_mensuelle_manquante',
+                created_at__gte=month_start, traitee=False,
+            ).exists():
+                Alerte.objects.create(
+                    coach=coach, client=c, type_alerte='facture_mensuelle_manquante',
+                    titre=f'Facture du mois à émettre : {c.nom_complet}',
+                    description=f'Aucune facture émise ce mois-ci pour {c.prenom} ({c.tarif} €/mois).',
+                    priorite='moyenne',
+                )
+
 
 def coach_required(view_func):
     """Vérifie que l'user est bien un coach."""
@@ -528,6 +551,33 @@ def dashboard_view(request):
         statut__in=['payee', 'envoyee'],
     ).aggregate(total=Sum('montant_ttc'))['total'] or 0
 
+    # MRR estimé : somme des tarifs des clients mensuels actifs/nouveaux
+    mrr_recurrent = Client.objects.filter(
+        coach=user,
+        statut__in=['actif', 'nouveau'],
+        mode_facturation='mensuel',
+        tarif__isnull=False,
+    ).aggregate(total=Sum('tarif'))['total'] or 0
+
+    # Revenu variable : tarif × séances réalisées le mois dernier pour les clients séance
+    last_month_end = month_start
+    last_month_start = (last_month_end - timedelta(days=1)).replace(day=1)
+    seance_clients = Client.objects.filter(
+        coach=user,
+        statut__in=['actif', 'nouveau'],
+        mode_facturation='seance',
+        tarif__isnull=False,
+    )
+    mrr_seance_estime = 0
+    for c in seance_clients:
+        nb = c.seances.filter(
+            statut='realisee',
+            date_heure__date__gte=last_month_start,
+            date_heure__date__lt=last_month_end,
+        ).count()
+        mrr_seance_estime += float(c.tarif) * nb
+    mrr_total = float(mrr_recurrent) + mrr_seance_estime
+
     assignations = AssignationProgramme.objects.filter(
         client__coach=user, statut='en_cours'
     )
@@ -596,6 +646,9 @@ def dashboard_view(request):
         'seances_semaine': seances_semaine,
         'seances_restantes': seances_restantes,
         'revenus_mois': float(revenus_mois),
+        'mrr_recurrent': float(mrr_recurrent),
+        'mrr_seance_estime': round(mrr_seance_estime, 2),
+        'mrr_total': round(mrr_total, 2),
         'taux_completion': taux,
         'alertes_non_lues': alertes_non_lues,
         'messages_non_lus': messages_non_lus,

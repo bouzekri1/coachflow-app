@@ -281,7 +281,19 @@ export default function Dashboard() {
             ? (() => { const [prev, cur] = data.revenus_par_mois.slice(-2); return prev.revenus > 0 ? `${cur.revenus >= prev.revenus ? '+' : ''}${Math.round((cur.revenus - prev.revenus) / prev.revenus * 100)}% vs mois préc.` : null; })()
             : null}
           onClick={() => nav('/revenus')} />
-        <Met icon="🏆" label="Taux complétion" value={`${data.taux_completion}%`} color="purple" delta="programmes en cours" up={false} />
+        <Met icon="📈" label="MRR estimé" color="purple"
+          value={`${Number(data.mrr_total||0).toLocaleString('fr-FR')} €`}
+          delta={Number(data.mrr_seance_estime||0) > 0
+            ? `${Number(data.mrr_recurrent||0).toLocaleString('fr-FR')} € forfaits + ${Number(data.mrr_seance_estime||0).toLocaleString('fr-FR')} € séances`
+            : 'récurrent mensuel'}
+          onClick={() => nav('/revenus')} />
+      </div>
+
+      {/* Taux complétion en barre séparée */}
+      <div style={{ marginBottom: 16 }}>
+        <div className="mets" style={{ gridTemplateColumns: '1fr' }}>
+          <Met icon="🏆" label="Taux complétion programmes" value={`${data.taux_completion}%`} color="green" delta="moyenne des programmes en cours" up={false} />
+        </div>
       </div>
 
       {/* Graphiques */}

@@ -700,10 +700,10 @@ class PushSubscription(models.Model):
 
 class Alerte(models.Model):
     PRIORITE_CHOICES = [('haute','Haute'),('moyenne','Moyenne'),('basse','Basse')]
-    TYPE_CHOICES = [('absences','Absences'),('inactivite','Inactivité'),('facture_retard','Facture retard'),('fin_programme','Fin programme'),('objectif_atteint','Objectif atteint'),('nouvelle_mesure','Nouvelle mesure'),('nouvelle_reservation','Nouvelle réservation')]
+    TYPE_CHOICES = [('absences','Absences'),('inactivite','Inactivité'),('facture_retard','Facture retard'),('facture_mensuelle_manquante','Facture mensuelle manquante'),('fin_programme','Fin programme'),('objectif_atteint','Objectif atteint'),('nouvelle_mesure','Nouvelle mesure'),('nouvelle_reservation','Nouvelle réservation')]
     coach = models.ForeignKey(User, on_delete=models.CASCADE, related_name='alertes')
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='alertes')
-    type_alerte = models.CharField(max_length=20, choices=TYPE_CHOICES, default='absences')
+    type_alerte = models.CharField(max_length=30, choices=TYPE_CHOICES, default='absences')
     titre = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     priorite = models.CharField(max_length=10, choices=PRIORITE_CHOICES, default='moyenne')
