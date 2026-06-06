@@ -82,6 +82,86 @@ function QuickStartCard({ num, icon, title, desc, cta, color, onClick }) {
   );
 }
 
+/* ── HEATMAP ACTIVITÉ ────────────────────────────────────────────────────── */
+function HeatmapActivite({ data }) {
+  const grid = data && data.length === 7 ? data : Array(7).fill([0,0,0,0]);
+  const max = Math.max(1, ...grid.flat());
+  const total = grid.flat().reduce((s, n) => s + n, 0);
+  const JOURS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const CRENEAUX = [
+    { label: 'Matin',  hint: '5h-12h' },
+    { label: 'Midi',   hint: '12h-14h' },
+    { label: 'Aprem',  hint: '14h-18h' },
+    { label: 'Soir',   hint: '18h-24h' },
+  ];
+  const cellColor = (n) => {
+    if (n === 0) return '#F1F5F9';
+    const intensity = n / max;
+    // de #C6F6E0 (faible) à #065F46 (fort)
+    if (intensity < 0.25) return '#D1FAE5';
+    if (intensity < 0.5)  return '#6EE7B7';
+    if (intensity < 0.75) return '#10B981';
+    return '#047857';
+  };
+
+  if (total === 0) {
+    return (
+      <div style={{ textAlign:'center', padding:'30px 0', color:'var(--t3)', fontSize:13 }}>
+        Aucune séance sur les 90 derniers jours
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div style={{
+        display:'grid',
+        gridTemplateColumns:'auto repeat(4, 1fr)',
+        gap:6, padding:'8px 4px',
+      }}>
+        <div />
+        {CRENEAUX.map(c => (
+          <div key={c.label} style={{ fontSize:10, fontWeight:600, color:'var(--t3)', textAlign:'center' }}>
+            {c.label}
+            <div style={{ fontSize:9, fontWeight:400, color:'var(--t3)', opacity:.7 }}>{c.hint}</div>
+          </div>
+        ))}
+        {grid.flatMap((row, d) => [
+          <div key={`l-${d}`} style={{ fontSize:11, fontWeight:600, color:'var(--t2)', alignSelf:'center' }}>{JOURS[d]}</div>,
+          ...row.map((n, s) => (
+            <div key={`c-${d}-${s}`}
+              title={`${JOURS[d]} ${CRENEAUX[s].label} : ${n} séance${n !== 1 ? 's' : ''}`}
+              style={{
+                background: cellColor(n),
+                borderRadius: 6,
+                height: 28,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 11, fontWeight: 700,
+                color: n / max >= 0.5 ? '#fff' : '#065F46',
+                transition: 'transform .12s',
+                cursor: 'default',
+              }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.08)'}
+              onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
+              {n > 0 ? n : ''}
+            </div>
+          )),
+        ])}
+      </div>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:11, color:'var(--t3)', marginTop:6, paddingTop:8, borderTop:'1px solid var(--bdr)' }}>
+        <span>{total} séance{total !== 1 ? 's' : ''} au total</span>
+        <span style={{ display:'flex', alignItems:'center', gap:4 }}>
+          Moins
+          {['#F1F5F9','#D1FAE5','#6EE7B7','#10B981','#047857'].map(c => (
+            <span key={c} style={{ width:10, height:10, borderRadius:2, background:c, display:'inline-block' }} />
+          ))}
+          Plus
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function EmptyDashboard({ user, nav }) {
   const TIPS = [
     { icon: '🤖', title: 'Génération IA', text: 'Programmes et plans nutritionnels générés en quelques secondes, adaptés au profil de chaque client.' },
@@ -398,6 +478,15 @@ export default function Dashboard() {
                 </BarChart>
               </ResponsiveContainer>
           }
+        </div>
+
+        {/* Heatmap activité */}
+        <div className="card">
+          <div className="card-t">
+            🔥 Activité hebdomadaire
+            <span style={{ fontSize: 11, color: 'var(--t3)', fontWeight: 500 }}>90 derniers jours</span>
+          </div>
+          <HeatmapActivite data={data.heatmap_activite} />
         </div>
 
         {/* Répartition clients */}

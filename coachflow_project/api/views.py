@@ -673,6 +673,23 @@ def dashboard_view(request):
     from django.db.models import Count
     repartition = list(Client.objects.filter(coach=user).values('statut').annotate(n=Count('id')))
 
+    # Heatmap d'activité (90 derniers jours) : 7 jours × 4 créneaux horaires
+    # Slots : 0=matin (5-12h), 1=midi (12-14h), 2=après-midi (14-18h), 3=soir (18-24h)
+    heatmap_start = now - timedelta(days=90)
+    heatmap = [[0]*4 for _ in range(7)]
+    seances_recentes = Seance.objects.filter(
+        coach=user, date_heure__gte=heatmap_start,
+    ).values_list('date_heure', flat=True)
+    for dt in seances_recentes:
+        local_dt = timezone.localtime(dt)
+        day = local_dt.weekday()  # 0 = lundi
+        h = local_dt.hour
+        if   h < 12: slot = 0
+        elif h < 14: slot = 1
+        elif h < 18: slot = 2
+        else:        slot = 3
+        heatmap[day][slot] += 1
+
     return Response({
         'clients_actifs': clients_actifs,
         'seances_semaine': seances_semaine,
@@ -691,6 +708,7 @@ def dashboard_view(request):
         'revenus_par_mois': revenus_par_mois,
         'seances_par_semaine': seances_par_semaine,
         'repartition_clients': repartition,
+        'heatmap_activite': heatmap,
     })
 
 
