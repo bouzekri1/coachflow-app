@@ -398,12 +398,32 @@ export function ClientDetail() {
               {[['Poids départ', client.poids_depart_kg ? `${client.poids_depart_kg} kg` : '—'],
                 ['Poids cible', client.poids_cible_kg ? `${client.poids_cible_kg} kg` : '—'],
                 ['Taille', client.taille_cm ? `${client.taille_cm} cm` : '—'],
-                ['IMC', client.imc || '—'],
-                ['Tarif', client.tarif
-                    ? `${client.tarif} €${client.mode_facturation === 'seance' ? '/séance' : '/mois'}`
-                    : '—']].map(([l, v]) => (
+                ['IMC', client.imc || '—']].map(([l, v]) => (
                 <div key={l} className="ir"><span className="irl">{l}</span><span className="irv">{v}</span></div>
               ))}
+            </div>
+            <div className="card mb12">
+              <div className="card-t">💰 Facturation</div>
+              <div className="ir">
+                <span className="irl">Mode</span>
+                <span className="irv">
+                  <span style={{
+                    display:'inline-block', padding:'2px 8px', borderRadius:6, fontSize:11, fontWeight:700,
+                    background: client.mode_facturation === 'seance' ? '#FEF3C7' : '#E0E7FF',
+                    color: client.mode_facturation === 'seance' ? '#92400E' : '#3730A3',
+                  }}>
+                    {client.mode_facturation === 'seance' ? '🎯 Par séance' : '📅 Forfait mensuel'}
+                  </span>
+                </span>
+              </div>
+              <div className="ir">
+                <span className="irl">Tarif</span>
+                <span className="irv" style={{ fontWeight:700 }}>
+                  {client.tarif
+                    ? `${Number(client.tarif).toLocaleString('fr-FR')} €${client.mode_facturation === 'seance' ? ' / séance' : ' / mois'}`
+                    : '—'}
+                </span>
+              </div>
             </div>
             <div className="card">
               <div className="card-t">Objectifs & contraintes</div>

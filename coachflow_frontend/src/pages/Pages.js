@@ -1231,7 +1231,7 @@ export function Revenus() {
   const [showNew, setShowNew] = useState(false);
   const todayISO = () => new Date().toISOString().slice(0, 10);
   const plusDaysISO = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
-  const emptyForm = () => ({ client:'', montant_ht:'', date_emission: todayISO(), date_echeance: plusDaysISO(14), statut:'envoyee', notes:'', periode: 'mois_courant' });
+  const emptyForm = () => ({ client:'', montant_ht:'', quantite: 1, date_emission: todayISO(), date_echeance: plusDaysISO(14), statut:'envoyee', notes:'', periode: 'mois_courant' });
   const [f, setF] = useState(emptyForm());
   const [prefill, setPrefill] = useState(null);
   const s = (k, v) => setF(x => ({ ...x, [k]: v }));
@@ -1246,10 +1246,26 @@ export function Revenus() {
     if (!f.client) { setPrefill(null); return; }
     let cancelled = false;
     api.clients.facturationPrefill(f.client, f.periode)
-      .then(p => { if (!cancelled) { setPrefill(p); setF(x => ({ ...x, montant_ht: p.montant_ht })); } })
+      .then(p => {
+        if (cancelled) return;
+        setPrefill(p);
+        // Mode séance avec 0 séance réalisée → on suggère 1 séance pour ne pas bloquer
+        const qty = p.mode_facturation === 'seance'
+          ? (p.nb_seances > 0 ? p.nb_seances : 1)
+          : 1;
+        const montant = +(p.tarif * qty).toFixed(2);
+        setF(x => ({ ...x, montant_ht: montant, quantite: qty }));
+      })
       .catch(() => { if (!cancelled) setPrefill(null); });
     return () => { cancelled = true; };
   }, [f.client, f.periode]);
+
+  // Recalcule montant quand quantité change (mode séance)
+  useEffect(() => {
+    if (!prefill || prefill.mode_facturation !== 'seance') return;
+    const montant = +(prefill.tarif * Number(f.quantite || 0)).toFixed(2);
+    setF(x => ({ ...x, montant_ht: montant }));
+  }, [f.quantite, prefill]);
 
   const openNew = () => { setF(emptyForm()); setPrefill(null); setShowNew(true); };
 
@@ -1257,9 +1273,19 @@ export function Revenus() {
     if (!f.client || !f.montant_ht) return toast('Client et montant requis', 'err');
     if (!f.date_emission || !f.date_echeance) return toast('Dates d\'émission et d\'échéance requises', 'err');
     const m = Number(f.montant_ht);
-    const lignes = prefill?.lignes && Number(prefill.montant_ht) === m
-      ? prefill.lignes
-      : [{ description: 'Coaching', quantite: 1, prix_unitaire: m }];
+    let lignes;
+    if (prefill && prefill.mode_facturation === 'seance') {
+      const qty = Number(f.quantite || 1);
+      lignes = [{
+        description: `Coaching — ${qty} séance${qty !== 1 ? 's' : ''} (${prefill.periode_label})`,
+        quantite: qty,
+        prix_unitaire: prefill.tarif,
+      }];
+    } else if (prefill && prefill.mode_facturation === 'mensuel' && Number(prefill.montant_ht) === m) {
+      lignes = prefill.lignes;
+    } else {
+      lignes = [{ description: 'Coaching', quantite: 1, prix_unitaire: m }];
+    }
     try {
       await api.factures.create({
         client: f.client, date_emission: f.date_emission, date_echeance: f.date_echeance,
@@ -1431,13 +1457,13 @@ export function Revenus() {
             <div style={{ background:'#F0FDF4', border:'1px solid #BBF7D0', borderRadius:8, padding:'10px 12px', marginBottom:12, fontSize:13 }}>
               {prefill.mode_facturation === 'seance' ? (
                 <>
-                  <div style={{ color:'#065F46', fontWeight:600 }}>📊 {prefill.periode_label}</div>
+                  <div style={{ color:'#065F46', fontWeight:600 }}>🎯 Par séance — {prefill.periode_label}</div>
                   <div style={{ color:'#047857', marginTop:4 }}>
-                    {prefill.nb_seances} séance{prefill.nb_seances !== 1 ? 's' : ''} × {prefill.tarif.toLocaleString('fr-FR')} € = <strong>{prefill.montant_ttc.toLocaleString('fr-FR')} €</strong>
+                    Tarif : <strong>{prefill.tarif.toLocaleString('fr-FR')} €</strong> / séance · {prefill.nb_seances} séance{prefill.nb_seances !== 1 ? 's' : ''} réalisée{prefill.nb_seances !== 1 ? 's' : ''}
                   </div>
                   {prefill.nb_seances === 0 && (
                     <div style={{ color:'#92400E', marginTop:6, fontSize:12 }}>
-                      ⚠ Aucune séance réalisée — montant à 0 €.
+                      ⚠ Aucune séance marquée « réalisée » — ajuste la quantité ci-dessous si besoin.
                     </div>
                   )}
                 </>
@@ -1452,14 +1478,30 @@ export function Revenus() {
             </div>
           )}
 
-          <div className="fg"><label className="fl">Montant HT (€) *</label>
-            <input className="fi" type="number" step="0.01" value={f.montant_ht} onChange={e => s('montant_ht', e.target.value)} />
-            {prefill && Number(f.montant_ht) !== Number(prefill.montant_ht) && (
-              <div style={{ fontSize:11, color:'var(--t3)', marginTop:4 }}>
-                Montant modifié manuellement (suggéré : {Number(prefill.montant_ht).toLocaleString('fr-FR')} €)
+          {prefill && prefill.mode_facturation === 'seance' && (
+            <div className="fr2">
+              <div className="fg">
+                <label className="fl">Nombre de séances</label>
+                <input className="fi" type="number" min="0" step="1"
+                  value={f.quantite} onChange={e => s('quantite', e.target.value)} />
               </div>
-            )}
-          </div>
+              <div className="fg">
+                <label className="fl">Montant HT (€) *</label>
+                <input className="fi" type="number" step="0.01" value={f.montant_ht} onChange={e => s('montant_ht', e.target.value)} />
+              </div>
+            </div>
+          )}
+
+          {(!prefill || prefill.mode_facturation !== 'seance') && (
+            <div className="fg"><label className="fl">Montant HT (€) *</label>
+              <input className="fi" type="number" step="0.01" value={f.montant_ht} onChange={e => s('montant_ht', e.target.value)} />
+              {prefill && Number(f.montant_ht) !== Number(prefill.montant_ht) && (
+                <div style={{ fontSize:11, color:'var(--t3)', marginTop:4 }}>
+                  Montant modifié manuellement (suggéré : {Number(prefill.montant_ht).toLocaleString('fr-FR')} €)
+                </div>
+              )}
+            </div>
+          )}
           <div className="fr2">
             <div className="fg"><label className="fl">Date d&apos;émission</label><input className="fi" type="date" value={f.date_emission} onChange={e => s('date_emission', e.target.value)} /></div>
             <div className="fg"><label className="fl">Date d&apos;échéance</label><input className="fi" type="date" value={f.date_echeance} onChange={e => s('date_echeance', e.target.value)} /></div>
