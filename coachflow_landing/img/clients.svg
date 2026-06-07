@@ -1,0 +1,284 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="sb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#032d22"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#1D9E75"/>
+    </linearGradient>
+    <linearGradient id="av1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366F1"/><stop offset="100%" stop-color="#a5b4fc"/></linearGradient>
+    <linearGradient id="av2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#fcd34d"/></linearGradient>
+    <linearGradient id="av3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1D9E75"/><stop offset="100%" stop-color="#6ee7b7"/></linearGradient>
+    <linearGradient id="av4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#EC4899"/><stop offset="100%" stop-color="#f9a8d4"/></linearGradient>
+    <linearGradient id="av5" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0EA5E9"/><stop offset="100%" stop-color="#7dd3fc"/></linearGradient>
+    <linearGradient id="av6" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#8B5CF6"/><stop offset="100%" stop-color="#c4b5fd"/></linearGradient>
+    <filter id="cs" x="-5%" y="-5%" width="110%" height="120%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dy="2"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.05"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1440" height="900" fill="#F8FAFC"/>
+
+  <!-- ═════ SIDEBAR ═════ -->
+  <g>
+    <rect width="240" height="900" fill="url(#sb)"/>
+    <rect x="20" y="22" width="38" height="38" rx="10" fill="rgba(255,255,255,0.15)"/>
+    <text x="39" y="49" font-size="20" text-anchor="middle" fill="#fff">⚡</text>
+    <text x="68" y="42" font-size="17" font-weight="800" fill="#fff">TrainFlow</text>
+    <text x="68" y="58" font-size="10" fill="#a7f3d0" font-weight="600">✦ Plan Pro</text>
+
+    <text x="22" y="100" font-size="10" font-weight="700" letter-spacing="1" fill="#6ee7b7" opacity="0.7">PRINCIPAL</text>
+
+    <g font-size="13" font-weight="500" fill="#a7f3d0">
+      <g transform="translate(0, 112)">
+        <text x="32" y="22" font-size="14">📊</text>
+        <text x="58" y="24">Tableau de bord</text>
+      </g>
+      <!-- Active : Clients -->
+      <rect x="14" y="150" width="212" height="38" rx="9" fill="rgba(255,255,255,0.15)"/>
+      <g transform="translate(28, 162)" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="5" cy="5" r="3"/>
+        <path d="M0 14 a5 5 0 0 1 10 0"/>
+        <circle cx="11" cy="3" r="2.5"/>
+      </g>
+      <text x="58" y="174" font-size="13" font-weight="700" fill="#fff">Clients</text>
+      <text x="220" y="174" text-anchor="end" font-size="11" fill="#fff" font-weight="700">14</text>
+
+      <g transform="translate(0, 196)">
+        <text x="32" y="20" font-size="14">🏋️</text>
+        <text x="58" y="22">Programmes</text>
+      </g>
+      <g transform="translate(0, 234)">
+        <text x="32" y="20" font-size="14">🥗</text>
+        <text x="58" y="22">Nutrition</text>
+      </g>
+      <g transform="translate(0, 272)">
+        <text x="32" y="20" font-size="14">💪</text>
+        <text x="58" y="22">Exercices</text>
+      </g>
+    </g>
+
+    <text x="22" y="324" font-size="10" font-weight="700" letter-spacing="1" fill="#6ee7b7" opacity="0.7">GESTION</text>
+    <g font-size="13" font-weight="500" fill="#a7f3d0">
+      <g transform="translate(0, 336)"><text x="32" y="20" font-size="14">📅</text><text x="58" y="22">Planning</text></g>
+      <g transform="translate(0, 374)"><text x="32" y="20" font-size="14">💰</text><text x="58" y="22">Revenus</text></g>
+      <g transform="translate(0, 412)">
+        <text x="32" y="20" font-size="14">💬</text>
+        <text x="58" y="22">Messages</text>
+        <circle cx="220" cy="16" r="9" fill="#EF4444"/>
+        <text x="220" y="20" font-size="10" font-weight="800" fill="#fff" text-anchor="middle">3</text>
+      </g>
+      <g transform="translate(0, 450)"><text x="32" y="20" font-size="14">🚨</text><text x="58" y="22">Alertes</text></g>
+    </g>
+
+    <rect x="14" y="838" width="212" height="50" rx="10" fill="rgba(255,255,255,0.06)"/>
+    <circle cx="38" cy="863" r="16" fill="url(#brand)"/>
+    <text x="38" y="868" font-size="11" font-weight="800" fill="#fff" text-anchor="middle">AB</text>
+    <text x="62" y="860" font-size="12" font-weight="700" fill="#fff">Abdessamad B.</text>
+    <text x="62" y="876" font-size="10" fill="#a7f3d0">Coach Pro</text>
+  </g>
+
+  <!-- ═════ MAIN ═════ -->
+  <g transform="translate(240, 0)">
+    <!-- Top bar -->
+    <rect x="0" y="0" width="1200" height="76" fill="#fff"/>
+    <line x1="0" y1="76" x2="1200" y2="76" stroke="#E5E7EB"/>
+    <text x="36" y="40" font-size="22" font-weight="900" fill="#0F172A">Clients</text>
+    <text x="36" y="60" font-size="13" fill="#64748B">14 clients · 11 actifs · 2 nouveaux · 1 en pause</text>
+
+    <!-- Search bar -->
+    <rect x="780" y="22" width="240" height="34" rx="8" fill="#F1F5F9"/>
+    <text x="798" y="44" font-size="12" fill="#94A3B8">🔍 Rechercher un client…</text>
+    <!-- New client button -->
+    <rect x="1032" y="22" width="136" height="34" rx="8" fill="url(#brand)"/>
+    <text x="1100" y="44" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">+ Nouveau client</text>
+
+    <!-- Filter chips -->
+    <g transform="translate(36, 100)">
+      <rect x="0"   y="0" width="60"  height="32" rx="8" fill="#0F172A"/>
+      <text x="30"  y="21" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">Tous</text>
+      <text x="48"  y="13" font-size="9"  font-weight="800" fill="#a7f3d0">14</text>
+
+      <rect x="72"  y="0" width="74"  height="32" rx="8" fill="#fff" stroke="#E5E7EB"/>
+      <text x="109" y="21" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">Actifs (11)</text>
+
+      <rect x="158" y="0" width="100" height="32" rx="8" fill="#fff" stroke="#E5E7EB"/>
+      <text x="208" y="21" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">Nouveaux (2)</text>
+
+      <rect x="270" y="0" width="100" height="32" rx="8" fill="#fff" stroke="#E5E7EB"/>
+      <text x="320" y="21" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">En pause (1)</text>
+
+      <rect x="382" y="0" width="86" height="32" rx="8" fill="#fff" stroke="#E5E7EB"/>
+      <text x="425" y="21" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">Inactifs (0)</text>
+    </g>
+
+    <!-- ═════ CLIENT CARDS GRID (3 cols × 2 rows) ═════ -->
+
+    <!-- Card 1: Marc Durand -->
+    <g transform="translate(36, 156)">
+      <rect width="360" height="220" rx="14" fill="#fff" filter="url(#cs)"/>
+      <circle cx="60" cy="60" r="32" fill="url(#av1)"/>
+      <text x="60" y="68" font-size="20" font-weight="800" fill="#fff" text-anchor="middle">MD</text>
+      <text x="108" y="50" font-size="16" font-weight="800" fill="#0F172A">Marc Durand</text>
+      <text x="108" y="68" font-size="12" fill="#64748B">32 ans · Lyon</text>
+      <rect x="108" y="76" width="60" height="20" rx="5" fill="#DCFCE7"/>
+      <text x="138" y="90" font-size="10" font-weight="800" fill="#166534" text-anchor="middle">● Actif</text>
+
+      <line x1="20" y1="110" x2="340" y2="110" stroke="#F1F5F9"/>
+
+      <text x="20" y="132" font-size="11" font-weight="600" fill="#64748B">Programme</text>
+      <text x="340" y="132" font-size="11" font-weight="700" fill="#0F172A" text-anchor="end">Force débutant</text>
+      <text x="20" y="152" font-size="11" font-weight="600" fill="#64748B">Tarif mensuel</text>
+      <text x="340" y="152" font-size="11" font-weight="700" fill="#0F172A" text-anchor="end">180 € / mois</text>
+
+      <text x="20" y="180" font-size="10" font-weight="700" fill="#64748B">PROGRESSION SEM. 4/12</text>
+      <rect x="20" y="190" width="320" height="6" rx="3" fill="#F1F5F9"/>
+      <rect x="20" y="190" width="106" height="6" rx="3" fill="#1D9E75"/>
+      <text x="340" y="187" font-size="10" font-weight="800" fill="#1D9E75" text-anchor="end">33%</text>
+    </g>
+
+    <!-- Card 2: Sophie Lambert -->
+    <g transform="translate(420, 156)">
+      <rect width="360" height="220" rx="14" fill="#fff" filter="url(#cs)"/>
+      <circle cx="60" cy="60" r="32" fill="url(#av2)"/>
+      <text x="60" y="68" font-size="20" font-weight="800" fill="#fff" text-anchor="middle">SL</text>
+      <text x="108" y="50" font-size="16" font-weight="800" fill="#0F172A">Sophie Lambert</text>
+      <text x="108" y="68" font-size="12" fill="#64748B">28 ans · Paris</text>
+      <rect x="108" y="76" width="60" height="20" rx="5" fill="#FEE2E2"/>
+      <text x="138" y="90" font-size="10" font-weight="800" fill="#991B1B" text-anchor="middle">● Retard</text>
+
+      <line x1="20" y1="110" x2="340" y2="110" stroke="#F1F5F9"/>
+
+      <text x="20" y="132" font-size="11" font-weight="600" fill="#64748B">Programme</text>
+      <text x="340" y="132" font-size="11" font-weight="700" fill="#0F172A" text-anchor="end">Perte de poids</text>
+      <text x="20" y="152" font-size="11" font-weight="600" fill="#64748B">Tarif mensuel</text>
+      <text x="340" y="152" font-size="11" font-weight="700" fill="#0F172A" text-anchor="end">220 € / mois</text>
+
+      <text x="20" y="180" font-size="10" font-weight="700" fill="#64748B">PROGRESSION SEM. 8/12</text>
+      <rect x="20" y="190" width="320" height="6" rx="3" fill="#F1F5F9"/>
+      <rect x="20" y="190" width="213" height="6" rx="3" fill="#F59E0B"/>
+      <text x="340" y="187" font-size="10" font-weight="800" fill="#F59E0B" text-anchor="end">67%</text>
+    </g>
+
+    <!-- Card 3: Karim Benali -->
+    <g transform="translate(804, 156)">
+      <rect width="360" height="220" rx="14" fill="#fff" filter="url(#cs)"/>
+      <circle cx="60" cy="60" r="32" fill="url(#av3)"/>
+      <text x="60" y="68" font-size="20" font-weight="800" fill="#fff" text-anchor="middle">KB</text>
+      <text x="108" y="50" font-size="16" font-weight="800" fill="#0F172A">Karim Benali</text>
+      <text x="108" y="68" font-size="12" fill="#64748B">35 ans · Marseille</text>
+      <rect x="108" y="76" width="60" height="20" rx="5" fill="#DCFCE7"/>
+      <text x="138" y="90" font-size="10" font-weight="800" fill="#166534" text-anchor="middle">● Actif</text>
+
+      <line x1="20" y1="110" x2="340" y2="110" stroke="#F1F5F9"/>
+
+      <text x="20" y="132" font-size="11" font-weight="600" fill="#64748B">Programme</text>
+      <text x="340" y="132" font-size="11" font-weight="700" fill="#0F172A" text-anchor="end">Force avancé</text>
+      <text x="20" y="152" font-size="11" font-weight="600" fill="#64748B">Par séance</text>
+      <text x="340" y="152" font-size="11" font-weight="700" fill="#0F172A" text-anchor="end">50 € / séance</text>
+
+      <text x="20" y="180" font-size="10" font-weight="700" fill="#64748B">PROGRESSION SEM. 10/12</text>
+      <rect x="20" y="190" width="320" height="6" rx="3" fill="#F1F5F9"/>
+      <rect x="20" y="190" width="266" height="6" rx="3" fill="#1D9E75"/>
+      <text x="340" y="187" font-size="10" font-weight="800" fill="#1D9E75" text-anchor="end">83%</text>
+    </g>
+
+    <!-- Card 4: Léa Martin -->
+    <g transform="translate(36, 400)">
+      <rect width="360" height="220" rx="14" fill="#fff" filter="url(#cs)"/>
+      <circle cx="60" cy="60" r="32" fill="url(#av4)"/>
+      <text x="60" y="68" font-size="20" font-weight="800" fill="#fff" text-anchor="middle">LM</text>
+      <text x="108" y="50" font-size="16" font-weight="800" fill="#0F172A">Léa Martin</text>
+      <text x="108" y="68" font-size="12" fill="#64748B">24 ans · Bordeaux</text>
+      <rect x="108" y="76" width="68" height="20" rx="5" fill="#DBEAFE"/>
+      <text x="142" y="90" font-size="10" font-weight="800" fill="#1E40AF" text-anchor="middle">● Nouvelle</text>
+
+      <line x1="20" y1="110" x2="340" y2="110" stroke="#F1F5F9"/>
+
+      <text x="20" y="132" font-size="11" font-weight="600" fill="#64748B">Programme</text>
+      <text x="340" y="132" font-size="11" font-weight="700" fill="#0F172A" text-anchor="end">Remise en forme</text>
+      <text x="20" y="152" font-size="11" font-weight="600" fill="#64748B">Tarif mensuel</text>
+      <text x="340" y="152" font-size="11" font-weight="700" fill="#0F172A" text-anchor="end">150 € / mois</text>
+
+      <text x="20" y="180" font-size="10" font-weight="700" fill="#64748B">PROGRESSION SEM. 1/8</text>
+      <rect x="20" y="190" width="320" height="6" rx="3" fill="#F1F5F9"/>
+      <rect x="20" y="190" width="40" height="6" rx="3" fill="#6366F1"/>
+      <text x="340" y="187" font-size="10" font-weight="800" fill="#6366F1" text-anchor="end">12%</text>
+    </g>
+
+    <!-- Card 5: Antoine Petit -->
+    <g transform="translate(420, 400)">
+      <rect width="360" height="220" rx="14" fill="#fff" filter="url(#cs)"/>
+      <circle cx="60" cy="60" r="32" fill="url(#av5)"/>
+      <text x="60" y="68" font-size="20" font-weight="800" fill="#fff" text-anchor="middle">AP</text>
+      <text x="108" y="50" font-size="16" font-weight="800" fill="#0F172A">Antoine Petit</text>
+      <text x="108" y="68" font-size="12" fill="#64748B">41 ans · Toulouse</text>
+      <rect x="108" y="76" width="60" height="20" rx="5" fill="#DCFCE7"/>
+      <text x="138" y="90" font-size="10" font-weight="800" fill="#166534" text-anchor="middle">● Actif</text>
+
+      <line x1="20" y1="110" x2="340" y2="110" stroke="#F1F5F9"/>
+
+      <text x="20" y="132" font-size="11" font-weight="600" fill="#64748B">Programme</text>
+      <text x="340" y="132" font-size="11" font-weight="700" fill="#0F172A" text-anchor="end">Cardio &amp; endurance</text>
+      <text x="20" y="152" font-size="11" font-weight="600" fill="#64748B">Tarif mensuel</text>
+      <text x="340" y="152" font-size="11" font-weight="700" fill="#0F172A" text-anchor="end">200 € / mois</text>
+
+      <text x="20" y="180" font-size="10" font-weight="700" fill="#64748B">PROGRESSION SEM. 6/10</text>
+      <rect x="20" y="190" width="320" height="6" rx="3" fill="#F1F5F9"/>
+      <rect x="20" y="190" width="192" height="6" rx="3" fill="#1D9E75"/>
+      <text x="340" y="187" font-size="10" font-weight="800" fill="#1D9E75" text-anchor="end">60%</text>
+    </g>
+
+    <!-- Card 6: Camille Roux -->
+    <g transform="translate(804, 400)">
+      <rect width="360" height="220" rx="14" fill="#fff" filter="url(#cs)"/>
+      <circle cx="60" cy="60" r="32" fill="url(#av6)"/>
+      <text x="60" y="68" font-size="20" font-weight="800" fill="#fff" text-anchor="middle">CR</text>
+      <text x="108" y="50" font-size="16" font-weight="800" fill="#0F172A">Camille Roux</text>
+      <text x="108" y="68" font-size="12" fill="#64748B">38 ans · Nice</text>
+      <rect x="108" y="76" width="74" height="20" rx="5" fill="#FEF3C7"/>
+      <text x="145" y="90" font-size="10" font-weight="800" fill="#92400E" text-anchor="middle">● En pause</text>
+
+      <line x1="20" y1="110" x2="340" y2="110" stroke="#F1F5F9"/>
+
+      <text x="20" y="132" font-size="11" font-weight="600" fill="#64748B">Programme</text>
+      <text x="340" y="132" font-size="11" font-weight="700" fill="#0F172A" text-anchor="end">Mobilité</text>
+      <text x="20" y="152" font-size="11" font-weight="600" fill="#64748B">Tarif mensuel</text>
+      <text x="340" y="152" font-size="11" font-weight="700" fill="#0F172A" text-anchor="end">160 € / mois</text>
+
+      <text x="20" y="180" font-size="10" font-weight="700" fill="#64748B">PROGRESSION SEM. 5/8</text>
+      <rect x="20" y="190" width="320" height="6" rx="3" fill="#F1F5F9"/>
+      <rect x="20" y="190" width="200" height="6" rx="3" fill="#94A3B8"/>
+      <text x="340" y="187" font-size="10" font-weight="800" fill="#94A3B8" text-anchor="end">62%</text>
+    </g>
+
+    <!-- Footer pagination + bottom info -->
+    <g transform="translate(36, 660)">
+      <rect width="1128" height="60" rx="12" fill="#fff" filter="url(#cs)"/>
+      <text x="20" y="36" font-size="13" font-weight="600" fill="#64748B">Affichage de 6 sur 14 clients</text>
+
+      <!-- Pagination -->
+      <g transform="translate(900, 14)">
+        <rect x="0" y="0" width="32" height="32" rx="7" fill="#fff" stroke="#E5E7EB"/>
+        <text x="16" y="22" font-size="13" fill="#475569" text-anchor="middle">←</text>
+
+        <rect x="40" y="0" width="32" height="32" rx="7" fill="#1D9E75"/>
+        <text x="56" y="22" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+
+        <rect x="80" y="0" width="32" height="32" rx="7" fill="#fff" stroke="#E5E7EB"/>
+        <text x="96" y="22" font-size="13" fill="#475569" text-anchor="middle">2</text>
+
+        <rect x="120" y="0" width="32" height="32" rx="7" fill="#fff" stroke="#E5E7EB"/>
+        <text x="136" y="22" font-size="13" fill="#475569" text-anchor="middle">3</text>
+
+        <rect x="160" y="0" width="32" height="32" rx="7" fill="#fff" stroke="#E5E7EB"/>
+        <text x="176" y="22" font-size="13" fill="#475569" text-anchor="middle">→</text>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,338 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="sb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#032d22"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#1D9E75"/>
+    </linearGradient>
+    <linearGradient id="mrrFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1D9E75" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#1D9E75" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="cs" x="-5%" y="-5%" width="110%" height="120%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dy="2"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.05"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Fond global -->
+  <rect width="1440" height="900" fill="#F8FAFC"/>
+
+  <!-- ═════ SIDEBAR ═════ -->
+  <g>
+    <rect width="240" height="900" fill="url(#sb)"/>
+    <!-- Logo -->
+    <rect x="20" y="22" width="38" height="38" rx="10" fill="rgba(255,255,255,0.15)"/>
+    <text x="39" y="49" font-size="20" text-anchor="middle" fill="#fff">⚡</text>
+    <text x="68" y="42" font-size="17" font-weight="800" fill="#fff">TrainFlow</text>
+    <text x="68" y="58" font-size="10" fill="#a7f3d0" font-weight="600">✦ Plan Pro</text>
+
+    <!-- Section Principal -->
+    <text x="22" y="100" font-size="10" font-weight="700" letter-spacing="1" fill="#6ee7b7" opacity="0.7">PRINCIPAL</text>
+
+    <!-- Active : Dashboard -->
+    <rect x="14" y="112" width="212" height="38" rx="9" fill="rgba(255,255,255,0.15)"/>
+    <g transform="translate(28, 124)" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0 7 L7 0 L14 7 L14 14 L0 14 Z"/>
+    </g>
+    <text x="58" y="136" font-size="13" font-weight="700" fill="#fff">Tableau de bord</text>
+
+    <!-- Items inactifs -->
+    <g font-size="13" font-weight="500" fill="#a7f3d0">
+      <g transform="translate(0, 158)">
+        <g transform="translate(28, 12)" stroke="#a7f3d0" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="5" cy="5" r="3"/>
+          <path d="M0 14 a5 5 0 0 1 10 0"/>
+          <circle cx="11" cy="3" r="2.5"/>
+        </g>
+        <text x="58" y="22">Clients</text>
+        <text x="220" y="22" text-anchor="end" font-size="11" fill="#6ee7b7">14</text>
+      </g>
+      <g transform="translate(0, 196)">
+        <text x="32" y="20" font-size="14">🏋️</text>
+        <text x="58" y="22">Programmes</text>
+      </g>
+      <g transform="translate(0, 234)">
+        <text x="32" y="20" font-size="14">🥗</text>
+        <text x="58" y="22">Nutrition</text>
+      </g>
+      <g transform="translate(0, 272)">
+        <text x="32" y="20" font-size="14">💪</text>
+        <text x="58" y="22">Exercices</text>
+      </g>
+    </g>
+
+    <!-- Section Gestion -->
+    <text x="22" y="324" font-size="10" font-weight="700" letter-spacing="1" fill="#6ee7b7" opacity="0.7">GESTION</text>
+    <g font-size="13" font-weight="500" fill="#a7f3d0">
+      <g transform="translate(0, 336)">
+        <text x="32" y="20" font-size="14">📅</text>
+        <text x="58" y="22">Planning</text>
+      </g>
+      <g transform="translate(0, 374)">
+        <text x="32" y="20" font-size="14">💰</text>
+        <text x="58" y="22">Revenus</text>
+      </g>
+      <g transform="translate(0, 412)">
+        <text x="32" y="20" font-size="14">💬</text>
+        <text x="58" y="22">Messages</text>
+        <circle cx="220" cy="16" r="9" fill="#EF4444"/>
+        <text x="220" y="20" font-size="10" font-weight="800" fill="#fff" text-anchor="middle">3</text>
+      </g>
+      <g transform="translate(0, 450)">
+        <text x="32" y="20" font-size="14">🚨</text>
+        <text x="58" y="22">Alertes</text>
+      </g>
+    </g>
+
+    <!-- Support -->
+    <text x="22" y="510" font-size="10" font-weight="700" letter-spacing="1" fill="#6ee7b7" opacity="0.7">SUPPORT</text>
+    <g font-size="13" font-weight="500" fill="#a7f3d0">
+      <g transform="translate(0, 522)">
+        <text x="32" y="20" font-size="14">❓</text>
+        <text x="58" y="22">Aide</text>
+      </g>
+    </g>
+
+    <!-- Footer sidebar : profil user -->
+    <rect x="14" y="838" width="212" height="50" rx="10" fill="rgba(255,255,255,0.06)"/>
+    <circle cx="38" cy="863" r="16" fill="url(#brand)"/>
+    <text x="38" y="868" font-size="11" font-weight="800" fill="#fff" text-anchor="middle">AB</text>
+    <text x="62" y="860" font-size="12" font-weight="700" fill="#fff">Abdessamad B.</text>
+    <text x="62" y="876" font-size="10" fill="#a7f3d0">Coach Pro</text>
+  </g>
+
+  <!-- ═════ MAIN CONTENT ═════ -->
+  <g transform="translate(240, 0)">
+
+    <!-- Top bar -->
+    <rect x="0" y="0" width="1200" height="76" fill="#fff"/>
+    <line x1="0" y1="76" x2="1200" y2="76" stroke="#E5E7EB"/>
+    <text x="36" y="40" font-size="22" font-weight="900" fill="#0F172A">Tableau de bord</text>
+    <text x="36" y="60" font-size="13" fill="#64748B">Vue d'ensemble · semaine du 1 juin 2026</text>
+
+    <!-- Right: search + new button -->
+    <rect x="900" y="22" width="180" height="34" rx="8" fill="#F1F5F9"/>
+    <text x="918" y="44" font-size="12" fill="#94A3B8">🔍 Rechercher…</text>
+    <rect x="1092" y="22" width="76" height="34" rx="8" fill="url(#brand)"/>
+    <text x="1130" y="44" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">+ Client</text>
+
+    <!-- ═════ KPI CARDS ═════ -->
+    <g transform="translate(36, 104)">
+      <!-- KPI 1: Clients actifs -->
+      <rect x="0" y="0" width="270" height="106" rx="14" fill="#fff" filter="url(#cs)"/>
+      <rect x="20" y="20" width="44" height="44" rx="11" fill="#E8F8F2"/>
+      <text x="42" y="50" font-size="20" text-anchor="middle">👥</text>
+      <text x="20" y="86" font-size="11" font-weight="700" letter-spacing="0.5" fill="#94A3B8">CLIENTS ACTIFS</text>
+      <text x="74" y="50" font-size="32" font-weight="900" fill="#0F172A">14</text>
+      <text x="120" y="50" font-size="11" font-weight="700" fill="#16a34a">↑ +3 ce mois</text>
+
+      <!-- KPI 2: MRR -->
+      <rect x="290" y="0" width="270" height="106" rx="14" fill="#fff" filter="url(#cs)"/>
+      <rect x="310" y="20" width="44" height="44" rx="11" fill="#EEF2FF"/>
+      <text x="332" y="50" font-size="18" text-anchor="middle">💰</text>
+      <text x="310" y="86" font-size="11" font-weight="700" letter-spacing="0.5" fill="#94A3B8">MRR MENSUEL</text>
+      <text x="364" y="50" font-size="32" font-weight="900" fill="#0F172A">2 380€</text>
+      <text x="470" y="50" font-size="11" font-weight="700" fill="#16a34a">↑ +18%</text>
+
+      <!-- KPI 3: Séances 7j -->
+      <rect x="580" y="0" width="270" height="106" rx="14" fill="#fff" filter="url(#cs)"/>
+      <rect x="600" y="20" width="44" height="44" rx="11" fill="#FEF3C7"/>
+      <text x="622" y="50" font-size="18" text-anchor="middle">📅</text>
+      <text x="600" y="86" font-size="11" font-weight="700" letter-spacing="0.5" fill="#94A3B8">SÉANCES (7 JOURS)</text>
+      <text x="654" y="50" font-size="32" font-weight="900" fill="#0F172A">42</text>
+      <text x="700" y="50" font-size="11" font-weight="700" fill="#16a34a">↑ +8</text>
+
+      <!-- KPI 4: Complétion -->
+      <rect x="870" y="0" width="270" height="106" rx="14" fill="#fff" filter="url(#cs)"/>
+      <rect x="890" y="20" width="44" height="44" rx="11" fill="#FCE7F3"/>
+      <text x="912" y="50" font-size="18" text-anchor="middle">📈</text>
+      <text x="890" y="86" font-size="11" font-weight="700" letter-spacing="0.5" fill="#94A3B8">COMPLÉTION MOYENNE</text>
+      <text x="944" y="50" font-size="32" font-weight="900" fill="#0F172A">87%</text>
+      <text x="1018" y="50" font-size="11" font-weight="700" fill="#16a34a">↑ +4 pts</text>
+    </g>
+
+    <!-- ═════ MRR CHART ═════ -->
+    <g transform="translate(36, 232)">
+      <rect width="710" height="320" rx="14" fill="#fff" filter="url(#cs)"/>
+      <text x="24" y="32" font-size="15" font-weight="800" fill="#0F172A">📈 Évolution du MRR</text>
+      <text x="24" y="50" font-size="12" fill="#94A3B8">12 derniers mois — récurrent + estimé par séance</text>
+
+      <!-- Y axis labels -->
+      <g font-size="10" fill="#94A3B8" text-anchor="end">
+        <text x="58" y="86">3000€</text>
+        <text x="58" y="134">2500€</text>
+        <text x="58" y="182">2000€</text>
+        <text x="58" y="230">1500€</text>
+        <text x="58" y="278">1000€</text>
+      </g>
+
+      <!-- Grid lines -->
+      <g stroke="#F1F5F9" stroke-width="1">
+        <line x1="70" y1="82"  x2="690" y2="82"/>
+        <line x1="70" y1="130" x2="690" y2="130"/>
+        <line x1="70" y1="178" x2="690" y2="178"/>
+        <line x1="70" y1="226" x2="690" y2="226"/>
+        <line x1="70" y1="274" x2="690" y2="274"/>
+      </g>
+
+      <!-- Area fill -->
+      <path d="M 70 264 L 122 254 L 174 240 L 226 232 L 278 222 L 330 210 L 382 192 L 434 184 L 486 172 L 538 158 L 590 144 L 642 124 L 690 102 L 690 274 L 70 274 Z" fill="url(#mrrFill)"/>
+      <!-- Line -->
+      <path d="M 70 264 L 122 254 L 174 240 L 226 232 L 278 222 L 330 210 L 382 192 L 434 184 L 486 172 L 538 158 L 590 144 L 642 124 L 690 102" stroke="#1D9E75" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+      <!-- Dots -->
+      <g fill="#1D9E75">
+        <circle cx="70" cy="264" r="3.5"/>
+        <circle cx="122" cy="254" r="3.5"/>
+        <circle cx="174" cy="240" r="3.5"/>
+        <circle cx="226" cy="232" r="3.5"/>
+        <circle cx="278" cy="222" r="3.5"/>
+        <circle cx="330" cy="210" r="3.5"/>
+        <circle cx="382" cy="192" r="3.5"/>
+        <circle cx="434" cy="184" r="3.5"/>
+        <circle cx="486" cy="172" r="3.5"/>
+        <circle cx="538" cy="158" r="3.5"/>
+        <circle cx="590" cy="144" r="3.5"/>
+        <circle cx="642" cy="124" r="3.5"/>
+        <circle cx="690" cy="102" r="4.5" stroke="#fff" stroke-width="2"/>
+      </g>
+      <!-- Highlight point label -->
+      <rect x="650" y="64" width="80" height="28" rx="6" fill="#0F172A"/>
+      <text x="690" y="82" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">Juin: 2380€</text>
+
+      <!-- X axis labels -->
+      <g font-size="10" fill="#94A3B8" text-anchor="middle">
+        <text x="70"  y="294">Juil</text>
+        <text x="122" y="294">Août</text>
+        <text x="174" y="294">Sept</text>
+        <text x="226" y="294">Oct</text>
+        <text x="278" y="294">Nov</text>
+        <text x="330" y="294">Déc</text>
+        <text x="382" y="294">Janv</text>
+        <text x="434" y="294">Févr</text>
+        <text x="486" y="294">Mars</text>
+        <text x="538" y="294">Avr</text>
+        <text x="590" y="294">Mai</text>
+        <text x="642" y="294">Juin</text>
+      </g>
+    </g>
+
+    <!-- ═════ HEATMAP ═════ -->
+    <g transform="translate(770, 232)">
+      <rect width="370" height="320" rx="14" fill="#fff" filter="url(#cs)"/>
+      <text x="24" y="32" font-size="15" font-weight="800" fill="#0F172A">🔥 Activité 4 semaines</text>
+      <text x="24" y="50" font-size="12" fill="#94A3B8">Séances réalisées par jour</text>
+
+      <!-- Day labels -->
+      <g font-size="10" fill="#94A3B8" font-weight="600">
+        <text x="24" y="92">Lun</text>
+        <text x="24" y="120">Mar</text>
+        <text x="24" y="148">Mer</text>
+        <text x="24" y="176">Jeu</text>
+        <text x="24" y="204">Ven</text>
+        <text x="24" y="232">Sam</text>
+        <text x="24" y="260">Dim</text>
+      </g>
+
+      <!-- Grid 7 rows x 4 cols + level indicator (intensity 0-4) -->
+      <!-- Row 1: Lun -->
+      <g transform="translate(60, 82)">
+        <rect x="0"   y="0" width="60" height="22" rx="4" fill="#16a34a"/>
+        <rect x="68"  y="0" width="60" height="22" rx="4" fill="#22c55e"/>
+        <rect x="136" y="0" width="60" height="22" rx="4" fill="#86efac"/>
+        <rect x="204" y="0" width="60" height="22" rx="4" fill="#16a34a"/>
+      </g>
+      <g transform="translate(60, 110)">
+        <rect x="0"   y="0" width="60" height="22" rx="4" fill="#bbf7d0"/>
+        <rect x="68"  y="0" width="60" height="22" rx="4" fill="#86efac"/>
+        <rect x="136" y="0" width="60" height="22" rx="4" fill="#22c55e"/>
+        <rect x="204" y="0" width="60" height="22" rx="4" fill="#16a34a"/>
+      </g>
+      <g transform="translate(60, 138)">
+        <rect x="0"   y="0" width="60" height="22" rx="4" fill="#22c55e"/>
+        <rect x="68"  y="0" width="60" height="22" rx="4" fill="#16a34a"/>
+        <rect x="136" y="0" width="60" height="22" rx="4" fill="#15803d"/>
+        <rect x="204" y="0" width="60" height="22" rx="4" fill="#22c55e"/>
+      </g>
+      <g transform="translate(60, 166)">
+        <rect x="0"   y="0" width="60" height="22" rx="4" fill="#86efac"/>
+        <rect x="68"  y="0" width="60" height="22" rx="4" fill="#86efac"/>
+        <rect x="136" y="0" width="60" height="22" rx="4" fill="#22c55e"/>
+        <rect x="204" y="0" width="60" height="22" rx="4" fill="#16a34a"/>
+      </g>
+      <g transform="translate(60, 194)">
+        <rect x="0"   y="0" width="60" height="22" rx="4" fill="#22c55e"/>
+        <rect x="68"  y="0" width="60" height="22" rx="4" fill="#15803d"/>
+        <rect x="136" y="0" width="60" height="22" rx="4" fill="#16a34a"/>
+        <rect x="204" y="0" width="60" height="22" rx="4" fill="#15803d"/>
+      </g>
+      <g transform="translate(60, 222)">
+        <rect x="0"   y="0" width="60" height="22" rx="4" fill="#dcfce7"/>
+        <rect x="68"  y="0" width="60" height="22" rx="4" fill="#86efac"/>
+        <rect x="136" y="0" width="60" height="22" rx="4" fill="#bbf7d0"/>
+        <rect x="204" y="0" width="60" height="22" rx="4" fill="#86efac"/>
+      </g>
+      <g transform="translate(60, 250)">
+        <rect x="0"   y="0" width="60" height="22" rx="4" fill="#F1F5F9"/>
+        <rect x="68"  y="0" width="60" height="22" rx="4" fill="#dcfce7"/>
+        <rect x="136" y="0" width="60" height="22" rx="4" fill="#F1F5F9"/>
+        <rect x="204" y="0" width="60" height="22" rx="4" fill="#dcfce7"/>
+      </g>
+
+      <!-- Legend -->
+      <g transform="translate(60, 288)" font-size="10" fill="#94A3B8">
+        <text x="0" y="9">Moins</text>
+        <rect x="32" y="0" width="12" height="10" rx="2" fill="#F1F5F9"/>
+        <rect x="48" y="0" width="12" height="10" rx="2" fill="#dcfce7"/>
+        <rect x="64" y="0" width="12" height="10" rx="2" fill="#86efac"/>
+        <rect x="80" y="0" width="12" height="10" rx="2" fill="#22c55e"/>
+        <rect x="96" y="0" width="12" height="10" rx="2" fill="#16a34a"/>
+        <rect x="112" y="0" width="12" height="10" rx="2" fill="#15803d"/>
+        <text x="130" y="9">Plus</text>
+      </g>
+    </g>
+
+    <!-- ═════ ALERTES ═════ -->
+    <g transform="translate(36, 580)">
+      <rect width="1104" height="280" rx="14" fill="#fff" filter="url(#cs)"/>
+      <text x="24" y="32" font-size="15" font-weight="800" fill="#0F172A">🚨 Alertes récentes</text>
+      <text x="900" y="32" font-size="12" font-weight="700" fill="#1D9E75" text-anchor="end">3 nouvelles · Voir tout →</text>
+
+      <!-- Alerte 1 -->
+      <g transform="translate(24, 56)">
+        <rect width="1056" height="64" rx="10" fill="#FEF2F2" stroke="#FCA5A5"/>
+        <circle cx="32" cy="32" r="18" fill="#FECACA"/>
+        <text x="32" y="38" font-size="16" text-anchor="middle">⚠️</text>
+        <text x="64" y="28" font-size="13" font-weight="700" fill="#991B1B">Facture en retard — Sophie Lambert</text>
+        <text x="64" y="46" font-size="12" fill="#7F1D1D">120€ dus depuis le 25 mai · Relance auto envoyée hier</text>
+        <rect x="940" y="20" width="100" height="28" rx="6" fill="#fff" stroke="#FCA5A5"/>
+        <text x="990" y="38" font-size="11" font-weight="700" fill="#991B1B" text-anchor="middle">Relancer</text>
+      </g>
+      <!-- Alerte 2 -->
+      <g transform="translate(24, 130)">
+        <rect width="1056" height="64" rx="10" fill="#FFFBEB" stroke="#FCD34D"/>
+        <circle cx="32" cy="32" r="18" fill="#FDE68A"/>
+        <text x="32" y="38" font-size="16" text-anchor="middle">🔔</text>
+        <text x="64" y="28" font-size="13" font-weight="700" fill="#92400E">Inactivité — Marc Durand</text>
+        <text x="64" y="46" font-size="12" fill="#78350F">Aucune séance enregistrée depuis 8 jours · Dernier check-in : 31/05</text>
+        <rect x="940" y="20" width="100" height="28" rx="6" fill="#fff" stroke="#FCD34D"/>
+        <text x="990" y="38" font-size="11" font-weight="700" fill="#92400E" text-anchor="middle">Message</text>
+      </g>
+      <!-- Alerte 3 -->
+      <g transform="translate(24, 204)">
+        <rect width="1056" height="64" rx="10" fill="#ECFDF5" stroke="#6EE7B7"/>
+        <circle cx="32" cy="32" r="18" fill="#A7F3D0"/>
+        <text x="32" y="38" font-size="16" text-anchor="middle">🎯</text>
+        <text x="64" y="28" font-size="13" font-weight="700" fill="#065F46">Objectif atteint — Karim Benali</text>
+        <text x="64" y="46" font-size="12" fill="#047857">Squat 80 kg ✓ atteint hier · Penser à fixer le prochain objectif</text>
+        <rect x="940" y="20" width="100" height="28" rx="6" fill="#fff" stroke="#6EE7B7"/>
+        <text x="990" y="38" font-size="11" font-weight="700" fill="#065F46" text-anchor="middle">Féliciter</text>
+      </g>
+    </g>
+  </g>
+</svg>

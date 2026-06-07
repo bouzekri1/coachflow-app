@@ -1,0 +1,378 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="sb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#032d22"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#1D9E75"/>
+    </linearGradient>
+    <linearGradient id="weightFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1D9E75" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#1D9E75" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="calFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EF4444" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#EF4444" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="cs" x="-5%" y="-5%" width="110%" height="120%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dy="2"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.05"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1440" height="900" fill="#F8FAFC"/>
+
+  <!-- ═════ SIDEBAR ═════ -->
+  <g>
+    <rect width="240" height="900" fill="url(#sb)"/>
+    <rect x="20" y="22" width="38" height="38" rx="10" fill="rgba(255,255,255,0.15)"/>
+    <text x="39" y="49" font-size="20" text-anchor="middle" fill="#fff">⚡</text>
+    <text x="68" y="42" font-size="17" font-weight="800" fill="#fff">TrainFlow</text>
+    <text x="68" y="58" font-size="10" fill="#a7f3d0" font-weight="600">✦ Plan Pro</text>
+
+    <text x="22" y="100" font-size="10" font-weight="700" letter-spacing="1" fill="#6ee7b7" opacity="0.7">PRINCIPAL</text>
+    <g font-size="13" font-weight="500" fill="#a7f3d0">
+      <g transform="translate(0, 112)"><text x="32" y="22" font-size="14">📊</text><text x="58" y="24">Tableau de bord</text></g>
+      <!-- Active : Clients (parent du détail) -->
+      <rect x="14" y="150" width="212" height="38" rx="9" fill="rgba(255,255,255,0.15)"/>
+      <g transform="translate(28, 162)" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="5" cy="5" r="3"/>
+        <path d="M0 14 a5 5 0 0 1 10 0"/>
+        <circle cx="11" cy="3" r="2.5"/>
+      </g>
+      <text x="58" y="174" font-size="13" font-weight="700" fill="#fff">Clients</text>
+      <text x="220" y="174" text-anchor="end" font-size="11" fill="#fff" font-weight="700">14</text>
+
+      <g transform="translate(0, 196)"><text x="32" y="20" font-size="14">🏋️</text><text x="58" y="22">Programmes</text></g>
+      <g transform="translate(0, 234)"><text x="32" y="20" font-size="14">🥗</text><text x="58" y="22">Nutrition</text></g>
+      <g transform="translate(0, 272)"><text x="32" y="20" font-size="14">💪</text><text x="58" y="22">Exercices</text></g>
+    </g>
+
+    <text x="22" y="324" font-size="10" font-weight="700" letter-spacing="1" fill="#6ee7b7" opacity="0.7">GESTION</text>
+    <g font-size="13" font-weight="500" fill="#a7f3d0">
+      <g transform="translate(0, 336)"><text x="32" y="20" font-size="14">📅</text><text x="58" y="22">Planning</text></g>
+      <g transform="translate(0, 374)"><text x="32" y="20" font-size="14">💰</text><text x="58" y="22">Revenus</text></g>
+      <g transform="translate(0, 412)">
+        <text x="32" y="20" font-size="14">💬</text>
+        <text x="58" y="22">Messages</text>
+        <circle cx="220" cy="16" r="9" fill="#EF4444"/>
+        <text x="220" y="20" font-size="10" font-weight="800" fill="#fff" text-anchor="middle">3</text>
+      </g>
+      <g transform="translate(0, 450)"><text x="32" y="20" font-size="14">🚨</text><text x="58" y="22">Alertes</text></g>
+    </g>
+
+    <rect x="14" y="838" width="212" height="50" rx="10" fill="rgba(255,255,255,0.06)"/>
+    <circle cx="38" cy="863" r="16" fill="url(#brand)"/>
+    <text x="38" y="868" font-size="11" font-weight="800" fill="#fff" text-anchor="middle">AB</text>
+    <text x="62" y="860" font-size="12" font-weight="700" fill="#fff">Abdessamad B.</text>
+    <text x="62" y="876" font-size="10" fill="#a7f3d0">Coach Pro</text>
+  </g>
+
+  <!-- ═════ MAIN ═════ -->
+  <g transform="translate(240, 0)">
+    <!-- Top bar avec breadcrumb + client header -->
+    <rect x="0" y="0" width="1200" height="124" fill="#fff"/>
+    <line x1="0" y1="124" x2="1200" y2="124" stroke="#E5E7EB"/>
+
+    <text x="36" y="32" font-size="11" fill="#94A3B8">← Clients / Marc Durand</text>
+
+    <!-- Client identity -->
+    <circle cx="74" cy="80" r="32" fill="#6366F1"/>
+    <text x="74" y="88" font-size="20" font-weight="800" fill="#fff" text-anchor="middle">MD</text>
+    <text x="120" y="68" font-size="22" font-weight="900" fill="#0F172A">Marc Durand</text>
+    <rect x="290" y="48" width="60" height="24" rx="6" fill="#DCFCE7"/>
+    <text x="320" y="64" font-size="11" font-weight="800" fill="#166534" text-anchor="middle">● Actif</text>
+    <text x="120" y="92" font-size="12" fill="#64748B">32 ans · 1m82 · 84 kg · Lyon · Force débutant (sem. 4/12)</text>
+
+    <!-- Action buttons -->
+    <rect x="940" y="50" width="100" height="34" rx="8" fill="#fff" stroke="#E5E7EB"/>
+    <text x="990" y="71" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">✏️ Modifier</text>
+    <rect x="1052" y="50" width="120" height="34" rx="8" fill="url(#brand)"/>
+    <text x="1112" y="71" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">+ Nouvelle séance</text>
+
+    <!-- Tabs -->
+    <g transform="translate(36, 96)">
+      <rect x="0"  y="0" width="80" height="26" rx="6" fill="#0F172A"/>
+      <text x="40" y="18" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">📈 Suivi</text>
+      <text x="106" y="18" font-size="12" font-weight="600" fill="#64748B">🏋️ Programme</text>
+      <text x="204" y="18" font-size="12" font-weight="600" fill="#64748B">Infos</text>
+      <text x="252" y="18" font-size="12" font-weight="600" fill="#64748B">Notes</text>
+      <text x="306" y="18" font-size="12" font-weight="600" fill="#64748B">Mesures</text>
+      <text x="372" y="18" font-size="12" font-weight="600" fill="#64748B">Historique</text>
+      <text x="450" y="18" font-size="12" font-weight="600" fill="#64748B">🥗 Nutrition</text>
+      <text x="538" y="18" font-size="12" font-weight="600" fill="#64748B">📋 Check-ins</text>
+      <text x="626" y="18" font-size="12" font-weight="600" fill="#64748B">📸 Photos</text>
+    </g>
+
+    <!-- ═════ KPI CARDS ═════ -->
+    <g transform="translate(36, 144)">
+      <rect x="0" y="0" width="216" height="86" rx="12" fill="#fff" filter="url(#cs)"/>
+      <text x="16" y="24" font-size="10" font-weight="700" fill="#64748B" letter-spacing="0.5">POIDS ACTUEL</text>
+      <text x="16" y="56" font-size="26" font-weight="900" fill="#0F172A">80.8</text>
+      <text x="72" y="56" font-size="13" fill="#94A3B8" font-weight="600">kg</text>
+      <text x="16" y="74" font-size="11" font-weight="700" fill="#16a34a">↓ -3.2 kg vs départ</text>
+
+      <rect x="232" y="0" width="216" height="86" rx="12" fill="#fff" filter="url(#cs)"/>
+      <text x="248" y="24" font-size="10" font-weight="700" fill="#64748B" letter-spacing="0.5">POIDS CIBLE</text>
+      <text x="248" y="56" font-size="26" font-weight="900" fill="#0F172A">79.0</text>
+      <text x="304" y="56" font-size="13" fill="#94A3B8" font-weight="600">kg</text>
+      <text x="248" y="74" font-size="11" font-weight="700" fill="#6366F1">Plus que 1.8 kg</text>
+
+      <rect x="464" y="0" width="216" height="86" rx="12" fill="#fff" filter="url(#cs)"/>
+      <text x="480" y="24" font-size="10" font-weight="700" fill="#64748B" letter-spacing="0.5">MASSE GRASSE</text>
+      <text x="480" y="56" font-size="26" font-weight="900" fill="#0F172A">19.2</text>
+      <text x="540" y="56" font-size="13" fill="#94A3B8" font-weight="600">%</text>
+      <text x="480" y="74" font-size="11" font-weight="700" fill="#16a34a">↓ -2.4 pts</text>
+
+      <rect x="696" y="0" width="216" height="86" rx="12" fill="#fff" filter="url(#cs)"/>
+      <text x="712" y="24" font-size="10" font-weight="700" fill="#64748B" letter-spacing="0.5">MOY. CALORIES</text>
+      <text x="712" y="56" font-size="26" font-weight="900" fill="#0F172A">2150</text>
+      <text x="784" y="56" font-size="13" fill="#94A3B8" font-weight="600">kcal/j</text>
+      <text x="712" y="74" font-size="11" font-weight="700" fill="#64748B">/ 2200 objectif</text>
+
+      <rect x="928" y="0" width="216" height="86" rx="12" fill="#fff" filter="url(#cs)"/>
+      <text x="944" y="24" font-size="10" font-weight="700" fill="#64748B" letter-spacing="0.5">ÉNERGIE (CHECK-IN)</text>
+      <text x="944" y="56" font-size="26" font-weight="900" fill="#0F172A">7.8</text>
+      <text x="1000" y="56" font-size="13" fill="#94A3B8" font-weight="600">/10</text>
+      <text x="944" y="74" font-size="11" font-weight="700" fill="#16a34a">↑ +0.6 vs sem -1</text>
+    </g>
+
+    <!-- ═════ CHART 1 : ÉVOLUTION POIDS ═════ -->
+    <g transform="translate(36, 254)">
+      <rect width="556" height="260" rx="14" fill="#fff" filter="url(#cs)"/>
+      <text x="20" y="32" font-size="14" font-weight="800" fill="#0F172A">⚖️ Évolution du poids</text>
+      <text x="20" y="50" font-size="11" fill="#94A3B8">12 dernières semaines</text>
+
+      <g font-size="9" fill="#94A3B8" text-anchor="end">
+        <text x="46" y="86">86kg</text>
+        <text x="46" y="126">84kg</text>
+        <text x="46" y="166">82kg</text>
+        <text x="46" y="206">80kg</text>
+      </g>
+      <g stroke="#F1F5F9">
+        <line x1="56" y1="82"  x2="536" y2="82"/>
+        <line x1="56" y1="122" x2="536" y2="122"/>
+        <line x1="56" y1="162" x2="536" y2="162"/>
+        <line x1="56" y1="202" x2="536" y2="202"/>
+      </g>
+      <!-- Cible line -->
+      <line x1="56" y1="214" x2="536" y2="214" stroke="#6366F1" stroke-dasharray="4 4" stroke-width="1.5"/>
+      <text x="540" y="218" font-size="9" fill="#6366F1" font-weight="700">cible 79kg</text>
+
+      <!-- Area + line -->
+      <path d="M 56 100 L 96 106 L 136 110 L 176 118 L 216 132 L 256 140 L 296 148 L 336 158 L 376 168 L 416 178 L 456 188 L 496 196 L 536 200 L 536 220 L 56 220 Z" fill="url(#weightFill)"/>
+      <path d="M 56 100 L 96 106 L 136 110 L 176 118 L 216 132 L 256 140 L 296 148 L 336 158 L 376 168 L 416 178 L 456 188 L 496 196 L 536 200" stroke="#1D9E75" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+      <g fill="#1D9E75">
+        <circle cx="56"  cy="100" r="3"/>
+        <circle cx="96"  cy="106" r="3"/>
+        <circle cx="136" cy="110" r="3"/>
+        <circle cx="176" cy="118" r="3"/>
+        <circle cx="216" cy="132" r="3"/>
+        <circle cx="256" cy="140" r="3"/>
+        <circle cx="296" cy="148" r="3"/>
+        <circle cx="336" cy="158" r="3"/>
+        <circle cx="376" cy="168" r="3"/>
+        <circle cx="416" cy="178" r="3"/>
+        <circle cx="456" cy="188" r="3"/>
+        <circle cx="496" cy="196" r="3"/>
+        <circle cx="536" cy="200" r="4.5" stroke="#fff" stroke-width="2"/>
+      </g>
+
+      <g font-size="9" fill="#94A3B8" text-anchor="middle">
+        <text x="56"  y="236">S1</text>
+        <text x="136" y="236">S3</text>
+        <text x="216" y="236">S5</text>
+        <text x="296" y="236">S7</text>
+        <text x="376" y="236">S9</text>
+        <text x="456" y="236">S11</text>
+        <text x="536" y="236">S12</text>
+      </g>
+    </g>
+
+    <!-- ═════ CHART 2 : MESURES CORPORELLES ═════ -->
+    <g transform="translate(608, 254)">
+      <rect width="556" height="260" rx="14" fill="#fff" filter="url(#cs)"/>
+      <text x="20" y="32" font-size="14" font-weight="800" fill="#0F172A">📏 Mesures corporelles</text>
+      <text x="20" y="50" font-size="11" fill="#94A3B8">Tour de taille, hanches, cuisse</text>
+
+      <!-- Legend -->
+      <g font-size="10" font-weight="600">
+        <circle cx="320" cy="40" r="4" fill="#3B82F6"/><text x="328" y="44" fill="#475569">Taille</text>
+        <circle cx="380" cy="40" r="4" fill="#EC4899"/><text x="388" y="44" fill="#475569">Hanches</text>
+        <circle cx="450" cy="40" r="4" fill="#F59E0B"/><text x="458" y="44" fill="#475569">Cuisse</text>
+      </g>
+
+      <g font-size="9" fill="#94A3B8" text-anchor="end">
+        <text x="46" y="86">110</text>
+        <text x="46" y="126">100</text>
+        <text x="46" y="166">90</text>
+        <text x="46" y="206">80</text>
+      </g>
+      <g stroke="#F1F5F9">
+        <line x1="56" y1="82"  x2="536" y2="82"/>
+        <line x1="56" y1="122" x2="536" y2="122"/>
+        <line x1="56" y1="162" x2="536" y2="162"/>
+        <line x1="56" y1="202" x2="536" y2="202"/>
+      </g>
+
+      <!-- Lines for measurements -->
+      <!-- Taille (top, declining) -->
+      <path d="M 56 100 L 136 112 L 216 124 L 296 138 L 376 150 L 456 162 L 536 170" stroke="#3B82F6" stroke-width="2" fill="none" stroke-linejoin="round"/>
+      <g fill="#3B82F6">
+        <circle cx="56"  cy="100" r="2.5"/>
+        <circle cx="136" cy="112" r="2.5"/>
+        <circle cx="216" cy="124" r="2.5"/>
+        <circle cx="296" cy="138" r="2.5"/>
+        <circle cx="376" cy="150" r="2.5"/>
+        <circle cx="456" cy="162" r="2.5"/>
+        <circle cx="536" cy="170" r="2.5"/>
+      </g>
+
+      <!-- Hanches (stable middle) -->
+      <path d="M 56 86 L 136 88 L 216 90 L 296 94 L 376 96 L 456 98 L 536 100" stroke="#EC4899" stroke-width="2" fill="none" stroke-linejoin="round"/>
+      <g fill="#EC4899">
+        <circle cx="56"  cy="86" r="2.5"/>
+        <circle cx="136" cy="88" r="2.5"/>
+        <circle cx="216" cy="90" r="2.5"/>
+        <circle cx="296" cy="94" r="2.5"/>
+        <circle cx="376" cy="96" r="2.5"/>
+        <circle cx="456" cy="98" r="2.5"/>
+        <circle cx="536" cy="100" r="2.5"/>
+      </g>
+
+      <!-- Cuisse (slight decrease) -->
+      <path d="M 56 156 L 136 158 L 216 158 L 296 162 L 376 166 L 456 170 L 536 174" stroke="#F59E0B" stroke-width="2" fill="none" stroke-linejoin="round"/>
+      <g fill="#F59E0B">
+        <circle cx="56"  cy="156" r="2.5"/>
+        <circle cx="136" cy="158" r="2.5"/>
+        <circle cx="216" cy="158" r="2.5"/>
+        <circle cx="296" cy="162" r="2.5"/>
+        <circle cx="376" cy="166" r="2.5"/>
+        <circle cx="456" cy="170" r="2.5"/>
+        <circle cx="536" cy="174" r="2.5"/>
+      </g>
+
+      <g font-size="9" fill="#94A3B8" text-anchor="middle">
+        <text x="56"  y="236">S1</text>
+        <text x="136" y="236">S3</text>
+        <text x="216" y="236">S5</text>
+        <text x="296" y="236">S7</text>
+        <text x="376" y="236">S9</text>
+        <text x="456" y="236">S11</text>
+        <text x="536" y="236">S12</text>
+      </g>
+    </g>
+
+    <!-- ═════ CHART 3 : CALORIES ═════ -->
+    <g transform="translate(36, 538)">
+      <rect width="556" height="260" rx="14" fill="#fff" filter="url(#cs)"/>
+      <text x="20" y="32" font-size="14" font-weight="800" fill="#0F172A">🔥 Apports caloriques (60j)</text>
+      <text x="20" y="50" font-size="11" fill="#94A3B8">Calories journalières · objectif 2200 kcal</text>
+
+      <g font-size="9" fill="#94A3B8" text-anchor="end">
+        <text x="50" y="86">2800</text>
+        <text x="50" y="126">2400</text>
+        <text x="50" y="166">2000</text>
+        <text x="50" y="206">1600</text>
+      </g>
+      <g stroke="#F1F5F9">
+        <line x1="60" y1="82"  x2="536" y2="82"/>
+        <line x1="60" y1="122" x2="536" y2="122"/>
+        <line x1="60" y1="162" x2="536" y2="162"/>
+        <line x1="60" y1="202" x2="536" y2="202"/>
+      </g>
+      <!-- Objectif line -->
+      <line x1="60" y1="142" x2="536" y2="142" stroke="#6366F1" stroke-dasharray="4 4" stroke-width="1.5"/>
+      <text x="540" y="146" font-size="9" fill="#6366F1" font-weight="700">2200</text>
+
+      <!-- Area -->
+      <path d="M 60 130 L 84 142 L 108 138 L 132 150 L 156 130 L 180 140 L 204 158 L 228 138 L 252 146 L 276 130 L 300 152 L 324 140 L 348 148 L 372 138 L 396 154 L 420 130 L 444 144 L 468 148 L 492 138 L 516 142 L 536 146 L 536 220 L 60 220 Z" fill="url(#calFill)"/>
+      <path d="M 60 130 L 84 142 L 108 138 L 132 150 L 156 130 L 180 140 L 204 158 L 228 138 L 252 146 L 276 130 L 300 152 L 324 140 L 348 148 L 372 138 L 396 154 L 420 130 L 444 144 L 468 148 L 492 138 L 516 142 L 536 146" stroke="#EF4444" stroke-width="2" fill="none" stroke-linejoin="round"/>
+
+      <g font-size="9" fill="#94A3B8" text-anchor="middle">
+        <text x="60"  y="236">J-60</text>
+        <text x="180" y="236">J-45</text>
+        <text x="300" y="236">J-30</text>
+        <text x="420" y="236">J-15</text>
+        <text x="536" y="236">Auj.</text>
+      </g>
+    </g>
+
+    <!-- ═════ CHART 4 : BIEN-ÊTRE CHECK-INS ═════ -->
+    <g transform="translate(608, 538)">
+      <rect width="556" height="260" rx="14" fill="#fff" filter="url(#cs)"/>
+      <text x="20" y="32" font-size="14" font-weight="800" fill="#0F172A">🧠 Bien-être hebdomadaire</text>
+      <text x="20" y="50" font-size="11" fill="#94A3B8">Check-ins clients : énergie, sommeil, motivation</text>
+
+      <!-- Legend -->
+      <g font-size="10" font-weight="600">
+        <circle cx="320" cy="40" r="4" fill="#22c55e"/><text x="328" y="44" fill="#475569">Énergie</text>
+        <circle cx="384" cy="40" r="4" fill="#3B82F6"/><text x="392" y="44" fill="#475569">Sommeil</text>
+        <circle cx="450" cy="40" r="4" fill="#a855f7"/><text x="458" y="44" fill="#475569">Motivation</text>
+      </g>
+
+      <g font-size="9" fill="#94A3B8" text-anchor="end">
+        <text x="46" y="86">10</text>
+        <text x="46" y="126">8</text>
+        <text x="46" y="166">6</text>
+        <text x="46" y="206">4</text>
+      </g>
+      <g stroke="#F1F5F9">
+        <line x1="56" y1="82"  x2="536" y2="82"/>
+        <line x1="56" y1="122" x2="536" y2="122"/>
+        <line x1="56" y1="162" x2="536" y2="162"/>
+        <line x1="56" y1="202" x2="536" y2="202"/>
+      </g>
+
+      <!-- Énergie -->
+      <path d="M 56 156 L 136 142 L 216 138 L 296 130 L 376 124 L 456 118 L 536 112" stroke="#22c55e" stroke-width="2" fill="none" stroke-linejoin="round"/>
+      <g fill="#22c55e">
+        <circle cx="56"  cy="156" r="3"/>
+        <circle cx="136" cy="142" r="3"/>
+        <circle cx="216" cy="138" r="3"/>
+        <circle cx="296" cy="130" r="3"/>
+        <circle cx="376" cy="124" r="3"/>
+        <circle cx="456" cy="118" r="3"/>
+        <circle cx="536" cy="112" r="3"/>
+      </g>
+
+      <!-- Sommeil -->
+      <path d="M 56 134 L 136 130 L 216 138 L 296 124 L 376 118 L 456 124 L 536 116" stroke="#3B82F6" stroke-width="2" fill="none" stroke-linejoin="round"/>
+      <g fill="#3B82F6">
+        <circle cx="56"  cy="134" r="3"/>
+        <circle cx="136" cy="130" r="3"/>
+        <circle cx="216" cy="138" r="3"/>
+        <circle cx="296" cy="124" r="3"/>
+        <circle cx="376" cy="118" r="3"/>
+        <circle cx="456" cy="124" r="3"/>
+        <circle cx="536" cy="116" r="3"/>
+      </g>
+
+      <!-- Motivation -->
+      <path d="M 56 142 L 136 138 L 216 124 L 296 120 L 376 110 L 456 116 L 536 100" stroke="#a855f7" stroke-width="2" fill="none" stroke-linejoin="round"/>
+      <g fill="#a855f7">
+        <circle cx="56"  cy="142" r="3"/>
+        <circle cx="136" cy="138" r="3"/>
+        <circle cx="216" cy="124" r="3"/>
+        <circle cx="296" cy="120" r="3"/>
+        <circle cx="376" cy="110" r="3"/>
+        <circle cx="456" cy="116" r="3"/>
+        <circle cx="536" cy="100" r="3"/>
+      </g>
+
+      <g font-size="9" fill="#94A3B8" text-anchor="middle">
+        <text x="56"  y="236">S1</text>
+        <text x="136" y="236">S2</text>
+        <text x="216" y="236">S3</text>
+        <text x="296" y="236">S4</text>
+        <text x="376" y="236">S5</text>
+        <text x="456" y="236">S6</text>
+        <text x="536" y="236">S7</text>
+      </g>
+    </g>
+  </g>
+</svg>

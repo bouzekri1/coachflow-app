@@ -1,0 +1,210 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" width="400" height="800" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <!-- Définitions : gradients + filtres -->
+  <defs>
+    <linearGradient id="heroBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#1D9E75"/>
+    </linearGradient>
+    <linearGradient id="logoBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#1D9E75"/>
+    </linearGradient>
+    <linearGradient id="progAcc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1D9E75"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <linearGradient id="progObj" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#a5b4fc"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="2"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.08"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Fond -->
+  <rect width="400" height="800" fill="#F3F4F6"/>
+
+  <!-- ── STATUS BAR iOS ─────────────────────────────────────── -->
+  <g>
+    <rect width="400" height="32" fill="#fff"/>
+    <text x="22" y="22" font-size="13" font-weight="700" fill="#0F172A">9:41</text>
+    <!-- Signal -->
+    <g transform="translate(310, 14)">
+      <rect x="0"  y="6" width="3" height="4" rx="0.5" fill="#0F172A"/>
+      <rect x="5"  y="4" width="3" height="6" rx="0.5" fill="#0F172A"/>
+      <rect x="10" y="2" width="3" height="8" rx="0.5" fill="#0F172A"/>
+      <rect x="15" y="0" width="3" height="10" rx="0.5" fill="#0F172A"/>
+    </g>
+    <!-- Wifi -->
+    <g transform="translate(335, 14)" fill="#0F172A">
+      <path d="M 8 10 A 1.5 1.5 0 0 0 8 7 A 1.5 1.5 0 0 0 8 10 Z"/>
+      <path d="M 4 6 Q 8 3 12 6" stroke="#0F172A" stroke-width="1.8" fill="none"/>
+      <path d="M 2 4 Q 8 -1 14 4" stroke="#0F172A" stroke-width="1.8" fill="none"/>
+    </g>
+    <!-- Battery -->
+    <g transform="translate(360, 14)">
+      <rect x="0" y="0" width="22" height="10" rx="2" stroke="#0F172A" stroke-width="1" fill="none"/>
+      <rect x="2" y="2" width="16" height="6" rx="0.5" fill="#0F172A"/>
+      <rect x="23" y="3" width="1.5" height="4" rx="0.5" fill="#0F172A"/>
+    </g>
+  </g>
+
+  <!-- ── HEADER APP ─────────────────────────────────────────── -->
+  <g>
+    <rect x="0" y="32" width="400" height="58" fill="#fff"/>
+    <line x1="0" y1="90" x2="400" y2="90" stroke="#E5E7EB" stroke-width="1"/>
+
+    <!-- Logo -->
+    <rect x="16" y="46" width="30" height="30" rx="8" fill="url(#logoBg)"/>
+    <text x="31" y="67" font-size="16" text-anchor="middle" fill="#fff">⚡</text>
+    <text x="54" y="68" font-size="15" font-weight="800" fill="#0F172A">TrainFlow</text>
+
+    <!-- Avatar + notif -->
+    <circle cx="350" cy="61" r="14" fill="url(#logoBg)"/>
+    <text x="350" y="66" font-size="11" font-weight="800" fill="#fff" text-anchor="middle">MD</text>
+    <g transform="translate(310, 49)">
+      <path d="M12 4 a6 6 0 0 0 -6 6 v3 l-2 2 v1 h16 v-1 l-2 -2 v-3 a6 6 0 0 0 -6 -6 z" stroke="#475569" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+      <circle cx="18" cy="6" r="3.5" fill="#EF4444"/>
+      <text x="18" y="9" font-size="7" font-weight="800" fill="#fff" text-anchor="middle">2</text>
+    </g>
+  </g>
+
+  <!-- ── HERO CARD ──────────────────────────────────────────── -->
+  <g transform="translate(16, 104)">
+    <rect width="368" height="116" rx="16" fill="url(#heroBg)" filter="url(#cardShadow)"/>
+    <text x="20" y="36" font-size="20" font-weight="800" fill="#fff">Bonjour Marc 👋</text>
+    <text x="20" y="58" font-size="12" fill="#a7f3d0">Semaine 4 sur 12 · Force débutant</text>
+    <!-- Progress bar -->
+    <rect x="20" y="78" width="328" height="6" rx="3" fill="rgba(255,255,255,0.2)"/>
+    <rect x="20" y="78" width="109" height="6" rx="3" fill="#fff"/>
+    <text x="20" y="104" font-size="11" fill="#a7f3d0" font-weight="600">33% du programme complété · 8/24 séances</text>
+  </g>
+
+  <!-- ── STATS GRID 2x2 ─────────────────────────────────────── -->
+  <g transform="translate(16, 236)">
+    <!-- Card 1 : Séances -->
+    <rect x="0" y="0" width="178" height="84" rx="14" fill="#fff" filter="url(#cardShadow)"/>
+    <rect x="14" y="14" width="34" height="34" rx="10" fill="#E8F8F2"/>
+    <text x="31" y="38" font-size="16" text-anchor="middle">🏋️</text>
+    <text x="56" y="32" font-size="22" font-weight="800" fill="#0F172A">8</text>
+    <text x="56" y="48" font-size="10" fill="#94A3B8" font-weight="600">SÉANCES RÉALISÉES</text>
+    <text x="14" y="70" font-size="10" fill="#16a34a" font-weight="700">↑ +2 cette semaine</text>
+
+    <!-- Card 2 : Calories -->
+    <rect x="190" y="0" width="178" height="84" rx="14" fill="#fff" filter="url(#cardShadow)"/>
+    <rect x="204" y="14" width="34" height="34" rx="10" fill="#FEF2F2"/>
+    <text x="221" y="38" font-size="16" text-anchor="middle">🔥</text>
+    <text x="246" y="32" font-size="22" font-weight="800" fill="#0F172A">1980</text>
+    <text x="246" y="48" font-size="10" fill="#94A3B8" font-weight="600">KCAL AUJOURD'HUI</text>
+    <text x="204" y="70" font-size="10" fill="#94A3B8">/ 2200 objectif</text>
+
+    <!-- Card 3 : Prochaine séance -->
+    <rect x="0" y="96" width="178" height="84" rx="14" fill="#fff" filter="url(#cardShadow)"/>
+    <rect x="14" y="110" width="34" height="34" rx="10" fill="#EEF2FF"/>
+    <text x="31" y="134" font-size="16" text-anchor="middle">📅</text>
+    <text x="56" y="128" font-size="14" font-weight="800" fill="#0F172A">Jeudi</text>
+    <text x="56" y="144" font-size="10" fill="#94A3B8" font-weight="600">PROCHAINE SÉANCE</text>
+    <text x="14" y="166" font-size="10" fill="#6366F1" font-weight="700">18:00 · 60 min</text>
+
+    <!-- Card 4 : Badges -->
+    <rect x="190" y="96" width="178" height="84" rx="14" fill="#fff" filter="url(#cardShadow)"/>
+    <rect x="204" y="110" width="34" height="34" rx="10" fill="#FEF3C7"/>
+    <text x="221" y="134" font-size="16" text-anchor="middle">🏆</text>
+    <text x="246" y="128" font-size="22" font-weight="800" fill="#0F172A">3</text>
+    <text x="246" y="144" font-size="10" fill="#94A3B8" font-weight="600">BADGES DÉBLOQUÉS</text>
+    <text x="204" y="166" font-size="10" fill="#F59E0B" font-weight="700">🔥 Streak 7 jours</text>
+  </g>
+
+  <!-- ── TODAY CARD ─────────────────────────────────────────── -->
+  <g transform="translate(16, 436)">
+    <rect width="368" height="124" rx="14" fill="#fff" stroke="#1D9E75" stroke-width="2" filter="url(#cardShadow)"/>
+    <!-- Accent strip -->
+    <rect x="0" y="0" width="4" height="124" rx="2" fill="#1D9E75"/>
+
+    <text x="18" y="28" font-size="11" font-weight="800" fill="#1D9E75" letter-spacing="0.5">AUJOURD'HUI · 18:00</text>
+    <text x="18" y="52" font-size="16" font-weight="800" fill="#0F172A">Force – Haut du corps</text>
+    <text x="18" y="70" font-size="12" fill="#475569">6 exercices · 60 min · Salle Fitness Lyon</text>
+
+    <!-- CTA -->
+    <rect x="18" y="84" width="180" height="32" rx="10" fill="#1D9E75"/>
+    <text x="108" y="105" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">Commencer ma séance →</text>
+
+    <!-- Coach avatar -->
+    <circle cx="338" cy="100" r="16" fill="#EEF2FF"/>
+    <text x="338" y="105" font-size="11" font-weight="800" fill="#4338CA" text-anchor="middle">AB</text>
+    <text x="338" y="128" font-size="9" fill="#94A3B8" text-anchor="middle">Coach</text>
+  </g>
+
+  <!-- ── OBJECTIFS ──────────────────────────────────────────── -->
+  <g transform="translate(16, 576)">
+    <text x="0" y="0" font-size="13" font-weight="800" fill="#0F172A">Mes objectifs</text>
+    <text x="368" y="0" font-size="11" font-weight="700" fill="#1D9E75" text-anchor="end">Voir tout →</text>
+
+    <!-- Obj 1 -->
+    <rect y="12" width="368" height="48" rx="12" fill="#fff" filter="url(#cardShadow)"/>
+    <text x="16" y="32" font-size="12" font-weight="700" fill="#0F172A">Perdre 5 kg</text>
+    <text x="352" y="32" font-size="12" font-weight="800" fill="#1D9E75" text-anchor="end">-3.2 / -5 kg</text>
+    <rect x="16" y="40" width="336" height="6" rx="3" fill="#F1F5F9"/>
+    <rect x="16" y="40" width="215" height="6" rx="3" fill="url(#progAcc)"/>
+
+    <!-- Obj 2 -->
+    <rect y="68" width="368" height="48" rx="12" fill="#fff" filter="url(#cardShadow)"/>
+    <text x="16" y="88" font-size="12" font-weight="700" fill="#0F172A">Squat 80 kg</text>
+    <text x="352" y="88" font-size="12" font-weight="800" fill="#6366F1" text-anchor="end">62 / 80 kg</text>
+    <rect x="16" y="96" width="336" height="6" rx="3" fill="#F1F5F9"/>
+    <rect x="16" y="96" width="260" height="6" rx="3" fill="url(#progObj)"/>
+  </g>
+
+  <!-- ── BOTTOM NAV ─────────────────────────────────────────── -->
+  <g transform="translate(0, 720)">
+    <rect width="400" height="80" fill="#fff"/>
+    <line x1="0" y1="0" x2="400" y2="0" stroke="#E5E7EB" stroke-width="1"/>
+
+    <!-- Onglet actif : Accueil -->
+    <g transform="translate(0, 14)">
+      <g stroke="#1D9E75" stroke-width="1.8" fill="none" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M40 22 L40 32 L52 32 L52 22 L46 16 Z" transform="translate(-6, -2)"/>
+      </g>
+      <text x="40" y="48" font-size="9" font-weight="800" fill="#1D9E75" text-anchor="middle">Accueil</text>
+      <rect x="20" y="-14" width="40" height="3" rx="1.5" fill="#1D9E75"/>
+    </g>
+
+    <!-- Séances -->
+    <g transform="translate(80, 14)" stroke="#94A3B8" stroke-width="1.8" fill="none" stroke-linejoin="round" stroke-linecap="round">
+      <rect x="30" y="14" width="20" height="20" rx="2"/>
+      <line x1="30" y1="20" x2="50" y2="20"/>
+      <line x1="35" y1="11" x2="35" y2="17"/>
+      <line x1="45" y1="11" x2="45" y2="17"/>
+    </g>
+    <text x="120" y="62" font-size="9" font-weight="600" fill="#94A3B8" text-anchor="middle">Séances</text>
+
+    <!-- Carnet (actif visuellement) -->
+    <g transform="translate(160, 14)" stroke="#94A3B8" stroke-width="1.8" fill="none" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M34 12 H46 a2 2 0 0 1 2 2 v18 a2 2 0 0 1 -2 2 H34 a2 2 0 0 1 -2 -2 v-18 a2 2 0 0 1 2 -2 z"/>
+      <line x1="36" y1="20" x2="44" y2="20"/>
+      <line x1="36" y1="26" x2="44" y2="26"/>
+    </g>
+    <text x="200" y="62" font-size="9" font-weight="600" fill="#94A3B8" text-anchor="middle">Carnet</text>
+
+    <!-- Mesures -->
+    <g transform="translate(240, 14)" stroke="#94A3B8" stroke-width="1.8" fill="none" stroke-linejoin="round" stroke-linecap="round">
+      <polyline points="32,30 38,22 42,26 50,16"/>
+    </g>
+    <text x="280" y="62" font-size="9" font-weight="600" fill="#94A3B8" text-anchor="middle">Mesures</text>
+
+    <!-- Messages -->
+    <g transform="translate(320, 14)" stroke="#94A3B8" stroke-width="1.8" fill="none" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M50 24 a2 2 0 0 1 -2 2 H38 l-4 4 V14 a2 2 0 0 1 2 -2 h12 a2 2 0 0 1 2 2 z"/>
+    </g>
+    <circle cx="355" cy="14" r="6" fill="#EF4444"/>
+    <text x="355" y="17" font-size="8" font-weight="800" fill="#fff" text-anchor="middle">2</text>
+    <text x="360" y="62" font-size="9" font-weight="600" fill="#94A3B8" text-anchor="middle">Messages</text>
+  </g>
+
+  <!-- Home indicator iOS -->
+  <rect x="135" y="788" width="130" height="4" rx="2" fill="#0F172A" opacity="0.3"/>
+</svg>

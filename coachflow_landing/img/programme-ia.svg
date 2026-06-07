@@ -1,0 +1,278 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="sb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#032d22"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#1D9E75"/>
+    </linearGradient>
+    <linearGradient id="aiHero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4338CA"/>
+      <stop offset="100%" stop-color="#6366F1"/>
+    </linearGradient>
+    <linearGradient id="aiAccent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <filter id="cs" x="-5%" y="-5%" width="110%" height="120%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dy="2"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.05"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1440" height="900" fill="#F8FAFC"/>
+
+  <!-- ═════ SIDEBAR ═════ -->
+  <g>
+    <rect width="240" height="900" fill="url(#sb)"/>
+    <rect x="20" y="22" width="38" height="38" rx="10" fill="rgba(255,255,255,0.15)"/>
+    <text x="39" y="49" font-size="20" text-anchor="middle" fill="#fff">⚡</text>
+    <text x="68" y="42" font-size="17" font-weight="800" fill="#fff">TrainFlow</text>
+    <text x="68" y="58" font-size="10" fill="#a7f3d0" font-weight="600">✦ Plan Pro</text>
+
+    <text x="22" y="100" font-size="10" font-weight="700" letter-spacing="1" fill="#6ee7b7" opacity="0.7">PRINCIPAL</text>
+    <g font-size="13" font-weight="500" fill="#a7f3d0">
+      <g transform="translate(0, 112)"><text x="32" y="22" font-size="14">📊</text><text x="58" y="24">Tableau de bord</text></g>
+      <g transform="translate(0, 150)">
+        <text x="32" y="22" font-size="14">👥</text>
+        <text x="58" y="24">Clients</text>
+        <text x="220" y="24" text-anchor="end" font-size="11" fill="#6ee7b7">14</text>
+      </g>
+      <!-- Active : Programmes -->
+      <rect x="14" y="188" width="212" height="38" rx="9" fill="rgba(255,255,255,0.15)"/>
+      <text x="32" y="212" font-size="14">🏋️</text>
+      <text x="58" y="214" font-size="13" font-weight="700" fill="#fff">Programmes</text>
+
+      <g transform="translate(0, 234)"><text x="32" y="20" font-size="14">🥗</text><text x="58" y="22">Nutrition</text></g>
+      <g transform="translate(0, 272)"><text x="32" y="20" font-size="14">💪</text><text x="58" y="22">Exercices</text></g>
+    </g>
+
+    <text x="22" y="324" font-size="10" font-weight="700" letter-spacing="1" fill="#6ee7b7" opacity="0.7">GESTION</text>
+    <g font-size="13" font-weight="500" fill="#a7f3d0">
+      <g transform="translate(0, 336)"><text x="32" y="20" font-size="14">📅</text><text x="58" y="22">Planning</text></g>
+      <g transform="translate(0, 374)"><text x="32" y="20" font-size="14">💰</text><text x="58" y="22">Revenus</text></g>
+      <g transform="translate(0, 412)">
+        <text x="32" y="20" font-size="14">💬</text>
+        <text x="58" y="22">Messages</text>
+        <circle cx="220" cy="16" r="9" fill="#EF4444"/>
+        <text x="220" y="20" font-size="10" font-weight="800" fill="#fff" text-anchor="middle">3</text>
+      </g>
+      <g transform="translate(0, 450)"><text x="32" y="20" font-size="14">🚨</text><text x="58" y="22">Alertes</text></g>
+    </g>
+
+    <rect x="14" y="838" width="212" height="50" rx="10" fill="rgba(255,255,255,0.06)"/>
+    <circle cx="38" cy="863" r="16" fill="url(#brand)"/>
+    <text x="38" y="868" font-size="11" font-weight="800" fill="#fff" text-anchor="middle">AB</text>
+    <text x="62" y="860" font-size="12" font-weight="700" fill="#fff">Abdessamad B.</text>
+    <text x="62" y="876" font-size="10" fill="#a7f3d0">Coach Pro</text>
+  </g>
+
+  <!-- ═════ MAIN ═════ -->
+  <g transform="translate(240, 0)">
+    <!-- Top bar -->
+    <rect x="0" y="0" width="1200" height="76" fill="#fff"/>
+    <line x1="0" y1="76" x2="1200" y2="76" stroke="#E5E7EB"/>
+    <text x="36" y="40" font-size="22" font-weight="900" fill="#0F172A">✨ Générateur IA de programmes</text>
+    <text x="36" y="60" font-size="13" fill="#64748B">Crée un programme personnalisé en 30 secondes</text>
+    <!-- Quota badge -->
+    <rect x="1020" y="22" width="148" height="34" rx="8" fill="#EEF2FF"/>
+    <text x="1094" y="35" font-size="10" font-weight="700" fill="#4338CA" text-anchor="middle">QUOTA IA CE MOIS</text>
+    <text x="1094" y="50" font-size="12" font-weight="800" fill="#4338CA" text-anchor="middle">23 / 100 générations</text>
+
+    <!-- ═════ LEFT FORM (380px) ═════ -->
+    <g transform="translate(36, 104)">
+      <rect width="384" height="724" rx="14" fill="#fff" filter="url(#cs)"/>
+
+      <!-- Section title -->
+      <rect x="0" y="0" width="384" height="80" rx="14" fill="url(#aiHero)"/>
+      <rect x="0" y="60" width="384" height="20" fill="url(#aiHero)"/>
+      <text x="24" y="34" font-size="14" font-weight="800" fill="#fff">PARAMÈTRES</text>
+      <text x="24" y="58" font-size="11" fill="#a5b4fc">Plus tu donnes de contexte, mieux c'est</text>
+
+      <!-- Client selector -->
+      <g transform="translate(20, 100)">
+        <text x="0" y="0" font-size="11" font-weight="700" fill="#64748B" letter-spacing="0.5">CLIENT</text>
+        <rect x="0" y="10" width="344" height="56" rx="10" fill="#F8FAFC" stroke="#E5E7EB"/>
+        <circle cx="32" cy="38" r="18" fill="#6366F1"/>
+        <text x="32" y="44" font-size="14" font-weight="800" fill="#fff" text-anchor="middle">MD</text>
+        <text x="58" y="34" font-size="13" font-weight="700" fill="#0F172A">Marc Durand</text>
+        <text x="58" y="50" font-size="11" fill="#64748B">32 ans · 1m82 · 84 kg</text>
+        <text x="328" y="42" font-size="14" fill="#94A3B8" text-anchor="end">▾</text>
+      </g>
+
+      <!-- Objectif -->
+      <g transform="translate(20, 188)">
+        <text x="0" y="0" font-size="11" font-weight="700" fill="#64748B" letter-spacing="0.5">OBJECTIF PRINCIPAL</text>
+        <rect x="0" y="10" width="170" height="38" rx="8" fill="#EEF2FF" stroke="#6366F1" stroke-width="2"/>
+        <text x="85" y="34" font-size="12" font-weight="700" fill="#4338CA" text-anchor="middle">💪 Force</text>
+        <rect x="174" y="10" width="170" height="38" rx="8" fill="#fff" stroke="#E5E7EB"/>
+        <text x="259" y="34" font-size="12" fill="#64748B" text-anchor="middle">🔥 Perte poids</text>
+      </g>
+
+      <!-- Niveau -->
+      <g transform="translate(20, 256)">
+        <text x="0" y="0" font-size="11" font-weight="700" fill="#64748B" letter-spacing="0.5">NIVEAU</text>
+        <rect x="0"   y="10" width="110" height="38" rx="8" fill="#EEF2FF" stroke="#6366F1" stroke-width="2"/>
+        <text x="55"  y="34" font-size="12" font-weight="700" fill="#4338CA" text-anchor="middle">Débutant</text>
+        <rect x="117" y="10" width="110" height="38" rx="8" fill="#fff" stroke="#E5E7EB"/>
+        <text x="172" y="34" font-size="12" fill="#64748B" text-anchor="middle">Intermédiaire</text>
+        <rect x="234" y="10" width="110" height="38" rx="8" fill="#fff" stroke="#E5E7EB"/>
+        <text x="289" y="34" font-size="12" fill="#64748B" text-anchor="middle">Avancé</text>
+      </g>
+
+      <!-- Durée -->
+      <g transform="translate(20, 324)">
+        <text x="0" y="0" font-size="11" font-weight="700" fill="#64748B" letter-spacing="0.5">DURÉE DU PROGRAMME</text>
+        <rect x="0" y="10" width="344" height="44" rx="8" fill="#F8FAFC" stroke="#E5E7EB"/>
+        <text x="20" y="37" font-size="13" font-weight="700" fill="#0F172A">12 semaines</text>
+        <text x="324" y="37" font-size="14" fill="#94A3B8" text-anchor="end">▾</text>
+      </g>
+
+      <!-- Séances/semaine -->
+      <g transform="translate(20, 398)">
+        <text x="0" y="0" font-size="11" font-weight="700" fill="#64748B" letter-spacing="0.5">SÉANCES PAR SEMAINE</text>
+        <g transform="translate(0, 10)">
+          <rect x="0"   y="0" width="78" height="44" rx="8" fill="#fff" stroke="#E5E7EB"/>
+          <text x="39"  y="29" font-size="14" fill="#64748B" text-anchor="middle">2</text>
+          <rect x="86"  y="0" width="78" height="44" rx="8" fill="#EEF2FF" stroke="#6366F1" stroke-width="2"/>
+          <text x="125" y="29" font-size="14" font-weight="800" fill="#4338CA" text-anchor="middle">3</text>
+          <rect x="172" y="0" width="78" height="44" rx="8" fill="#fff" stroke="#E5E7EB"/>
+          <text x="211" y="29" font-size="14" fill="#64748B" text-anchor="middle">4</text>
+          <rect x="258" y="0" width="86" height="44" rx="8" fill="#fff" stroke="#E5E7EB"/>
+          <text x="301" y="29" font-size="14" fill="#64748B" text-anchor="middle">5+</text>
+        </g>
+      </g>
+
+      <!-- Matériel -->
+      <g transform="translate(20, 472)">
+        <text x="0" y="0" font-size="11" font-weight="700" fill="#64748B" letter-spacing="0.5">MATÉRIEL DISPONIBLE</text>
+        <rect x="0" y="10" width="344" height="44" rx="8" fill="#F8FAFC" stroke="#E5E7EB"/>
+        <text x="20" y="37" font-size="13" font-weight="700" fill="#0F172A">Salle complète + haltères perso</text>
+        <text x="324" y="37" font-size="14" fill="#94A3B8" text-anchor="end">▾</text>
+      </g>
+
+      <!-- Contraintes -->
+      <g transform="translate(20, 546)">
+        <text x="0" y="0" font-size="11" font-weight="700" fill="#64748B" letter-spacing="0.5">CONTRAINTES (BLESSURES, ETC.)</text>
+        <rect x="0" y="10" width="344" height="60" rx="8" fill="#F8FAFC" stroke="#E5E7EB"/>
+        <text x="14" y="32" font-size="12" fill="#64748B">Légère douleur lombaire depuis 6 mois.</text>
+        <text x="14" y="50" font-size="12" fill="#64748B">Préfère éviter le squat lourd.</text>
+      </g>
+
+      <!-- CTA Generate -->
+      <g transform="translate(20, 644)">
+        <rect width="344" height="56" rx="12" fill="url(#aiAccent)"/>
+        <text x="172" y="36" font-size="14" font-weight="800" fill="#fff" text-anchor="middle">✨ Générer le programme</text>
+      </g>
+    </g>
+
+    <!-- ═════ RIGHT RESULT (760px) ═════ -->
+    <g transform="translate(444, 104)">
+      <!-- Header result -->
+      <rect width="720" height="724" rx="14" fill="#fff" filter="url(#cs)"/>
+
+      <g transform="translate(24, 24)">
+        <rect width="672" height="62" rx="10" fill="#ECFDF5" stroke="#6EE7B7"/>
+        <text x="20" y="26" font-size="13" font-weight="800" fill="#065F46">✓ Programme généré en 28 secondes</text>
+        <text x="20" y="48" font-size="11" fill="#047857">3 mésocycles · 36 séances planifiées · adapté aux contraintes lombaires</text>
+        <rect x="554" y="14" width="100" height="34" rx="8" fill="#1D9E75"/>
+        <text x="604" y="36" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">Assigner →</text>
+      </g>
+
+      <!-- Mesocycle 1 -->
+      <g transform="translate(24, 110)">
+        <rect width="672" height="178" rx="10" fill="#F8FAFC" stroke="#E5E7EB"/>
+        <rect x="0" y="0" width="4" height="178" rx="2" fill="#6366F1"/>
+        <text x="20" y="28" font-size="10" font-weight="800" fill="#4338CA" letter-spacing="0.5">MÉSOCYCLE 1 · SEMAINES 1-4</text>
+        <text x="20" y="48" font-size="15" font-weight="800" fill="#0F172A">Adaptation anatomique</text>
+        <text x="20" y="66" font-size="11" fill="#64748B">Préparer le corps, technique avant charge. Full-body 3×/sem.</text>
+
+        <!-- Day chips -->
+        <g transform="translate(20, 80)">
+          <!-- Lun -->
+          <rect x="0" y="0" width="208" height="78" rx="8" fill="#fff" stroke="#E5E7EB"/>
+          <text x="14" y="20" font-size="10" font-weight="800" fill="#94A3B8">LUNDI · FULL BODY A</text>
+          <text x="14" y="40" font-size="12" fill="#475569">• Goblet squat 4×10</text>
+          <text x="14" y="56" font-size="12" fill="#475569">• Développé couché haltères 4×8</text>
+          <text x="14" y="72" font-size="12" fill="#475569">• Rowing horizontal + Planche</text>
+
+          <!-- Mer -->
+          <rect x="216" y="0" width="208" height="78" rx="8" fill="#fff" stroke="#E5E7EB"/>
+          <text x="230" y="20" font-size="10" font-weight="800" fill="#94A3B8">MERCREDI · FULL BODY B</text>
+          <text x="230" y="40" font-size="12" fill="#475569">• Soulevé de terre roumain 4×8</text>
+          <text x="230" y="56" font-size="12" fill="#475569">• Tirage poitrine 4×10</text>
+          <text x="230" y="72" font-size="12" fill="#475569">• Fentes alternées + Gainage</text>
+
+          <!-- Ven -->
+          <rect x="432" y="0" width="208" height="78" rx="8" fill="#fff" stroke="#E5E7EB"/>
+          <text x="446" y="20" font-size="10" font-weight="800" fill="#94A3B8">VENDREDI · FULL BODY C</text>
+          <text x="446" y="40" font-size="12" fill="#475569">• Hip thrust 4×12</text>
+          <text x="446" y="56" font-size="12" fill="#475569">• Développé militaire 4×8</text>
+          <text x="446" y="72" font-size="12" fill="#475569">• Tractions assistées + Abdos</text>
+        </g>
+      </g>
+
+      <!-- Mesocycle 2 -->
+      <g transform="translate(24, 310)">
+        <rect width="672" height="178" rx="10" fill="#F8FAFC" stroke="#E5E7EB"/>
+        <rect x="0" y="0" width="4" height="178" rx="2" fill="#1D9E75"/>
+        <text x="20" y="28" font-size="10" font-weight="800" fill="#065F46" letter-spacing="0.5">MÉSOCYCLE 2 · SEMAINES 5-8</text>
+        <text x="20" y="48" font-size="15" font-weight="800" fill="#0F172A">Hypertrophie</text>
+        <text x="20" y="66" font-size="11" fill="#64748B">Volume +20%, séries de 8-12 reps. Split Push / Pull / Legs.</text>
+
+        <g transform="translate(20, 80)">
+          <rect x="0" y="0" width="208" height="78" rx="8" fill="#fff" stroke="#E5E7EB"/>
+          <text x="14" y="20" font-size="10" font-weight="800" fill="#94A3B8">LUNDI · PUSH</text>
+          <text x="14" y="40" font-size="12" fill="#475569">• Développé couché barre 5×10</text>
+          <text x="14" y="56" font-size="12" fill="#475569">• Développé militaire 4×10</text>
+          <text x="14" y="72" font-size="12" fill="#475569">• Dips + Élévations latérales</text>
+
+          <rect x="216" y="0" width="208" height="78" rx="8" fill="#fff" stroke="#E5E7EB"/>
+          <text x="230" y="20" font-size="10" font-weight="800" fill="#94A3B8">MERCREDI · PULL</text>
+          <text x="230" y="40" font-size="12" fill="#475569">• Tractions 5×8</text>
+          <text x="230" y="56" font-size="12" fill="#475569">• Rowing barre 4×10</text>
+          <text x="230" y="72" font-size="12" fill="#475569">• Curl barre + Face pulls</text>
+
+          <rect x="432" y="0" width="208" height="78" rx="8" fill="#fff" stroke="#E5E7EB"/>
+          <text x="446" y="20" font-size="10" font-weight="800" fill="#94A3B8">VENDREDI · LEGS</text>
+          <text x="446" y="40" font-size="12" fill="#475569">• Front squat 5×8 (lombaires OK)</text>
+          <text x="446" y="56" font-size="12" fill="#475569">• Hip thrust lourd 4×8</text>
+          <text x="446" y="72" font-size="12" fill="#475569">• Curl ischios + Mollets</text>
+        </g>
+      </g>
+
+      <!-- Mesocycle 3 -->
+      <g transform="translate(24, 510)">
+        <rect width="672" height="178" rx="10" fill="#F8FAFC" stroke="#E5E7EB"/>
+        <rect x="0" y="0" width="4" height="178" rx="2" fill="#F59E0B"/>
+        <text x="20" y="28" font-size="10" font-weight="800" fill="#92400E" letter-spacing="0.5">MÉSOCYCLE 3 · SEMAINES 9-12</text>
+        <text x="20" y="48" font-size="15" font-weight="800" fill="#0F172A">Force maximale</text>
+        <text x="20" y="66" font-size="11" fill="#64748B">Intensité 80-90% RM. Séries courtes 3-5 reps + récupération longue.</text>
+
+        <g transform="translate(20, 80)">
+          <rect x="0" y="0" width="208" height="78" rx="8" fill="#fff" stroke="#E5E7EB"/>
+          <text x="14" y="20" font-size="10" font-weight="800" fill="#94A3B8">LUNDI · UPPER FORCE</text>
+          <text x="14" y="40" font-size="12" fill="#475569">• Développé couché 5×5</text>
+          <text x="14" y="56" font-size="12" fill="#475569">• Tractions lestées 5×3</text>
+          <text x="14" y="72" font-size="12" fill="#475569">• Accessoires hypertrophie</text>
+
+          <rect x="216" y="0" width="208" height="78" rx="8" fill="#fff" stroke="#E5E7EB"/>
+          <text x="230" y="20" font-size="10" font-weight="800" fill="#94A3B8">MERCREDI · LOWER FORCE</text>
+          <text x="230" y="40" font-size="12" fill="#475569">• Front squat 5×5</text>
+          <text x="230" y="56" font-size="12" fill="#475569">• Hip thrust max 5×5</text>
+          <text x="230" y="72" font-size="12" fill="#475569">• Accessoires postérieurs</text>
+
+          <rect x="432" y="0" width="208" height="78" rx="8" fill="#fff" stroke="#E5E7EB"/>
+          <text x="446" y="20" font-size="10" font-weight="800" fill="#94A3B8">VENDREDI · TOTAL BODY</text>
+          <text x="446" y="40" font-size="12" fill="#475569">• Cleans 6×3 (technique)</text>
+          <text x="446" y="56" font-size="12" fill="#475569">• Développé militaire 5×5</text>
+          <text x="446" y="72" font-size="12" fill="#475569">• Finisher conditioning</text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

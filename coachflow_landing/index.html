@@ -144,16 +144,21 @@
     }
     .hero-meta span { display: flex; align-items: center; gap: 6px; }
 
-    /* ── DEMO MOCKUP ───────────────────────────────────────────────────── */
-    .demo-wrap {
+    /* ── HERO SHOT (screenshot ou mockup CSS) ──────────────────────────── */
+    .hero-shot {
       margin-top: 60px; position: relative;
-      perspective: 2000px;
+    }
+    .hero-shot picture, .hero-shot img {
+      width: 100%; height: auto;
+      border-radius: 16px;
+      border: 1px solid var(--bdr);
+      box-shadow: var(--sh-lg);
+      display: block;
     }
     .demo-frame {
       background: linear-gradient(180deg, #fff, #f8fafc);
       border: 1px solid var(--bdr); border-radius: 16px;
       box-shadow: var(--sh-lg); overflow: hidden;
-      transform: rotateX(2deg);
     }
     .demo-bar {
       display: flex; align-items: center; gap: 6px;
@@ -277,6 +282,31 @@
     .feat h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
     .feat p { color: var(--t2); font-size: 14px; line-height: 1.6; }
 
+    /* ── SHOWCASE GALLERY ──────────────────────────────────────────────── */
+    .showcase { background: linear-gradient(180deg, var(--bg), #fff); }
+    .shots-grid {
+      display: grid; gap: 22px;
+      grid-template-columns: repeat(12, 1fr);
+    }
+    .shot {
+      background: #fff; border: 1px solid var(--bdr); border-radius: 16px;
+      overflow: hidden; box-shadow: var(--sh);
+      transition: transform .25s, box-shadow .25s;
+    }
+    .shot:hover { transform: translateY(-3px); box-shadow: var(--sh-lg); }
+    .shot picture, .shot img { display: block; width: 100%; height: auto; }
+    .shot figcaption {
+      padding: 14px 18px; font-size: 13px; color: var(--t2);
+      border-top: 1px solid var(--bdr); line-height: 1.5;
+    }
+    .shot-wide   { grid-column: span 8; }
+    .shot-mobile { grid-column: span 4; }
+    .shots-grid > .shot:nth-child(1) { grid-column: span 8; }
+    .shots-grid > .shot:nth-child(2) { grid-column: span 4; grid-row: span 2; }
+    .shots-grid > .shot:nth-child(2) img { object-fit: cover; max-height: 720px; }
+    .shots-grid > .shot:nth-child(3) { grid-column: span 8; }
+    .shots-grid > .shot:nth-child(4) { grid-column: span 12; }
+
     /* ── HOW IT WORKS ──────────────────────────────────────────────────── */
     .steps {
       background: linear-gradient(180deg, #fff, var(--bg));
@@ -395,6 +425,9 @@
       .steps-grid { grid-template-columns: 1fr; }
       .pricing-grid { grid-template-columns: 1fr; }
       .price.featured { transform: none; }
+      .shots-grid { grid-template-columns: 1fr; }
+      .shots-grid > .shot { grid-column: span 1 !important; grid-row: auto !important; }
+      .shots-grid > .shot:nth-child(2) img { max-height: 600px; object-fit: contain; }
       section { padding: 60px 0; }
       .hero { padding: 50px 0 30px; }
     }
@@ -448,9 +481,15 @@
         <span>✓ Migration assistée</span>
       </div>
 
-      <!-- Demo mockup -->
-      <div class="demo-wrap">
-        <div class="demo-frame">
+      <!-- Hero screenshot -->
+      <div class="hero-shot">
+        <picture>
+          <source srcset="img/dashboard.webp" type="image/webp">
+          <img src="img/dashboard.svg" alt="Tableau de bord TrainFlow"
+               width="1440" height="900" loading="eager" fetchpriority="high">
+        </picture>
+        <!-- Fallback mockup si pas encore de screenshot -->
+        <div id="mockup-fallback" class="demo-frame" style="display:none;">
           <div class="demo-bar">
             <i></i><i></i><i></i>
             <span class="url">🔒 app.trainflow.fr/dashboard</span>
@@ -470,26 +509,10 @@
             </aside>
             <main class="demo-main">
               <div class="demo-kpis">
-                <div class="demo-kpi">
-                  <div class="k-lbl">Clients actifs</div>
-                  <div class="k-val">14</div>
-                  <div class="k-sub">+2 ce mois</div>
-                </div>
-                <div class="demo-kpi">
-                  <div class="k-lbl">MRR</div>
-                  <div class="k-val">2 380€</div>
-                  <div class="k-sub">+18%</div>
-                </div>
-                <div class="demo-kpi">
-                  <div class="k-lbl">Séances 7j</div>
-                  <div class="k-val">42</div>
-                  <div class="k-sub">+8</div>
-                </div>
-                <div class="demo-kpi">
-                  <div class="k-lbl">Complétion</div>
-                  <div class="k-val">87%</div>
-                  <div class="k-sub">+4 pts</div>
-                </div>
+                <div class="demo-kpi"><div class="k-lbl">Clients actifs</div><div class="k-val">14</div><div class="k-sub">+2 ce mois</div></div>
+                <div class="demo-kpi"><div class="k-lbl">MRR</div><div class="k-val">2 380€</div><div class="k-sub">+18%</div></div>
+                <div class="demo-kpi"><div class="k-lbl">Séances 7j</div><div class="k-val">42</div><div class="k-sub">+8</div></div>
+                <div class="demo-kpi"><div class="k-lbl">Complétion</div><div class="k-val">87%</div><div class="k-sub">+4 pts</div></div>
               </div>
               <div class="demo-chart">
                 <div class="bar" style="height: 40%"></div>
@@ -586,6 +609,51 @@
           <h3>Suivi & analytics</h3>
           <p>Évolution du poids, mesures corporelles, performances sportives, check-ins hebdo. Vue d'ensemble en 1 coup d'œil.</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SHOWCASE ─────────────────────────────────────────────── -->
+  <section class="showcase">
+    <div class="wrap">
+      <div class="sec-h">
+        <span class="label">Aperçu</span>
+        <h2>Une interface qui ne te fait pas perdre de temps.</h2>
+        <p>Pensée pour aller à l'essentiel : tes infos importantes en 1 clic, partout dans l'app.</p>
+      </div>
+      <div class="shots-grid">
+        <figure class="shot shot-wide">
+          <picture>
+            <source srcset="img/clients.webp" type="image/webp">
+            <img src="img/clients.svg" alt="Liste des clients"
+                 width="1440" height="900" loading="lazy">
+          </picture>
+          <figcaption>Tous tes clients, leurs programmes et leurs progrès. En un coup d'œil.</figcaption>
+        </figure>
+        <figure class="shot shot-mobile">
+          <picture>
+            <source srcset="img/portail-mobile.webp" type="image/webp">
+            <img src="img/portail-mobile.svg" alt="Portail client mobile"
+                 width="400" height="800" loading="lazy">
+          </picture>
+          <figcaption>Le portail client. PWA installable, notifications push.</figcaption>
+        </figure>
+        <figure class="shot shot-wide">
+          <picture>
+            <source srcset="img/programme-ia.webp" type="image/webp">
+            <img src="img/programme-ia.svg" alt="Génération de programme par IA"
+                 width="1440" height="900" loading="lazy">
+          </picture>
+          <figcaption>Plan d'entraînement complet généré en 30 secondes par l'IA.</figcaption>
+        </figure>
+        <figure class="shot shot-wide">
+          <picture>
+            <source srcset="img/suivi.webp" type="image/webp">
+            <img src="img/suivi.svg" alt="Suivi et analytics du client"
+                 width="1440" height="900" loading="lazy">
+          </picture>
+          <figcaption>Suivi poids, mesures, perfs sportives, check-ins hebdo.</figcaption>
+        </figure>
       </div>
     </div>
   </section>
