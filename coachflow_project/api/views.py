@@ -1718,7 +1718,13 @@ class AlimentViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AlimentSerializer
 
     def get_queryset(self):
-        qs = Aliment.objects.filter(Q(coach=None) | Q(coach=self.request.user))
+        # Coach voit globaux + ses customs. Client voit globaux + customs de son coach.
+        owner = self.request.user
+        if getattr(self.request.user, 'role', '') == 'client':
+            client = Client.objects.filter(user_account=self.request.user).first()
+            if client:
+                owner = client.coach
+        qs = Aliment.objects.filter(Q(coach=None) | Q(coach=owner))
         q = self.request.query_params.get('q', '')
         cat = self.request.query_params.get('cat', '')
         if q:
@@ -1751,6 +1757,8 @@ class AlimentViewSet(viewsets.ReadOnlyModelViewSet):
         Body attendu : {nom, categorie, calories_100g, proteines_100g, glucides_100g,
                         lipides_100g, fibres_100g, source_id}
         Si un aliment avec le même source_id existe déjà, le réutilise.
+        Quand un client appelle l'endpoint, l'aliment est attaché à son coach
+        (visible dans la bibliothèque du coach et utilisable par tous ses clients).
         """
         source_id = (request.data.get('source_id') or '').strip()
         if source_id:
@@ -1771,7 +1779,13 @@ class AlimentViewSet(viewsets.ReadOnlyModelViewSet):
         s = AlimentSerializer(data=payload)
         if not s.is_valid():
             return Response(s.errors, status=400)
-        aliment = s.save(coach=request.user, source='openfoodfacts', source_id=source_id)
+        # Si client → attacher au coach. Sinon → l'utilisateur lui-même.
+        owner = request.user
+        if getattr(request.user, 'role', '') == 'client':
+            client = Client.objects.filter(user_account=request.user).first()
+            if client:
+                owner = client.coach
+        aliment = s.save(coach=owner, source='openfoodfacts', source_id=source_id)
         return Response(AlimentSerializer(aliment).data, status=201)
 
 

@@ -2191,6 +2191,9 @@ function PortalNutrition() {
   const [repasType, setRepasType] = useState('dejeuner');
   const [busy, setBusy]         = useState(false);
   const [loading, setLoading]   = useState(true);
+  const [externs, setExterns]   = useState(null); // null = pas cherché, [] vide, [...] résultats
+  const [externBusy, setExternBusy] = useState(false);
+  const [importing, setImporting] = useState(null); // source_id en cours d'import
 
   const loadPlan    = () => api.nutrition.portalPlan().then(setPlan).catch(() => setPlan(null));
   const loadJournal = (d) => api.nutrition.portalJournal(d).then(r => setJournal(r.entries || [])).catch(() => setJournal([]));
@@ -2242,9 +2245,44 @@ function PortalNutrition() {
   };
 
   const searchAliments = async (q) => {
-    if (q.length < 2) return;
+    setExterns(null);
+    if (q.length < 2) { setAliments([]); return; }
     const res = await api.nutrition.aliments(`?q=${encodeURIComponent(q)}`);
     setAliments(res.results || res);
+  };
+
+  const searchExterne = async () => {
+    if (search.trim().length < 2) return;
+    setExternBusy(true);
+    try {
+      const data = await api.nutrition.searchAlimentExterne(search.trim());
+      setExterns(data.results || []);
+    } catch { setExterns([]); }
+    finally { setExternBusy(false); }
+  };
+
+  const importExterne = async (candidate) => {
+    setImporting(candidate.source_id);
+    try {
+      const created = await api.nutrition.importAlimentExterne({
+        nom: candidate.nom,
+        categorie: candidate.categorie,
+        calories_100g:  candidate.calories_100g,
+        proteines_100g: candidate.proteines_100g,
+        glucides_100g:  candidate.glucides_100g,
+        lipides_100g:   candidate.lipides_100g,
+        fibres_100g:    candidate.fibres_100g,
+        source_id:      candidate.source_id,
+      });
+      setSelAl(created);
+      setSearch(created.nom);
+      setAliments([]);
+      setExterns(null);
+    } catch (e) {
+      toast(e.message || 'Erreur import', 'err');
+    } finally {
+      setImporting(null);
+    }
   };
 
   const addEntry = async () => {
@@ -2530,9 +2568,9 @@ function PortalNutrition() {
 
           {/* Modal ajout aliment */}
           {showAdd && (
-            <Modal title="Ajouter au journal" onClose={() => { setShowAdd(false); setSelAl(null); setSearch(''); }}
+            <Modal title="Ajouter au journal" onClose={() => { setShowAdd(false); setSelAl(null); setSearch(''); setExterns(null); setAliments([]); }}
               footer={<>
-                <button className="btn btn-s" onClick={() => { setShowAdd(false); setSelAl(null); setSearch(''); }}>Annuler</button>
+                <button className="btn btn-s" onClick={() => { setShowAdd(false); setSelAl(null); setSearch(''); setExterns(null); setAliments([]); }}>Annuler</button>
                 <button className="btn btn-p" onClick={addEntry} disabled={busy || !selAl}>
                   {busy ? 'Ajout...' : 'Ajouter'}
                 </button>
@@ -2556,7 +2594,7 @@ function PortalNutrition() {
                   overflowY: 'auto', marginBottom: 12,
                 }}>
                   {aliments.map(a => (
-                    <div key={a.id} onClick={() => { setSelAl(a); setSearch(a.nom); setAliments([]); }}
+                    <div key={a.id} onClick={() => { setSelAl(a); setSearch(a.nom); setAliments([]); setExterns(null); }}
                       style={{
                         padding: '9px 12px', cursor: 'pointer', borderBottom: '1px solid var(--bdr)',
                         fontSize: 13,
@@ -2572,6 +2610,53 @@ function PortalNutrition() {
                   ))}
                 </div>
               )}
+
+              {/* Bouton Open Food Facts */}
+              {!selAl && search.trim().length >= 2 && externs === null && (
+                <div style={{ marginBottom: 12, textAlign:'center' }}>
+                  <button className="btn btn-s btn-sm" onClick={searchExterne} disabled={externBusy}>
+                    {externBusy ? '🔍 Recherche...' : aliments.length === 0
+                      ? `🌍 Pas trouvé ? Chercher "${search.trim()}" sur Open Food Facts`
+                      : `🌍 Élargir avec Open Food Facts`}
+                  </button>
+                </div>
+              )}
+
+              {/* Résultats Open Food Facts */}
+              {externs !== null && !selAl && (
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 6, display:'flex', justifyContent:'space-between' }}>
+                    <span>🌍 Suggestions Open Food Facts ({externs.length})</span>
+                    <button onClick={() => setExterns(null)} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--t3)', fontSize:11 }}>Fermer</button>
+                  </div>
+                  {externs.length === 0 ? (
+                    <div style={{ padding: 14, textAlign:'center', color:'var(--t3)', fontSize: 12, background:'var(--bg)', borderRadius: 8 }}>
+                      Aucun résultat. Essaie un autre mot-clé.
+                    </div>
+                  ) : (
+                    <div style={{ border:'1px solid var(--bdr)', borderRadius: 8, maxHeight: 220, overflowY:'auto' }}>
+                      {externs.map(c => (
+                        <div key={c.source_id} style={{ display:'flex', alignItems:'center', gap: 10, padding:'9px 12px', borderBottom:'1px solid var(--bdr)' }}>
+                          {c.image
+                            ? <img src={c.image} alt="" style={{ width: 36, height: 36, objectFit:'cover', borderRadius: 6, flexShrink: 0 }} />
+                            : <div style={{ width: 36, height: 36, borderRadius: 6, background:'var(--bg)', flexShrink: 0 }} />}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 12, fontWeight: 600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{c.nom}</div>
+                            <div style={{ fontSize: 10, color:'var(--t3)' }}>
+                              {Math.round(c.calories_100g)} kcal · P {c.proteines_100g} G {c.glucides_100g} L {c.lipides_100g} (100g)
+                            </div>
+                          </div>
+                          <button className="btn btn-p btn-sm" style={{ fontSize: 11, flexShrink: 0 }}
+                            onClick={() => importExterne(c)} disabled={importing === c.source_id}>
+                            {importing === c.source_id ? '⏳' : '+'}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {selAl && (
                 <div style={{ background: '#E8F8F2', borderRadius: 10, padding: '10px 14px', marginBottom: 12 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: '#065f46', marginBottom: 4 }}>✓ {selAl.nom}</div>
