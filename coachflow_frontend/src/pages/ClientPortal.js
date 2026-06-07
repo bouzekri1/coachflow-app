@@ -2104,28 +2104,68 @@ const PORTAL_RECIPE_TAGS = [
 function RecetteCard({ recette }) {
   const [open, setOpen] = useState(false);
   const m = recette.macros_par_portion || {};
+  const hasMacro = m.calories || m.proteines || m.glucides || m.lipides;
   return (
-    <div className="card" style={{ marginBottom: 10 }}>
-      {/* En-tête cliquable */}
-      <div style={{ display:'flex', alignItems:'center', gap:12, cursor:'pointer' }} onClick={() => setOpen(o => !o)}>
+    <div className="card" style={{ marginBottom: 12, padding: 0, overflow: 'hidden' }}>
+      <div style={{ cursor: 'pointer' }} onClick={() => setOpen(o => !o)}>
+        {/* Photo bannière 16:9 */}
         {recette.photo_url ? (
           <img src={recette.photo_url} alt={recette.nom}
-            style={{ width:56, height:56, borderRadius:10, objectFit:'cover', flexShrink:0 }} />
+            style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', display: 'block', background: '#F1F5F9' }} />
         ) : (
-          <div style={{ width:56, height:56, borderRadius:10, background:'var(--bg)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:24, flexShrink:0 }}>🍽️</div>
-        )}
-        <div style={{ flex:1, minWidth:0 }}>
-          <div style={{ fontSize:14, fontWeight:700 }}>{recette.nom}</div>
-          <div style={{ fontSize:12, color:'var(--t3)', marginTop:2 }}>
-            {recette.ingredients?.length || 0} ingrédient{recette.ingredients?.length !== 1 ? 's' : ''} · {recette.portions} portion{recette.portions > 1 ? 's' : ''}
+          <div style={{ width: '100%', aspectRatio: '16/9', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 56 }}>
+            🍽️
           </div>
+        )}
+
+        <div style={{ padding: '12px 14px' }}>
+          {/* Ligne titre + chevron */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                {recette.nom}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--t3)', marginTop: 3 }}>
+                {recette.ingredients?.length || 0} ingrédient{recette.ingredients?.length !== 1 ? 's' : ''} · {recette.portions} portion{recette.portions > 1 ? 's' : ''}
+              </div>
+            </div>
+            <span style={{ fontSize: 14, color: 'var(--t3)', flexShrink: 0, paddingTop: 2 }}>{open ? '▲' : '▼'}</span>
+          </div>
+
+          {/* Macros */}
+          {hasMacro && (
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10 }}>
+              {m.calories && (
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#065f46', background: '#E8F8F2', borderRadius: 6, padding: '3px 8px' }}>
+                  {Math.round(m.calories)} kcal
+                </span>
+              )}
+              {m.proteines && (
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#1E40AF', background: '#EFF6FF', borderRadius: 6, padding: '3px 8px' }}>
+                  P {Math.round(m.proteines)}g
+                </span>
+              )}
+              {m.glucides && (
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#92400E', background: '#FFFBEB', borderRadius: 6, padding: '3px 8px' }}>
+                  G {Math.round(m.glucides)}g
+                </span>
+              )}
+              {m.lipides && (
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#991B1B', background: '#FEF2F2', borderRadius: 6, padding: '3px 8px' }}>
+                  L {Math.round(m.lipides)}g
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Tags */}
           {recette.tags && recette.tags.length > 0 && (
-            <div style={{ display:'flex', flexWrap:'wrap', gap:4, marginTop:5 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 8 }}>
               {recette.tags.map(t => {
                 const meta = PORTAL_RECIPE_TAGS.find(x => x.slug === t);
                 if (!meta) return null;
                 return (
-                  <span key={t} style={{ fontSize:9, padding:'1px 5px', borderRadius:3, fontWeight:600, background:meta.bg, color:meta.color }}>
+                  <span key={t} style={{ fontSize: 10, padding: '2px 7px', borderRadius: 10, fontWeight: 600, background: meta.bg, color: meta.color, whiteSpace: 'nowrap' }}>
                     {meta.icon} {meta.label}
                   </span>
                 );
@@ -2133,17 +2173,10 @@ function RecetteCard({ recette }) {
             </div>
           )}
         </div>
-        <div style={{ display:'flex', gap:5, flexWrap:'wrap', justifyContent:'flex-end' }}>
-          {m.calories  && <span style={{ fontSize:11, fontWeight:700, color:'#065f46', background:'#E8F8F2', borderRadius:6, padding:'2px 6px' }}>{Math.round(m.calories)} kcal</span>}
-          {m.proteines && <span style={{ fontSize:11, fontWeight:700, color:'#1E40AF', background:'#EFF6FF', borderRadius:6, padding:'2px 6px' }}>P {Math.round(m.proteines)}g</span>}
-          {m.glucides  && <span style={{ fontSize:11, fontWeight:700, color:'#92400E', background:'#FFFBEB', borderRadius:6, padding:'2px 6px' }}>G {Math.round(m.glucides)}g</span>}
-          {m.lipides   && <span style={{ fontSize:11, fontWeight:700, color:'#991B1B', background:'#FEF2F2', borderRadius:6, padding:'2px 6px' }}>L {Math.round(m.lipides)}g</span>}
-        </div>
-        <span style={{ fontSize:18, color:'var(--t3)', marginLeft:4 }}>{open ? '▲' : '▼'}</span>
       </div>
 
       {open && (
-        <div style={{ marginTop:14, borderTop:'1px solid var(--bdr)', paddingTop:12 }}>
+        <div style={{ padding: '12px 14px 14px', borderTop:'1px solid var(--bdr)' }}>
           {recette.description && (
             <div style={{ fontSize:13, color:'var(--t2)', marginBottom:10 }}>{recette.description}</div>
           )}
