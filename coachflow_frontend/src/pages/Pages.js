@@ -284,7 +284,9 @@ export function Programmes() {
 
   const CATS = { force:'Force & Musculation', cardio:'Cardio & Endurance', perte_poids:'Perte de poids', remise_forme:'Remise en forme', mobilite:'Mobilité', custom:'Personnalisé' };
 
-  const FormFields = () => (
+  // ⚠ Inliné — surtout pas de sous-composant défini ici, sinon React le re-mount
+  // à chaque keystroke et l'input perd le focus.
+  const formFields = (
     <>
       <div className="fg"><label className="fl">Nom *</label><input className="fi" value={f.nom} onChange={e => s('nom', e.target.value)} /></div>
       <div className="fg"><label className="fl">Catégorie</label>
@@ -384,7 +386,7 @@ export function Programmes() {
           <><button className="btn btn-s" onClick={() => setShowNew(false)}>Annuler</button>
             <button className="btn btn-p" onClick={create}>Créer</button></>
         }>
-          <FormFields />
+          {formFields}
         </Modal>
       )}
 
@@ -398,7 +400,7 @@ export function Programmes() {
               ⚠️ Ce programme est assigné à {showEdit.nb_clients} client{showEdit.nb_clients > 1 ? 's' : ''} en cours. Les modifications affectent le calcul des séances totales.
             </div>
           )}
-          <FormFields />
+          {formFields}
         </Modal>
       )}
 
@@ -1643,8 +1645,10 @@ export function Messages() {
 
   if (busy) return <Loader />;
 
-  /* ── Liste conversations ── */
-  const ConvList = () => (
+  /* ── Liste conversations ── (variable JSX, surtout pas un sous-composant
+     défini ici : re-créer une identité de composant à chaque render perd
+     le focus du textarea en bas) */
+  const convList = (
     <div className="card" style={{ padding:0, overflow:'auto', flex:1 }}>
       {convs.length === 0 ? <Empty icon="messages" title="Aucune conversation" desc="" /> :
         convs.map(c => (
@@ -1670,8 +1674,8 @@ export function Messages() {
     </div>
   );
 
-  /* ── Fenêtre chat ── */
-  const ChatPanel = () => (
+  /* ── Fenêtre chat ── (variable JSX, pas un sous-composant) */
+  const chatPanel = (
     <div className="card" style={{ display:'flex', flexDirection:'column', padding:0, overflow:'hidden', flex:1, position:'relative' }}>
       {!active
         ? <Empty icon="messages" title="Sélectionnez une conversation" desc="Cliquez sur un client pour ouvrir le chat" />
@@ -1737,7 +1741,7 @@ export function Messages() {
             : <div className="page-title">Messages</div>
           }
         </div>
-        {active ? <ChatPanel /> : <ConvList />}
+        {active ? chatPanel : convList}
       </div>
     );
   }
@@ -1747,8 +1751,8 @@ export function Messages() {
     <div>
       <div className="page-hd"><div className="page-title">Messages</div></div>
       <div style={{ display:'grid', gridTemplateColumns:'260px 1fr', gap:14, height:'calc(100vh - 160px)' }}>
-        <ConvList />
-        <ChatPanel />
+        {convList}
+        {chatPanel}
       </div>
     </div>
   );
