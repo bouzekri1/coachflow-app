@@ -854,7 +854,7 @@ class ClientViewSet(viewsets.ModelViewSet):
         from collections import defaultdict
         client = self.get_object()
         logs = (SerieLog.objects
-                .filter(seance__client=client, poids_kg__isnull=False, repetitions__isnull=False)
+                .filter(seance__client=client, poids_kg__isnull=False)
                 .select_related('seance')
                 .order_by('seance__date_heure'))
 
@@ -874,8 +874,13 @@ class ClientViewSet(viewsets.ModelViewSet):
             data = []
             for date_str, day in sorted(by_date.items()):
                 max_kg = max(e['poids_kg'] for e in day)
-                volume = sum(e['poids_kg'] * e['reps'] for e in day)
-                data.append({'date': date_str, 'max_kg': round(max_kg, 1), 'volume': round(volume)})
+                rep_entries = [e for e in day if e['reps']]
+                volume = sum(e['poids_kg'] * e['reps'] for e in rep_entries) if rep_entries else None
+                data.append({
+                    'date': date_str,
+                    'max_kg': round(max_kg, 1),
+                    'volume': round(volume) if volume is not None else None,
+                })
             if data:
                 result.append({'nom': nom, 'nb_sessions': len(data), 'data': data})
 

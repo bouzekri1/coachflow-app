@@ -2481,8 +2481,19 @@ function PerformancesChart({ data }) {
 
       {/* Résumé delta */}
       {exo.data.length >= 2 && (() => {
-        const first = exo.data[0][mode];
-        const last  = exo.data[exo.data.length - 1][mode];
+        const pts = exo.data.filter(d => d[mode] != null);
+        if (pts.length < 2) {
+          if (mode === 'volume') {
+            return (
+              <div style={{ background:'#fef3c7', color:'#92400e', borderRadius:10, padding:'10px 14px', marginBottom:14, fontSize:12 }}>
+                ℹ️ Volume indisponible — pas de répétitions loguées. Bascule en <b>💪 Charge max</b>.
+              </div>
+            );
+          }
+          return null;
+        }
+        const first = pts[0][mode];
+        const last  = pts[pts.length - 1][mode];
         const delta = last - first;
         return (
           <div style={{ display:'flex', gap:12, background:'var(--bg)', borderRadius:10, padding:'10px 16px', marginBottom:14, flexWrap:'wrap' }}>
@@ -2517,7 +2528,7 @@ function PerformancesChart({ data }) {
             <Line type="monotone" dataKey={mode} stroke={color} strokeWidth={2.5}
               dot={{ r:4, fill:color, strokeWidth:2, stroke:'#fff' }}
               activeDot={{ r:6, strokeWidth:2, stroke:'#fff' }}
-              name={label} />
+              name={label} connectNulls />
           </LineChart>
         </ResponsiveContainer>
       )}
@@ -2671,7 +2682,7 @@ function ClientSuiviTab({ client, mesures, nutrition, checkins, performances }) 
 
       {/* ── Bien-être (check-ins) ── */}
       <SuiviSection title="🧠 Bien-être hebdomadaire (check-ins)" loading={loading}>
-        {checkinsData.length < 2
+        {checkinsData.length < 1
           ? <NoData icon="📋" />
           : <ResponsiveContainer width="100%" height={240}>
               <LineChart data={checkinsData} margin={{ top:8, right:16, left:0, bottom:0 }}>
