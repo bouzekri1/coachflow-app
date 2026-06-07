@@ -2761,22 +2761,50 @@ function PortalNutrition() {
                         {recettes.length} recette{recettes.length > 1 ? 's' : ''}
                       </div>
                       {slice.map(r => <RecetteCard key={r.id} recette={r} />)}
-                      {totalPages > 1 && (
-                        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6, marginTop:16 }}>
-                          <button className="btn" style={{ padding:'4px 10px', fontSize:13 }}
-                            disabled={page <= 1} onClick={() => setRecettePage(p => p - 1)}>‹</button>
-                          {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
-                            <button key={n} className="btn" onClick={() => setRecettePage(n)}
-                              style={{ padding:'4px 10px', fontSize:13, fontWeight: n === page ? 800 : 400,
-                                background: n === page ? 'var(--acc)' : undefined,
-                                color: n === page ? '#fff' : undefined }}>
-                              {n}
-                            </button>
-                          ))}
-                          <button className="btn" style={{ padding:'4px 10px', fontSize:13 }}
-                            disabled={page >= totalPages} onClick={() => setRecettePage(p => p + 1)}>›</button>
-                        </div>
-                      )}
+                      {totalPages > 1 && (() => {
+                        // Calcule la liste compacte des pages : [1, '…', p-1, p, p+1, '…', total]
+                        const pages = new Set([1, totalPages, page, page - 1, page + 1, page - 2, page + 2]);
+                        const sorted = [...pages].filter(n => n >= 1 && n <= totalPages).sort((a, b) => a - b);
+                        const items = [];
+                        let prev = 0;
+                        for (const n of sorted) {
+                          if (n - prev > 1) items.push('gap-' + n);
+                          items.push(n);
+                          prev = n;
+                        }
+                        const btnBase = {
+                          minWidth: 36, height: 36, padding: 0, fontSize: 14, fontWeight: 600,
+                          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                          borderRadius: 8, border: '1px solid var(--bdr)', background: '#fff',
+                          color: 'var(--t2)', cursor: 'pointer', flexShrink: 0,
+                        };
+                        return (
+                          <div style={{
+                            display:'flex', alignItems:'center', justifyContent:'center',
+                            gap:6, marginTop:20, flexWrap:'wrap',
+                          }}>
+                            <button style={{ ...btnBase, opacity: page <= 1 ? .4 : 1, cursor: page <= 1 ? 'not-allowed' : 'pointer' }}
+                              disabled={page <= 1} onClick={() => setRecettePage(p => p - 1)}>‹</button>
+                            {items.map(it => typeof it === 'string'
+                              ? <span key={it} style={{ color:'var(--t3)', padding:'0 4px', fontSize: 14 }}>…</span>
+                              : (
+                                <button key={it} onClick={() => setRecettePage(it)}
+                                  style={{
+                                    ...btnBase,
+                                    background: it === page ? 'var(--acc)' : '#fff',
+                                    color:      it === page ? '#fff' : 'var(--t2)',
+                                    borderColor: it === page ? 'var(--acc)' : 'var(--bdr)',
+                                    fontWeight: it === page ? 800 : 600,
+                                  }}>
+                                  {it}
+                                </button>
+                              )
+                            )}
+                            <button style={{ ...btnBase, opacity: page >= totalPages ? .4 : 1, cursor: page >= totalPages ? 'not-allowed' : 'pointer' }}
+                              disabled={page >= totalPages} onClick={() => setRecettePage(p => p + 1)}>›</button>
+                          </div>
+                        );
+                      })()}
                     </>
                   );
                 })()
