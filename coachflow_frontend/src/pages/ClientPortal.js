@@ -1614,6 +1614,14 @@ const REPAS_LABELS = {
   diner: 'Dîner',
 };
 
+const REPAS_STYLE = {
+  petit_dejeuner:  { icon: '🌅', color: '#D97706', bg: '#FFFBEB', border: '#FCD34D' },
+  collation_matin: { icon: '🍎', color: '#16A34A', bg: '#F0FDF4', border: '#86EFAC' },
+  dejeuner:        { icon: '☀️', color: '#0284C7', bg: '#F0F9FF', border: '#7DD3FC' },
+  collation_soir:  { icon: '🥜', color: '#9333EA', bg: '#FAF5FF', border: '#D8B4FE' },
+  diner:           { icon: '🌙', color: '#4F46E5', bg: '#EEF2FF', border: '#A5B4FC' },
+};
+
 function MacroPill({ label, value, color, bg }) {
   return (
     <span style={{
@@ -2432,38 +2440,83 @@ function PortalNutrition() {
             </div>
 
             {/* Repas */}
-            {(plan.plan?.repas || []).map(repas => (
-              <div key={repas.id} className="card" style={{ marginBottom: 12 }}>
-                <div className="card-t" style={{ marginBottom: 12 }}>
-                  {REPAS_LABELS[repas.type_repas] || repas.type_repas_label}
-                  {repas.macros_total?.calories && (
-                    <span style={{ fontSize: 12, color: 'var(--t3)', fontWeight: 500 }}>
-                      {Math.round(repas.macros_total.calories)} kcal
-                    </span>
-                  )}
-                </div>
-                {(repas.aliments || []).map(ar => {
-                  const m = ar.macros || {};
-                  return (
-                    <div key={ar.id} style={{
-                      display: 'flex', alignItems: 'center', gap: 12,
-                      padding: '8px 0', borderBottom: '1px solid var(--bdr)',
+            {(plan.plan?.repas || []).map(repas => {
+              const style = REPAS_STYLE[repas.type_repas] || { icon: '🍽️', color: 'var(--t2)', bg: 'var(--bg)', border: 'var(--bdr)' };
+              const aliments = repas.aliments || [];
+              return (
+                <div key={repas.id} style={{
+                  marginBottom: 14, borderRadius: 14, overflow: 'hidden',
+                  border: `1px solid ${style.border}`, background: '#fff',
+                  boxShadow: '0 1px 2px rgba(0,0,0,.04)',
+                }}>
+                  {/* Header coloré */}
+                  <div style={{
+                    background: style.bg, padding: '12px 16px',
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    borderBottom: `1px solid ${style.border}`,
+                  }}>
+                    <div style={{
+                      width: 40, height: 40, borderRadius: 10,
+                      background: '#fff', border: `1.5px solid ${style.border}`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 20, flexShrink: 0,
                     }}>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 13, fontWeight: 600 }}>{ar.aliment_nom}</div>
-                        <div style={{ fontSize: 11, color: 'var(--t3)', marginTop: 2 }}>{ar.quantite_g}g</div>
+                      {style.icon}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: style.color, lineHeight: 1.2 }}>
+                        {REPAS_LABELS[repas.type_repas] || repas.type_repas_label}
                       </div>
-                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                        {m.calories && <MacroPill label="kcal" value={Math.round(m.calories)} color="#065f46" bg="#E8F8F2" />}
-                        {m.proteines && <MacroPill label="P" value={`${Math.round(m.proteines)}g`} color="#1E40AF" bg="#EFF6FF" />}
-                        {m.glucides && <MacroPill label="G" value={`${Math.round(m.glucides)}g`} color="#92400E" bg="#FFFBEB" />}
-                        {m.lipides && <MacroPill label="L" value={`${Math.round(m.lipides)}g`} color="#991B1B" bg="#FEF2F2" />}
+                      <div style={{ fontSize: 11, color: style.color, opacity: .7, marginTop: 2 }}>
+                        {aliments.length} aliment{aliments.length > 1 ? 's' : ''}
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            ))}
+                    {repas.macros_total?.calories ? (
+                      <div style={{
+                        background: '#fff', border: `1.5px solid ${style.border}`,
+                        borderRadius: 10, padding: '6px 12px', textAlign: 'center', flexShrink: 0,
+                      }}>
+                        <div style={{ fontSize: 16, fontWeight: 800, color: style.color, lineHeight: 1 }}>
+                          {Math.round(repas.macros_total.calories)}
+                        </div>
+                        <div style={{ fontSize: 9, color: style.color, opacity: .7, fontWeight: 600 }}>kcal</div>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  {/* Aliments */}
+                  {aliments.length === 0 ? (
+                    <div style={{ padding: '16px', fontSize: 12, color: 'var(--t3)', textAlign: 'center', fontStyle: 'italic' }}>
+                      Aucun aliment pour ce repas
+                    </div>
+                  ) : (
+                    <div style={{ padding: '4px 16px 12px' }}>
+                      {aliments.map((ar, idx) => {
+                        const m = ar.macros || {};
+                        return (
+                          <div key={ar.id} style={{
+                            display: 'flex', alignItems: 'center', gap: 12,
+                            padding: '10px 0',
+                            borderBottom: idx < aliments.length - 1 ? '1px solid var(--bdr)' : 'none',
+                          }}>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: 13, fontWeight: 600 }}>{ar.aliment_nom}</div>
+                              <div style={{ fontSize: 11, color: 'var(--t3)', marginTop: 2 }}>{ar.quantite_g}g</div>
+                            </div>
+                            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                              {m.calories && <MacroPill label="kcal" value={Math.round(m.calories)} color="#065f46" bg="#E8F8F2" />}
+                              {m.proteines && <MacroPill label="P" value={`${Math.round(m.proteines)}g`} color="#1E40AF" bg="#EFF6FF" />}
+                              {m.glucides && <MacroPill label="G" value={`${Math.round(m.glucides)}g`} color="#92400E" bg="#FFFBEB" />}
+                              {m.lipides && <MacroPill label="L" value={`${Math.round(m.lipides)}g`} color="#991B1B" bg="#FEF2F2" />}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )
       )}
