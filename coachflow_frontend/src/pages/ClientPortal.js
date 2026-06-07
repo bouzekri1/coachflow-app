@@ -2106,7 +2106,7 @@ function RecetteCard({ recette }) {
   const m = recette.macros_par_portion || {};
   const hasMacro = m.calories || m.proteines || m.glucides || m.lipides;
   return (
-    <div className="card" style={{ marginBottom: 12, padding: 0, overflow: 'hidden' }}>
+    <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
       <div style={{ cursor: 'pointer' }} onClick={() => setOpen(o => !o)}>
         {/* Photo bannière 16:9 */}
         {recette.photo_url ? (
@@ -2760,7 +2760,13 @@ function PortalNutrition() {
                       <div style={{ fontSize:12, color:'var(--t3)', marginBottom:10 }}>
                         {recettes.length} recette{recettes.length > 1 ? 's' : ''}
                       </div>
-                      {slice.map(r => <RecetteCard key={r.id} recette={r} />)}
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+                        gap: 12,
+                      }}>
+                        {slice.map(r => <RecetteCard key={r.id} recette={r} />)}
+                      </div>
                       {totalPages > 1 && (() => {
                         // Calcule la liste compacte des pages : [1, '…', p-1, p, p+1, '…', total]
                         const pages = new Set([1, totalPages, page, page - 1, page + 1, page - 2, page + 2]);
