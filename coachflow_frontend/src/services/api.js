@@ -240,4 +240,14 @@ export const api = {
   feedback: {
     submit: (d) => req('POST', '/feedback/', d),
   },
+
+  admin: {
+    dashboard:    ()           => req('GET',   '/admin-panel/dashboard/'),
+    coachs:       (q = '')     => req('GET',   `/admin-panel/coachs/${q ? '?' + q : ''}`),
+    coach:        (id)         => req('GET',   `/admin-panel/coachs/${id}/`),
+    updateCoach:  (id, d)      => req('PATCH', `/admin-panel/coachs/${id}/`, d),
+    impersonate:  (id)         => req('POST',  `/admin-panel/coachs/${id}/impersonate/`),
+    feedbacks:    (q = '')     => req('GET',   `/admin-panel/feedbacks/${q ? '?' + q : ''}`),
+    updateFeedback: (id, d)    => req('PATCH', `/admin-panel/feedbacks/${id}/`, d),
+  },
 };

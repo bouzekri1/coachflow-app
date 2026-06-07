@@ -51,6 +51,16 @@ export default function Sidebar({ badges = {}, open = false, onClose = () => {} 
             </button>
           );
         })}
+        {user?.role === 'admin' && (
+          <>
+            <div className="sb-sec">Plateforme</div>
+            <button className="sb-item" onClick={() => go('/admin-panel')}
+              style={{ background: 'linear-gradient(135deg, #4338ca22, #6366f122)', color: '#4338ca', fontWeight: 700 }}>
+              <span style={{ fontSize: 14 }}>👑</span>
+              Panel admin
+            </button>
+          </>
+        )}
       </nav>
 
       <div className="sb-foot">

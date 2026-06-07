@@ -19,6 +19,7 @@ import { Programmes, Planning, Revenus, Messages, Alertes } from './pages/Pages'
 import { ClientPortalLayout } from './pages/ClientPortal';
 import Nutrition from './pages/Nutrition';
 import Exercices from './pages/Exercices';
+import AdminPanel from './pages/AdminPanel';
 import { api } from './services/api';
 import InstallPWA from './components/InstallPWA';
 import FeedbackWidget from './components/FeedbackWidget';
@@ -105,7 +106,14 @@ function Layout() {
   if (!user) return <Navigate to="/login" replace />;
   return (
     <>
-      {user.role === 'client' ? <ClientPortalLayout /> : <CoachLayout />}
+      <Routes>
+        <Route path="/admin-panel/*" element={
+          user.role === 'admin' ? <AdminPanel /> : <Navigate to="/dashboard" replace />
+        } />
+        <Route path="/*" element={
+          user.role === 'client' ? <ClientPortalLayout /> : <CoachLayout />
+        } />
+      </Routes>
       <FeedbackWidget />
     </>
   );

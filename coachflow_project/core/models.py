@@ -5,9 +5,10 @@ import uuid
 
 
 class User(AbstractUser):
+    ROLE_ADMIN = 'admin'
     ROLE_COACH = 'coach'
     ROLE_CLIENT = 'client'
-    ROLE_CHOICES = [(ROLE_COACH, 'Coach'), (ROLE_CLIENT, 'Client')]
+    ROLE_CHOICES = [(ROLE_ADMIN, 'Admin'), (ROLE_COACH, 'Coach'), (ROLE_CLIENT, 'Client')]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default=ROLE_COACH)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)

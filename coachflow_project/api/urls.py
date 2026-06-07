@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from . import views
+from . import views, admin_panel
 
 router = DefaultRouter()
 router.register('clients', views.ClientViewSet, basename='clients')
@@ -81,4 +81,11 @@ urlpatterns = [
     path('portal/badges/',       views.portal_badges,       name='portal-badges'),
     path('clients/<uuid:client_id>/badges/', views.coach_client_badges, name='coach-client-badges'),
     path('feedback/', views.submit_feedback, name='submit-feedback'),
+    # ─── ADMIN PANEL (role='admin' uniquement) ───────────────────────────────
+    path('admin-panel/dashboard/',                   admin_panel.admin_dashboard,        name='admin-dashboard'),
+    path('admin-panel/coachs/',                      admin_panel.admin_coachs_list,      name='admin-coachs-list'),
+    path('admin-panel/coachs/<uuid:coach_id>/',      admin_panel.admin_coach_detail,     name='admin-coach-detail'),
+    path('admin-panel/coachs/<uuid:coach_id>/impersonate/', admin_panel.admin_impersonate, name='admin-impersonate'),
+    path('admin-panel/feedbacks/',                   admin_panel.admin_feedbacks_list,   name='admin-feedbacks'),
+    path('admin-panel/feedbacks/<uuid:feedback_id>/', admin_panel.admin_feedback_update, name='admin-feedback-update'),
 ]
