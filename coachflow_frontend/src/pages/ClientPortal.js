@@ -1614,13 +1614,66 @@ const REPAS_LABELS = {
   diner: 'Dîner',
 };
 
-const REPAS_STYLE = {
-  petit_dejeuner:  { icon: '🌅', color: '#D97706', bg: '#FFFBEB', border: '#FCD34D' },
-  collation_matin: { icon: '🍎', color: '#16A34A', bg: '#F0FDF4', border: '#86EFAC' },
-  dejeuner:        { icon: '☀️', color: '#0284C7', bg: '#F0F9FF', border: '#7DD3FC' },
-  collation_soir:  { icon: '🥜', color: '#9333EA', bg: '#FAF5FF', border: '#D8B4FE' },
-  diner:           { icon: '🌙', color: '#4F46E5', bg: '#EEF2FF', border: '#A5B4FC' },
+const REPAS_ICONS = {
+  petit_dejeuner: ( // soleil levant (sunrise)
+    <>
+      <path d="M17 18a5 5 0 0 0-10 0"/>
+      <line x1="12" y1="2" x2="12" y2="9"/>
+      <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/>
+      <line x1="1" y1="18" x2="3" y2="18"/>
+      <line x1="21" y1="18" x2="23" y2="18"/>
+      <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/>
+      <line x1="23" y1="22" x2="1" y2="22"/>
+      <polyline points="8 6 12 2 16 6"/>
+    </>
+  ),
+  collation_matin: ( // pomme
+    <>
+      <path d="M19 13c0 4.5-3 9-7 9s-7-4.5-7-9c0-3 2.5-5 5-5 1 0 1.5.5 2 1 .5-.5 1-1 2-1 2.5 0 5 2 5 5z"/>
+      <path d="M12 7c0-2 1-3 3-3"/>
+    </>
+  ),
+  dejeuner: ( // couverts (fourchette + couteau)
+    <>
+      <path d="M5 2v6a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V2"/>
+      <line x1="7" y1="10" x2="7" y2="22"/>
+      <path d="M19 2v8a3 3 0 0 1-3 3v9"/>
+      <line x1="15" y1="2" x2="15" y2="9"/>
+    </>
+  ),
+  collation_soir: ( // cookie avec pépites
+    <>
+      <circle cx="12" cy="12" r="9"/>
+      <circle cx="9" cy="9" r=".5" fill="currentColor"/>
+      <circle cx="15" cy="11" r=".5" fill="currentColor"/>
+      <circle cx="11" cy="15" r=".5" fill="currentColor"/>
+      <circle cx="14.5" cy="14.5" r=".5" fill="currentColor"/>
+      <circle cx="8" cy="13" r=".5" fill="currentColor"/>
+    </>
+  ),
+  diner: ( // lune (croissant)
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  ),
 };
+
+const REPAS_STYLE = {
+  petit_dejeuner:  { color: '#D97706', bg: '#FFFBEB', border: '#FCD34D' },
+  collation_matin: { color: '#16A34A', bg: '#F0FDF4', border: '#86EFAC' },
+  dejeuner:        { color: '#0284C7', bg: '#F0F9FF', border: '#7DD3FC' },
+  collation_soir:  { color: '#9333EA', bg: '#FAF5FF', border: '#D8B4FE' },
+  diner:           { color: '#4F46E5', bg: '#EEF2FF', border: '#A5B4FC' },
+};
+
+function RepasIcon({ type, color, size = 22 }) {
+  const content = REPAS_ICONS[type];
+  if (!content) return null;
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      {content}
+    </svg>
+  );
+}
 
 function MacroPill({ label, value, color, bg }) {
   return (
@@ -2441,7 +2494,7 @@ function PortalNutrition() {
 
             {/* Repas */}
             {(plan.plan?.repas || []).map(repas => {
-              const style = REPAS_STYLE[repas.type_repas] || { icon: '🍽️', color: 'var(--t2)', bg: 'var(--bg)', border: 'var(--bdr)' };
+              const style = REPAS_STYLE[repas.type_repas] || { color: 'var(--t2)', bg: 'var(--bg)', border: 'var(--bdr)' };
               const aliments = repas.aliments || [];
               return (
                 <div key={repas.id} style={{
@@ -2459,9 +2512,9 @@ function PortalNutrition() {
                       width: 40, height: 40, borderRadius: 10,
                       background: '#fff', border: `1.5px solid ${style.border}`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 20, flexShrink: 0,
+                      flexShrink: 0,
                     }}>
-                      {style.icon}
+                      <RepasIcon type={repas.type_repas} color={style.color} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 15, fontWeight: 800, color: style.color, lineHeight: 1.2 }}>
