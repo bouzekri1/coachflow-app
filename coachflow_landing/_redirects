@@ -5,3 +5,12 @@ https://www.trainflow.fr/* https://trainflow.fr/:splat 301!
 /login    https://app.trainflow.fr/login    302
 /register https://app.trainflow.fr/register 302
 /app      https://app.trainflow.fr          302
+
+# Empêcher le SPA-fallback sur les assets statiques manquants
+# (sinon Cloudflare renvoie index.html avec un 200 au lieu d'un vrai 404,
+#  ce qui casse les <picture><source>)
+/img/*    /404.html  404
+/*.svg    /404.html  404
+/*.webp   /404.html  404
+/*.png    /404.html  404
+/*.jpg    /404.html  404
