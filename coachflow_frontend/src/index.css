@@ -476,6 +476,12 @@ body{overflow-x:hidden;-webkit-text-size-adjust:100%}
 
 .pnav{display:none}
 .factures-cards{display:none}
+
+/* Bouton flottant de feedback (💬) — décalé au-dessus de la pnav côté client mobile */
+.fab-feedback{bottom:20px}
+@media(max-width:768px){
+  .fab-feedback--client{bottom:calc(78px + env(safe-area-inset-bottom))}
+}
 .macro-badge{display:flex;gap:10px}
 .plan-card{display:flex;gap:16px;align-items:flex-start}
 .plan-card-body{flex:1;min-width:0}

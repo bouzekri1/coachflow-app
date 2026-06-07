@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api } from '../services/api';
 import { toast } from './UI';
+import { useAuth } from '../contexts/AuthContext';
 
 const TYPES = [
   { key: 'bug',        label: 'Bug',        icon: '🐛', color: '#dc2626', bg: '#fee2e2' },
@@ -15,6 +16,8 @@ const SEVERITIES = [
 ];
 
 export default function FeedbackWidget() {
+  const { user } = useAuth();
+  const isClient = user?.role === 'client';
   const [open, setOpen]       = useState(false);
   const [type, setType]       = useState('bug');
   const [severity, setSev]    = useState('medium');
@@ -54,8 +57,9 @@ export default function FeedbackWidget() {
       <button
         onClick={() => setOpen(true)}
         title="Signaler un bug ou faire une suggestion"
+        className={isClient ? 'fab-feedback fab-feedback--client' : 'fab-feedback'}
         style={{
-          position: 'fixed', bottom: 20, right: 20, zIndex: 9000,
+          position: 'fixed', right: 20, zIndex: 9000,
           width: 52, height: 52, borderRadius: '50%',
           background: 'linear-gradient(135deg, #6366f1, #4338ca)',
           color: '#fff', border: 'none', cursor: 'pointer',
