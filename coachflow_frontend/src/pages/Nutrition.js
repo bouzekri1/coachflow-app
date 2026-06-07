@@ -128,6 +128,9 @@ function AlimentSearchModal({ onSelect, onClose }) {
   const [cat, setCat] = useState('');
   const [results, setResults] = useState([]);
   const [busy, setBusy] = useState(false);
+  const [externs, setExterns] = useState(null); // null = pas encore cherché, [] = vide, [...] = résultats
+  const [externBusy, setExternBusy] = useState(false);
+  const [importing, setImporting] = useState(null); // source_id en cours d'import
 
   const search = useCallback(async () => {
     setBusy(true);
@@ -141,7 +144,41 @@ function AlimentSearchModal({ onSelect, onClose }) {
     finally { setBusy(false); }
   }, [q, cat]);
 
-  useEffect(() => { search(); }, [search]);
+  useEffect(() => { search(); setExterns(null); }, [search]);
+
+  const searchExterne = async () => {
+    if (q.trim().length < 2) return;
+    setExternBusy(true);
+    try {
+      const data = await api.nutrition.searchAlimentExterne(q.trim());
+      setExterns(data.results || []);
+    } catch { setExterns([]); }
+    finally { setExternBusy(false); }
+  };
+
+  const importExterne = async (candidate) => {
+    setImporting(candidate.source_id);
+    try {
+      const created = await api.nutrition.importAlimentExterne({
+        nom: candidate.nom,
+        categorie: candidate.categorie,
+        calories_100g:  candidate.calories_100g,
+        proteines_100g: candidate.proteines_100g,
+        glucides_100g:  candidate.glucides_100g,
+        lipides_100g:   candidate.lipides_100g,
+        fibres_100g:    candidate.fibres_100g,
+        source_id:      candidate.source_id,
+      });
+      setSel(created);
+      setResults(r => [created, ...r.filter(a => a.id !== created.id)]);
+      setExterns(null);
+      setQ(created.nom);
+    } catch (e) {
+      // affiche l'erreur via toast si dispo
+    } finally {
+      setImporting(null);
+    }
+  };
 
   const [qty, setQty] = useState('100');
   const [sel, setSel] = useState(null);
@@ -174,7 +211,16 @@ function AlimentSearchModal({ onSelect, onClose }) {
       <div style={{ maxHeight: 280, overflowY: 'auto', border: '1px solid var(--bdr)', borderRadius: 8 }}>
         {busy ? <div style={{ padding: 20, textAlign: 'center' }}><div className="spin" /></div>
           : results.length === 0
-          ? <div style={{ padding: 20, textAlign: 'center', color: 'var(--t3)', fontSize: 13 }}>Aucun résultat</div>
+          ? (
+            <div style={{ padding: 20, textAlign: 'center', color: 'var(--t3)', fontSize: 13 }}>
+              <div style={{ marginBottom: 12 }}>Aucun aliment dans ta base</div>
+              {q.trim().length >= 2 && externs === null && (
+                <button className="btn btn-p btn-sm" onClick={searchExterne} disabled={externBusy}>
+                  {externBusy ? '🔍 Recherche…' : `🌍 Chercher "${q.trim()}" sur Open Food Facts`}
+                </button>
+              )}
+            </div>
+          )
           : results.map(a => (
             <div key={a.id}
               onClick={() => setSel(a)}
@@ -197,6 +243,53 @@ function AlimentSearchModal({ onSelect, onClose }) {
           ))
         }
       </div>
+
+      {/* Suggestion Open Food Facts quand on a des résultats locaux mais que le coach veut élargir */}
+      {!busy && results.length > 0 && q.trim().length >= 2 && externs === null && (
+        <div style={{ marginTop: 10, textAlign: 'center' }}>
+          <button className="btn btn-s btn-sm" onClick={searchExterne} disabled={externBusy}>
+            {externBusy ? '🔍 Recherche…' : `🌍 Chercher "${q.trim()}" sur Open Food Facts`}
+          </button>
+        </div>
+      )}
+
+      {/* Résultats Open Food Facts */}
+      {externs !== null && (
+        <div style={{ marginTop: 14 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--t2)', marginBottom: 8, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+            <span>🌍 Suggestions Open Food Facts ({externs.length})</span>
+            <button className="btn btn-g btn-sm" style={{ fontSize:11 }} onClick={() => setExterns(null)}>Fermer</button>
+          </div>
+          {externs.length === 0 ? (
+            <div style={{ padding:14, textAlign:'center', color:'var(--t3)', fontSize:13, background:'var(--bg)', borderRadius:8 }}>
+              Aucun résultat dans Open Food Facts.
+            </div>
+          ) : (
+            <div style={{ maxHeight: 240, overflowY:'auto', border:'1px solid var(--bdr)', borderRadius:8 }}>
+              {externs.map(c => (
+                <div key={c.source_id} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 12px', borderBottom:'1px solid var(--bdr)' }}>
+                  {c.image
+                    ? <img src={c.image} alt="" style={{ width:40, height:40, objectFit:'cover', borderRadius:6, flexShrink:0 }} />
+                    : <div style={{ width:40, height:40, borderRadius:6, background:'var(--bg)', flexShrink:0 }} />}
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:13, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{c.nom}</div>
+                    <div style={{ fontSize:11, color:'var(--t3)' }}>
+                      {Math.round(c.calories_100g)} kcal · P {c.proteines_100g}g · G {c.glucides_100g}g · L {c.lipides_100g}g — /100g
+                    </div>
+                  </div>
+                  <button className="btn btn-p btn-sm" style={{ fontSize:11, flexShrink:0 }}
+                    onClick={() => importExterne(c)} disabled={importing === c.source_id}>
+                    {importing === c.source_id ? '⏳' : '+ Ajouter'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <div style={{ fontSize:10, color:'var(--t3)', marginTop:6, textAlign:'center' }}>
+            Les aliments importés sont ajoutés à ta base personnelle.
+          </div>
+        </div>
+      )}
 
       {sel && (
         <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 12 }}>

@@ -174,6 +174,8 @@ export const api = {
   nutrition: {
     aliments: (q = '') => req('GET', `/aliments/${q}`),
     createAliment: (d) => req('POST', '/aliments/custom/', d),
+    searchAlimentExterne: (q) => req('GET', `/aliments/search-externe/?q=${encodeURIComponent(q)}`),
+    importAlimentExterne: (d) => req('POST', '/aliments/import-externe/', d),
     recettes: (q = '') => req('GET', `/recettes/${q}`),
     createRecette: (d) => req('POST', '/recettes/', d),
     updateRecette: (id, d) => req('PATCH', `/recettes/${id}/`, d),

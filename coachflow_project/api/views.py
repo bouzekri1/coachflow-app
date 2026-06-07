@@ -1735,6 +1735,45 @@ class AlimentViewSet(viewsets.ReadOnlyModelViewSet):
         s.save(coach=request.user)
         return Response(s.data, status=201)
 
+    @action(detail=False, methods=['get'], url_path='search-externe')
+    def search_externe(self, request):
+        """Recherche dans Open Food Facts. Renvoie une liste de candidats."""
+        from core.openfoodfacts import search as off_search
+        q = request.query_params.get('q', '').strip()
+        if len(q) < 2:
+            return Response({'results': []})
+        return Response({'results': off_search(q, limit=8)})
+
+    @action(detail=False, methods=['post'], url_path='import-externe')
+    def import_externe(self, request):
+        """Crée un Aliment dans la DB à partir d'un produit OFF déjà retourné par search-externe.
+
+        Body attendu : {nom, categorie, calories_100g, proteines_100g, glucides_100g,
+                        lipides_100g, fibres_100g, source_id}
+        Si un aliment avec le même source_id existe déjà, le réutilise.
+        """
+        source_id = (request.data.get('source_id') or '').strip()
+        if source_id:
+            existing = Aliment.objects.filter(source='openfoodfacts', source_id=source_id).first()
+            if existing:
+                return Response(AlimentSerializer(existing).data, status=200)
+        payload = {
+            'nom': request.data.get('nom', '').strip()[:200],
+            'categorie': request.data.get('categorie', 'autres'),
+            'calories_100g':  request.data.get('calories_100g',  0),
+            'proteines_100g': request.data.get('proteines_100g', 0),
+            'glucides_100g':  request.data.get('glucides_100g',  0),
+            'lipides_100g':   request.data.get('lipides_100g',   0),
+            'fibres_100g':    request.data.get('fibres_100g',    0),
+        }
+        if not payload['nom']:
+            return Response({'error': 'Nom requis.'}, status=400)
+        s = AlimentSerializer(data=payload)
+        if not s.is_valid():
+            return Response(s.errors, status=400)
+        aliment = s.save(coach=request.user, source='openfoodfacts', source_id=source_id)
+        return Response(AlimentSerializer(aliment).data, status=201)
+
 
 def _recette_queryset_for(user):
     """Recettes visibles pour un coach : toutes les globales + ses copies personnalisées."""

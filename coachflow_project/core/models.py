@@ -508,9 +508,14 @@ class Aliment(models.Model):
     lipides_100g  = models.DecimalField(max_digits=5, decimal_places=1, default=0)
     fibres_100g   = models.DecimalField(max_digits=5, decimal_places=1, default=0)
     coach         = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='aliments_custom')
+    source        = models.CharField(max_length=20, default='manuel',
+                                     choices=[('manuel','Manuel'),('openfoodfacts','Open Food Facts')])
+    source_id     = models.CharField(max_length=50, blank=True, default='',
+                                     help_text='Code-barres OFF si source = openfoodfacts')
     class Meta:
         db_table = 'aliments'
         ordering = ['categorie', 'nom']
+        indexes = [models.Index(fields=['source', 'source_id'])]
     def __str__(self):
         return self.nom
 
