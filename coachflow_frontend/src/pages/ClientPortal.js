@@ -1614,154 +1614,6 @@ const REPAS_LABELS = {
   diner: 'Dîner',
 };
 
-const REPAS_ICONS = {
-  petit_dejeuner: ( // soleil levant (sunrise)
-    <>
-      <path d="M17 18a5 5 0 0 0-10 0"/>
-      <line x1="12" y1="2" x2="12" y2="9"/>
-      <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/>
-      <line x1="1" y1="18" x2="3" y2="18"/>
-      <line x1="21" y1="18" x2="23" y2="18"/>
-      <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/>
-      <line x1="23" y1="22" x2="1" y2="22"/>
-      <polyline points="8 6 12 2 16 6"/>
-    </>
-  ),
-  collation_matin: ( // pomme
-    <>
-      <path d="M19 13c0 4.5-3 9-7 9s-7-4.5-7-9c0-3 2.5-5 5-5 1 0 1.5.5 2 1 .5-.5 1-1 2-1 2.5 0 5 2 5 5z"/>
-      <path d="M12 7c0-2 1-3 3-3"/>
-    </>
-  ),
-  dejeuner: ( // couverts (fourchette + couteau)
-    <>
-      <path d="M5 2v6a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V2"/>
-      <line x1="7" y1="10" x2="7" y2="22"/>
-      <path d="M19 2v8a3 3 0 0 1-3 3v9"/>
-      <line x1="15" y1="2" x2="15" y2="9"/>
-    </>
-  ),
-  collation_soir: ( // cookie avec pépites
-    <>
-      <circle cx="12" cy="12" r="9"/>
-      <circle cx="9" cy="9" r=".5" fill="currentColor"/>
-      <circle cx="15" cy="11" r=".5" fill="currentColor"/>
-      <circle cx="11" cy="15" r=".5" fill="currentColor"/>
-      <circle cx="14.5" cy="14.5" r=".5" fill="currentColor"/>
-      <circle cx="8" cy="13" r=".5" fill="currentColor"/>
-    </>
-  ),
-  diner: ( // lune (croissant)
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-  ),
-};
-
-const REPAS_STYLE = {
-  petit_dejeuner:  { color: '#D97706', bg: '#FFFBEB', border: '#FCD34D' },
-  collation_matin: { color: '#16A34A', bg: '#F0FDF4', border: '#86EFAC' },
-  dejeuner:        { color: '#0284C7', bg: '#F0F9FF', border: '#7DD3FC' },
-  collation_soir:  { color: '#9333EA', bg: '#FAF5FF', border: '#D8B4FE' },
-  diner:           { color: '#4F46E5', bg: '#EEF2FF', border: '#A5B4FC' },
-};
-
-function RepasIcon({ type, color, size = 22 }) {
-  const content = REPAS_ICONS[type];
-  if (!content) return null;
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-      stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      {content}
-    </svg>
-  );
-}
-
-function RepasAccordion({ repas }) {
-  const [open, setOpen] = useState(false);
-  const style = REPAS_STYLE[repas.type_repas] || { color: 'var(--t2)', bg: 'var(--bg)', border: 'var(--bdr)' };
-  const aliments = repas.aliments || [];
-  return (
-    <div style={{
-      marginBottom: 10, borderRadius: 14, overflow: 'hidden',
-      border: `1px solid ${style.border}`, background: '#fff',
-      boxShadow: '0 1px 2px rgba(0,0,0,.04)',
-    }}>
-      {/* Header cliquable */}
-      <div onClick={() => setOpen(o => !o)} style={{
-        background: style.bg, padding: '12px 16px',
-        display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
-        userSelect: 'none',
-      }}>
-        <div style={{
-          width: 40, height: 40, borderRadius: 10,
-          background: '#fff', border: `1.5px solid ${style.border}`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-        }}>
-          <RepasIcon type={repas.type_repas} color={style.color} />
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 15, fontWeight: 800, color: style.color, lineHeight: 1.2 }}>
-            {REPAS_LABELS[repas.type_repas] || repas.type_repas_label}
-          </div>
-          <div style={{ fontSize: 11, color: style.color, opacity: .7, marginTop: 2 }}>
-            {aliments.length} aliment{aliments.length > 1 ? 's' : ''}
-          </div>
-        </div>
-        {repas.macros_total?.calories ? (
-          <div style={{
-            background: '#fff', border: `1.5px solid ${style.border}`,
-            borderRadius: 10, padding: '6px 12px', textAlign: 'center', flexShrink: 0,
-          }}>
-            <div style={{ fontSize: 16, fontWeight: 800, color: style.color, lineHeight: 1 }}>
-              {Math.round(repas.macros_total.calories)}
-            </div>
-            <div style={{ fontSize: 9, color: style.color, opacity: .7, fontWeight: 600 }}>kcal</div>
-          </div>
-        ) : null}
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-          stroke={style.color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
-          style={{ flexShrink: 0, transition: 'transform .2s', transform: open ? 'rotate(180deg)' : 'none' }}>
-          <polyline points="6 9 12 15 18 9"/>
-        </svg>
-      </div>
-
-      {/* Contenu collapsible */}
-      {open && (
-        <div style={{ borderTop: `1px solid ${style.border}` }}>
-          {aliments.length === 0 ? (
-            <div style={{ padding: '16px', fontSize: 12, color: 'var(--t3)', textAlign: 'center', fontStyle: 'italic' }}>
-              Aucun aliment pour ce repas
-            </div>
-          ) : (
-            <div style={{ padding: '4px 16px 12px' }}>
-              {aliments.map((ar, idx) => {
-                const m = ar.macros || {};
-                return (
-                  <div key={ar.id} style={{
-                    display: 'flex', alignItems: 'center', gap: 12,
-                    padding: '10px 0',
-                    borderBottom: idx < aliments.length - 1 ? '1px solid var(--bdr)' : 'none',
-                  }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600 }}>{ar.aliment_nom}</div>
-                      <div style={{ fontSize: 11, color: 'var(--t3)', marginTop: 2 }}>{ar.quantite_g}g</div>
-                    </div>
-                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                      {m.calories && <MacroPill label="kcal" value={Math.round(m.calories)} color="#065f46" bg="#E8F8F2" />}
-                      {m.proteines && <MacroPill label="P" value={`${Math.round(m.proteines)}g`} color="#1E40AF" bg="#EFF6FF" />}
-                      {m.glucides && <MacroPill label="G" value={`${Math.round(m.glucides)}g`} color="#92400E" bg="#FFFBEB" />}
-                      {m.lipides && <MacroPill label="L" value={`${Math.round(m.lipides)}g`} color="#991B1B" bg="#FEF2F2" />}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
 function MacroPill({ label, value, color, bg }) {
   return (
     <span style={{
@@ -2514,7 +2366,7 @@ function PortalNutrition() {
   const lipidesTarget   = plan?.plan?.objectif_lipides_g   || planMacros?.lipides;
 
   const TABS_N = [
-    { key: 'plan',       label: '📋 Mon plan' },
+    { key: 'plan',       label: '🎯 Mes objectifs' },
     { key: 'journal',    label: '📝 Journal' },
     { key: 'recettes',   label: '👨‍🍳 Recettes' },
     { key: 'graphiques', label: '📈 Graphiques' },
@@ -2579,10 +2431,77 @@ function PortalNutrition() {
               )}
             </div>
 
-            {/* Repas en accordéon */}
-            {(plan.plan?.repas || []).map(repas => (
-              <RepasAccordion key={repas.id} repas={repas} />
-            ))}
+            {/* Progression d'aujourd'hui */}
+            {plan.progression_jour && (
+              <div className="card" style={{ marginBottom: 18 }}>
+                <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 12, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                  <span>📊 Aujourd'hui</span>
+                  <button onClick={() => setTab('journal')} style={{
+                    background: 'none', border: 'none', cursor:'pointer',
+                    color: 'var(--acc)', fontSize: 12, fontWeight: 600,
+                  }}>
+                    + Ajouter au journal →
+                  </button>
+                </div>
+                {[
+                  { key:'calories',  label:'Calories',  unit:'kcal', color:'#065f46', bg:'#E8F8F2' },
+                  { key:'proteines', label:'Protéines', unit:'g',    color:'#1E40AF', bg:'#EFF6FF' },
+                  { key:'glucides',  label:'Glucides',  unit:'g',    color:'#92400E', bg:'#FFFBEB' },
+                  { key:'lipides',   label:'Lipides',   unit:'g',    color:'#991B1B', bg:'#FEF2F2' },
+                ].map(m => {
+                  const consomme = plan.progression_jour.consomme[m.key] || 0;
+                  const objectif = plan.progression_jour.objectifs[m.key];
+                  if (!objectif) return null;
+                  const pct = Math.min(100, Math.round(consomme / objectif * 100));
+                  const overflow = consomme > objectif;
+                  return (
+                    <div key={m.key} style={{ marginBottom: 12 }}>
+                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom: 4 }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: m.color }}>{m.label}</span>
+                        <span style={{ fontSize: 12, color:'var(--t3)' }}>
+                          <strong style={{ color: overflow ? '#991B1B' : 'var(--t1)' }}>{Math.round(consomme)}</strong>
+                          {' / '}{Math.round(objectif)} {m.unit}
+                        </span>
+                      </div>
+                      <div style={{ height: 8, background: m.bg, borderRadius: 4, overflow: 'hidden' }}>
+                        <div style={{
+                          height: '100%', width: `${pct}%`,
+                          background: overflow ? '#DC2626' : m.color,
+                          borderRadius: 4, transition: 'width .3s',
+                        }} />
+                      </div>
+                    </div>
+                  );
+                })}
+                {!plan.progression_jour.objectifs.calories && (
+                  <div style={{ fontSize: 12, color:'var(--t3)', fontStyle:'italic', textAlign:'center', padding:'8px 0' }}>
+                    Aucun objectif défini par ton coach pour le moment.
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Idées repas */}
+            {(plan.idees_repas || []).length > 0 && (
+              <div>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: 10 }}>
+                  <div style={{ fontSize: 14, fontWeight: 800 }}>💡 Idées de repas</div>
+                  <button onClick={() => setTab('recettes')} style={{
+                    background:'none', border:'none', cursor:'pointer',
+                    color: 'var(--acc)', fontSize: 12, fontWeight: 600,
+                  }}>
+                    Voir toutes les recettes →
+                  </button>
+                </div>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                  gap: 12,
+                }}>
+                  {plan.idees_repas.map(r => <RecetteCard key={r.id} recette={r} />)}
+                </div>
+              </div>
+            )}
           </div>
         )
       )}

@@ -2118,12 +2118,47 @@ def portal_plan_actif(request):
         'repas__aliments__aliment',
         'repas__aliments__recette__ingredients__aliment',
     ).get(id=assignation.plan_id)
+
+    # Progression d'aujourd'hui : agrégation des macros consommées
+    today = timezone.now().date()
+    entries = client.journal_alimentaire.filter(date=today).select_related('aliment')
+    consomme = {'calories': 0.0, 'proteines': 0.0, 'glucides': 0.0, 'lipides': 0.0}
+    for e in entries:
+        if not e.aliment:
+            continue
+        ratio = float(e.quantite_g) / 100.0
+        consomme['calories']  += float(e.aliment.calories_100g  or 0) * ratio
+        consomme['proteines'] += float(e.aliment.proteines_100g or 0) * ratio
+        consomme['glucides']  += float(e.aliment.glucides_100g  or 0) * ratio
+        consomme['lipides']   += float(e.aliment.lipides_100g   or 0) * ratio
+    for k in consomme:
+        consomme[k] = round(consomme[k], 1)
+
+    # Idées repas : 6 recettes random dans la bibliothèque du coach
+    import random
+    recipes_qs = _recette_queryset_for(client.coach)
+    recipe_ids = list(recipes_qs.values_list('id', flat=True))
+    if len(recipe_ids) > 6:
+        recipe_ids = random.sample(recipe_ids, 6)
+    idees = recipes_qs.filter(id__in=recipe_ids)
+
     return Response({
         'plan': PlanAlimentaireSerializer(plan).data,
         'assignation': {
             'date_debut': assignation.date_debut,
             'calories_objectif': float(plan.objectif_calories) if plan.objectif_calories else None,
         },
+        'progression_jour': {
+            'date': today.isoformat(),
+            'consomme': consomme,
+            'objectifs': {
+                'calories':  float(plan.objectif_calories)     if plan.objectif_calories else None,
+                'proteines': float(plan.objectif_proteines_g)  if plan.objectif_proteines_g else None,
+                'glucides':  float(plan.objectif_glucides_g)   if plan.objectif_glucides_g else None,
+                'lipides':   float(plan.objectif_lipides_g)    if plan.objectif_lipides_g else None,
+            },
+        },
+        'idees_repas': RecetteSerializer(idees, many=True, context={'request': request}).data,
     })
 
 
