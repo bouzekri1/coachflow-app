@@ -5,6 +5,11 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
 
+# Google OAuth : Google retourne souvent les scopes dans un ordre/format différent
+# de celui demandé (ex: ajoute 'openid' ou réordonne). Sans ce flag,
+# google-auth-oauthlib lève une Warning promue en exception à fetch_token.
+os.environ.setdefault('OAUTHLIB_RELAX_TOKEN_SCOPE', '1')
+
 # ── SÉCURITÉ DE BASE ───────────────────────────────────────────────────────────
 SECRET_KEY = os.environ.get('SECRET_KEY')
 if not SECRET_KEY:
