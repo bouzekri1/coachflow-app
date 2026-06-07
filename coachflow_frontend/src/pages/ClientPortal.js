@@ -2392,92 +2392,155 @@ function PortalNutrition() {
         ))}
       </div>
 
-      {/* ── MON PLAN ── */}
-      {tab === 'plan' && (
-        !plan?.plan ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>🥗</div>
-            <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Aucun plan alimentaire actif</div>
-            <div style={{ fontSize: 13, color: 'var(--t3)' }}>Votre coach n'a pas encore assigné de plan alimentaire</div>
-          </div>
-        ) : (
+      {/* ── MES OBJECTIFS ── */}
+      {tab === 'plan' && (() => {
+        // 1. Aucun plan assigné
+        if (!plan?.plan) {
+          return (
+            <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+              <div style={{ fontSize: 48, marginBottom: 12 }}>🥗</div>
+              <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Aucun plan alimentaire actif</div>
+              <div style={{ fontSize: 13, color: 'var(--t3)' }}>Votre coach n'a pas encore défini d'objectifs pour vous</div>
+            </div>
+          );
+        }
+
+        // 2. Plan assigné mais sans aucun objectif chiffré
+        const hasTargets = caloTarget || proteinesTarget || glucidesTarget || lipidesTarget;
+        if (!hasTargets) {
+          return (
+            <div>
+              <div style={{
+                background: 'linear-gradient(135deg, #1D9E75 0%, #065f46 100%)',
+                borderRadius: 16, padding: '16px 20px', marginBottom: 18, color: '#fff',
+              }}>
+                <div style={{ fontSize: 16, fontWeight: 800 }}>{plan.plan.nom}</div>
+              </div>
+              <div style={{ textAlign: 'center', padding: '40px 20px', background:'#FEF9C3', borderRadius: 12, border: '1px solid #FDE68A' }}>
+                <div style={{ fontSize: 36, marginBottom: 8 }}>⏳</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#854D0E', marginBottom: 4 }}>
+                  Objectifs en attente
+                </div>
+                <div style={{ fontSize: 13, color: '#854D0E', opacity: .8, maxWidth: 320, margin: '0 auto' }}>
+                  Votre coach n'a pas encore renseigné de cibles caloriques.<br/>
+                  Vous pouvez quand même tracker vos repas dans le Journal.
+                </div>
+                <button className="btn btn-p btn-sm" style={{ marginTop: 14 }} onClick={() => setTab('journal')}>
+                  → Aller au Journal
+                </button>
+              </div>
+            </div>
+          );
+        }
+
+        const macros = [
+          { val: caloTarget,      label: 'kcal / jour', icon: '🔥' },
+          { val: proteinesTarget, label: 'Protéines',   icon: '💪', suffix: 'g' },
+          { val: glucidesTarget,  label: 'Glucides',    icon: '🌾', suffix: 'g' },
+          { val: lipidesTarget,   label: 'Lipides',     icon: '🥑', suffix: 'g' },
+        ].filter(m => m.val);
+
+        return (
           <div>
-            {/* Plan header */}
+            {/* 1. Header compact — 4 mini cards en grille auto */}
             <div style={{
               background: 'linear-gradient(135deg, #1D9E75 0%, #065f46 100%)',
-              borderRadius: 16, padding: '20px 24px', marginBottom: 20, color: '#fff',
+              borderRadius: 16, padding: '16px 18px', marginBottom: 18, color: '#fff',
             }}>
-              <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>{plan.plan?.nom}</div>
-              {plan.plan?.description && (
-                <div style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>{plan.plan.description}</div>
-              )}
-              {caloTarget && (
-                <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                  <div style={{ background: 'rgba(255,255,255,.18)', borderRadius: 10, padding: '8px 14px', textAlign: 'center' }}>
-                    <div style={{ fontSize: 22, fontWeight: 900 }}>{Math.round(caloTarget)}</div>
-                    <div style={{ fontSize: 11, opacity: 0.8 }}>kcal / jour</div>
-                  </div>
-                  {[
-                    { val: proteinesTarget, label: 'Protéines' },
-                    { val: glucidesTarget,  label: 'Glucides' },
-                    { val: lipidesTarget,   label: 'Lipides' },
-                  ].filter(x => x.val).map(x => (
-                    <div key={x.label} style={{ background: 'rgba(255,255,255,.18)', borderRadius: 10, padding: '8px 14px', textAlign: 'center' }}>
-                      <div style={{ fontSize: 22, fontWeight: 900 }}>{Math.round(x.val)}g</div>
-                      <div style={{ fontSize: 11, opacity: 0.8 }}>{x.label}</div>
+              <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 12, opacity: .95 }}>
+                🎯 {plan.plan.nom}
+              </div>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))',
+                gap: 8,
+              }}>
+                {macros.map(m => (
+                  <div key={m.label} style={{
+                    background: 'rgba(255,255,255,.18)', borderRadius: 10,
+                    padding: '10px 8px', textAlign: 'center',
+                  }}>
+                    <div style={{ fontSize: 18, fontWeight: 900, lineHeight: 1.1 }}>
+                      {Math.round(m.val)}{m.suffix || ''}
                     </div>
-                  ))}
-                </div>
-              )}
+                    <div style={{ fontSize: 10, opacity: .8, marginTop: 3, fontWeight: 600 }}>
+                      {m.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Progression d'aujourd'hui */}
-            {plan.progression_jour && (
-              <div className="card" style={{ marginBottom: 18 }}>
-                <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 12, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                  <span>📊 Aujourd'hui</span>
+            {/* 3. CTA — Aujourd'hui */}
+            {plan.progression_jour ? (
+              <div className="card" style={{
+                marginBottom: 18, padding: 0, overflow: 'hidden',
+                border: '1.5px solid var(--acc)',
+              }}>
+                <div style={{
+                  padding: '10px 14px', background:'var(--acc2)',
+                  display:'flex', justifyContent:'space-between', alignItems:'center',
+                }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color:'var(--acc3)' }}>
+                    📊 Aujourd'hui
+                  </div>
                   <button onClick={() => setTab('journal')} style={{
-                    background: 'none', border: 'none', cursor:'pointer',
-                    color: 'var(--acc)', fontSize: 12, fontWeight: 600,
+                    background:'var(--acc)', border:'none', cursor:'pointer',
+                    color:'#fff', fontSize: 12, fontWeight: 700,
+                    padding:'5px 12px', borderRadius: 8,
                   }}>
-                    + Ajouter au journal →
+                    + Ajouter un repas
                   </button>
                 </div>
-                {[
-                  { key:'calories',  label:'Calories',  unit:'kcal', color:'#065f46', bg:'#E8F8F2' },
-                  { key:'proteines', label:'Protéines', unit:'g',    color:'#1E40AF', bg:'#EFF6FF' },
-                  { key:'glucides',  label:'Glucides',  unit:'g',    color:'#92400E', bg:'#FFFBEB' },
-                  { key:'lipides',   label:'Lipides',   unit:'g',    color:'#991B1B', bg:'#FEF2F2' },
-                ].map(m => {
-                  const consomme = plan.progression_jour.consomme[m.key] || 0;
-                  const objectif = plan.progression_jour.objectifs[m.key];
-                  if (!objectif) return null;
-                  const pct = Math.min(100, Math.round(consomme / objectif * 100));
-                  const overflow = consomme > objectif;
-                  return (
-                    <div key={m.key} style={{ marginBottom: 12 }}>
-                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom: 4 }}>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: m.color }}>{m.label}</span>
-                        <span style={{ fontSize: 12, color:'var(--t3)' }}>
-                          <strong style={{ color: overflow ? '#991B1B' : 'var(--t1)' }}>{Math.round(consomme)}</strong>
-                          {' / '}{Math.round(objectif)} {m.unit}
-                        </span>
+                <div style={{ padding: '14px' }}>
+                  {[
+                    { key:'calories',  label:'Calories',  unit:'kcal', color:'#065f46', bg:'#E8F8F2' },
+                    { key:'proteines', label:'Protéines', unit:'g',    color:'#1E40AF', bg:'#EFF6FF' },
+                    { key:'glucides',  label:'Glucides',  unit:'g',    color:'#92400E', bg:'#FFFBEB' },
+                    { key:'lipides',   label:'Lipides',   unit:'g',    color:'#991B1B', bg:'#FEF2F2' },
+                  ].map(m => {
+                    const consomme = plan.progression_jour.consomme[m.key] || 0;
+                    const objectif = plan.progression_jour.objectifs[m.key];
+                    if (!objectif) return null;
+                    const pct = Math.min(100, Math.round(consomme / objectif * 100));
+                    const overflow = consomme > objectif;
+                    return (
+                      <div key={m.key} style={{ marginBottom: 12 }}>
+                        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom: 4 }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: m.color }}>{m.label}</span>
+                          <span style={{ fontSize: 12, color:'var(--t3)' }}>
+                            <strong style={{ color: overflow ? '#991B1B' : 'var(--t1)' }}>{Math.round(consomme)}</strong>
+                            {' / '}{Math.round(objectif)} {m.unit}
+                          </span>
+                        </div>
+                        <div style={{ height: 8, background: m.bg, borderRadius: 4, overflow: 'hidden' }}>
+                          <div style={{
+                            height: '100%', width: `${pct}%`,
+                            background: overflow ? '#DC2626' : m.color,
+                            borderRadius: 4, transition: 'width .3s',
+                          }} />
+                        </div>
                       </div>
-                      <div style={{ height: 8, background: m.bg, borderRadius: 4, overflow: 'hidden' }}>
-                        <div style={{
-                          height: '100%', width: `${pct}%`,
-                          background: overflow ? '#DC2626' : m.color,
-                          borderRadius: 4, transition: 'width .3s',
-                        }} />
-                      </div>
+                    );
+                  })}
+                  {!plan.progression_jour.consomme.calories && (
+                    <div style={{ fontSize: 12, color:'var(--t3)', textAlign:'center', padding:'4px 0 0' }}>
+                      Pas encore de repas enregistré aujourd'hui.
                     </div>
-                  );
-                })}
-                {!plan.progression_jour.objectifs.calories && (
-                  <div style={{ fontSize: 12, color:'var(--t3)', fontStyle:'italic', textAlign:'center', padding:'8px 0' }}>
-                    Aucun objectif défini par ton coach pour le moment.
-                  </div>
-                )}
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="card" style={{
+                marginBottom: 18, textAlign:'center', padding:'18px',
+                border: '1.5px dashed var(--bdr)',
+              }}>
+                <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>
+                  Tu n'as encore rien tracké aujourd'hui
+                </div>
+                <button className="btn btn-p btn-sm" onClick={() => setTab('journal')}>
+                  + Commencer le journal
+                </button>
               </div>
             )}
 
@@ -2490,7 +2553,7 @@ function PortalNutrition() {
                     background:'none', border:'none', cursor:'pointer',
                     color: 'var(--acc)', fontSize: 12, fontWeight: 600,
                   }}>
-                    Voir toutes les recettes →
+                    Voir toutes →
                   </button>
                 </div>
                 <div style={{
@@ -2503,8 +2566,8 @@ function PortalNutrition() {
               </div>
             )}
           </div>
-        )
-      )}
+        );
+      })()}
 
       {/* ── JOURNAL ── */}
       {tab === 'journal' && (
