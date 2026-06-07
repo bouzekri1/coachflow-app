@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1D9E75" />
+  <title>TrainFlow — L'OS du coach sportif indépendant</title>
+  <meta name="description" content="Clients, programmes, nutrition, factures : tout ce qu'un coach indépendant gère, dans une seule app. Plans personnalisés avec IA, portail client mobile, sync Google Calendar." />
+
+  <meta property="og:title" content="TrainFlow — L'OS du coach sportif indépendant" />
+  <meta property="og:description" content="Arrête de jongler entre Excel, WhatsApp, Notion et Calendly. Tout pour gérer ton coaching, dans une seule app." />
+  <meta property="og:url" content="https://trainflow.fr" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="fr_FR" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="TrainFlow — L'OS du coach sportif" />
+  <meta name="twitter:description" content="Tout pour gérer ton coaching, dans une seule app. Beta privée en cours." />
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231D9E75'/><text x='50' y='66' font-size='56' text-anchor='middle' font-family='-apple-system,system-ui,sans-serif' font-weight='800'>⚡</text></svg>" />
+
+  <style>
+    :root {
+      --green:   #1D9E75;
+      --green-d: #065f46;
+      --green-l: #E8F8F2;
+      --indigo:  #6366F1;
+      --indigo-d:#4338CA;
+      --indigo-l:#EEF2FF;
+      --bg:      #FAFBFC;
+      --t1:      #0F172A;
+      --t2:      #475569;
+      --t3:      #94A3B8;
+      --bdr:     #E5E7EB;
+      --sh:      0 1px 3px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.04);
+      --sh-lg:   0 20px 60px rgba(15,23,42,.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+      color: var(--t1); background: var(--bg);
+      line-height: 1.5; -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img, svg { display: block; max-width: 100%; }
+    button, input, textarea { font-family: inherit; font-size: inherit; }
+
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── NAV ───────────────────────────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(255,255,255,.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--bdr);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 18px; letter-spacing: -.3px;
+    }
+    .logo-mark {
+      width: 32px; height: 32px; border-radius: 9px;
+      background: linear-gradient(135deg, var(--green-d), var(--green));
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    .nav-link {
+      padding: 8px 14px; border-radius: 8px; color: var(--t2);
+      font-size: 14px; font-weight: 500; transition: background .15s;
+    }
+    .nav-link:hover { background: var(--bg); color: var(--t1); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px;
+      cursor: pointer; border: none; transition: transform .12s, box-shadow .15s;
+      text-decoration: none;
+    }
+    .btn-p {
+      background: linear-gradient(135deg, var(--green-d), var(--green));
+      color: #fff; box-shadow: 0 4px 14px rgba(29,158,117,.3);
+    }
+    .btn-p:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(29,158,117,.4); }
+    .btn-g {
+      background: #fff; color: var(--t1); border: 1px solid var(--bdr);
+    }
+    .btn-g:hover { background: var(--bg); }
+
+    /* ── HERO ──────────────────────────────────────────────────────────── */
+    .hero {
+      padding: 80px 0 60px;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(99,102,241,.08), transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(29,158,117,.08), transparent 50%);
+    }
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 999px;
+      background: var(--indigo-l); color: var(--indigo-d);
+      font-size: 12px; font-weight: 700; letter-spacing: .3px;
+      margin-bottom: 22px;
+    }
+    .pill-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--indigo); position: relative;
+    }
+    .pill-dot::after {
+      content: ''; position: absolute; inset: -4px;
+      border-radius: 50%; background: var(--indigo);
+      animation: pulse 2s infinite; opacity: .4;
+    }
+    @keyframes pulse {
+      0%   { transform: scale(1);   opacity: .4; }
+      70%  { transform: scale(2);   opacity: 0; }
+      100% { transform: scale(2);   opacity: 0; }
+    }
+    .hero h1 {
+      font-size: clamp(34px, 6vw, 58px); font-weight: 900;
+      line-height: 1.05; letter-spacing: -1.5px;
+      max-width: 880px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--green-d), var(--green));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p.lead {
+      font-size: clamp(16px, 2vw, 20px); color: var(--t2);
+      max-width: 620px; margin-top: 22px; line-height: 1.55;
+    }
+    .hero-ctas {
+      display: flex; gap: 12px; margin-top: 32px; flex-wrap: wrap;
+    }
+    .btn-lg { padding: 14px 24px; font-size: 15px; border-radius: 12px; }
+    .hero-meta {
+      display: flex; align-items: center; gap: 16px;
+      margin-top: 28px; font-size: 13px; color: var(--t3);
+    }
+    .hero-meta span { display: flex; align-items: center; gap: 6px; }
+
+    /* ── DEMO MOCKUP ───────────────────────────────────────────────────── */
+    .demo-wrap {
+      margin-top: 60px; position: relative;
+      perspective: 2000px;
+    }
+    .demo-frame {
+      background: linear-gradient(180deg, #fff, #f8fafc);
+      border: 1px solid var(--bdr); border-radius: 16px;
+      box-shadow: var(--sh-lg); overflow: hidden;
+      transform: rotateX(2deg);
+    }
+    .demo-bar {
+      display: flex; align-items: center; gap: 6px;
+      padding: 12px 16px; border-bottom: 1px solid var(--bdr);
+      background: #f8fafc;
+    }
+    .demo-bar i { width: 12px; height: 12px; border-radius: 50%; background: #e5e7eb; display: block; }
+    .demo-bar i:nth-child(1) { background: #FF5F57; }
+    .demo-bar i:nth-child(2) { background: #FEBC2E; }
+    .demo-bar i:nth-child(3) { background: #28C840; }
+    .demo-bar .url {
+      margin-left: 18px; padding: 4px 12px; background: #fff;
+      border-radius: 6px; font-size: 12px; color: var(--t3);
+      border: 1px solid var(--bdr);
+    }
+    .demo-body { display: grid; grid-template-columns: 220px 1fr; min-height: 420px; }
+    .demo-sidebar {
+      background: linear-gradient(180deg, var(--green-d), #032d22);
+      color: #d1fae5; padding: 18px 14px;
+    }
+    .demo-sidebar .sb-logo { display: flex; align-items: center; gap: 8px; color: #fff; font-weight: 800; font-size: 15px; margin-bottom: 22px; }
+    .demo-sidebar .sb-logo span { width: 26px; height: 26px; border-radius: 7px; background: rgba(255,255,255,.18); display: grid; place-items: center; font-size: 13px; }
+    .demo-sidebar .sb-item {
+      padding: 8px 12px; border-radius: 8px; font-size: 13px;
+      display: flex; align-items: center; gap: 10px; margin-bottom: 2px;
+      cursor: pointer; transition: background .15s;
+    }
+    .demo-sidebar .sb-item.on { background: rgba(255,255,255,.15); color: #fff; font-weight: 600; }
+    .demo-sidebar .sb-sec { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; opacity: .5; margin: 14px 0 6px 12px; }
+    .demo-main { padding: 22px; }
+    .demo-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+    .demo-kpi {
+      background: #fff; border: 1px solid var(--bdr); border-radius: 12px;
+      padding: 12px 14px;
+    }
+    .demo-kpi .k-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--t3); font-weight: 700; }
+    .demo-kpi .k-val { font-size: 22px; font-weight: 800; color: var(--t1); margin-top: 4px; }
+    .demo-kpi .k-sub { font-size: 11px; color: var(--green); margin-top: 2px; font-weight: 600; }
+    .demo-chart {
+      background: #fff; border: 1px solid var(--bdr); border-radius: 12px;
+      padding: 18px; height: 180px;
+      display: flex; align-items: flex-end; gap: 8px;
+    }
+    .demo-chart .bar {
+      flex: 1; background: linear-gradient(180deg, var(--green), var(--green-d));
+      border-radius: 4px 4px 0 0; opacity: .85; transition: opacity .2s;
+    }
+    .demo-chart .bar:hover { opacity: 1; }
+
+    /* ── SECTIONS ──────────────────────────────────────────────────────── */
+    section { padding: 80px 0; }
+    .sec-h {
+      text-align: center; max-width: 720px; margin: 0 auto 56px;
+    }
+    .sec-h .label {
+      display: inline-block; padding: 4px 12px; border-radius: 999px;
+      background: var(--green-l); color: var(--green-d);
+      font-size: 12px; font-weight: 700; letter-spacing: .5px;
+      text-transform: uppercase; margin-bottom: 14px;
+    }
+    .sec-h h2 {
+      font-size: clamp(28px, 4vw, 42px); font-weight: 900;
+      letter-spacing: -1px; line-height: 1.15;
+    }
+    .sec-h p {
+      font-size: 17px; color: var(--t2); margin-top: 14px;
+    }
+
+    /* ── PROBLEM ───────────────────────────────────────────────────────── */
+    .problem {
+      background: #fff; border-top: 1px solid var(--bdr); border-bottom: 1px solid var(--bdr);
+    }
+    .problem-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center;
+    }
+    .problem-list { list-style: none; }
+    .problem-list li {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 0; border-bottom: 1px dashed var(--bdr);
+      font-size: 15px;
+    }
+    .problem-list li:last-child { border-bottom: 0; }
+    .problem-list .x { color: #dc2626; font-weight: 800; flex-shrink: 0; }
+    .problem-after {
+      background: var(--green-l); border-radius: 16px; padding: 28px;
+      border: 1px solid #a7f3d0;
+    }
+    .problem-after .pa-title {
+      font-size: 13px; font-weight: 800; color: var(--green-d);
+      text-transform: uppercase; letter-spacing: .5px; margin-bottom: 14px;
+    }
+    .problem-after ul { list-style: none; }
+    .problem-after li {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 0; font-size: 15px; color: var(--t1);
+    }
+    .problem-after .v { color: var(--green-d); font-weight: 800; flex-shrink: 0; }
+
+    /* ── FEATURES ──────────────────────────────────────────────────────── */
+    .features {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+    }
+    .feat {
+      background: #fff; border: 1px solid var(--bdr); border-radius: 16px;
+      padding: 28px; transition: transform .2s, box-shadow .2s;
+    }
+    .feat:hover { transform: translateY(-3px); box-shadow: var(--sh-lg); }
+    .feat-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: grid; place-items: center; font-size: 22px;
+      margin-bottom: 16px;
+    }
+    .feat:nth-child(1) .feat-icon { background: var(--green-l); }
+    .feat:nth-child(2) .feat-icon { background: var(--indigo-l); }
+    .feat:nth-child(3) .feat-icon { background: #fef3c7; }
+    .feat:nth-child(4) .feat-icon { background: #fce7f3; }
+    .feat:nth-child(5) .feat-icon { background: #dbeafe; }
+    .feat:nth-child(6) .feat-icon { background: #fef2f2; }
+    .feat h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+    .feat p { color: var(--t2); font-size: 14px; line-height: 1.6; }
+
+    /* ── HOW IT WORKS ──────────────────────────────────────────────────── */
+    .steps {
+      background: linear-gradient(180deg, #fff, var(--bg));
+    }
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px;
+      counter-reset: step;
+    }
+    .step {
+      background: #fff; border: 1px solid var(--bdr); border-radius: 16px;
+      padding: 28px; position: relative; counter-increment: step;
+    }
+    .step::before {
+      content: counter(step, decimal-leading-zero);
+      position: absolute; top: 22px; right: 22px;
+      font-size: 38px; font-weight: 900; color: var(--bdr);
+      line-height: 1; letter-spacing: -2px;
+    }
+    .step h3 { font-size: 17px; font-weight: 800; margin-bottom: 8px; padding-right: 60px; }
+    .step p { color: var(--t2); font-size: 14px; line-height: 1.6; }
+
+    /* ── PRICING ───────────────────────────────────────────────────────── */
+    .pricing {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+    }
+    .pricing .sec-h .label { background: rgba(255,255,255,.1); color: #a7f3d0; }
+    .pricing .sec-h h2 { color: #fff; }
+    .pricing .sec-h p { color: #cbd5e1; }
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px;
+      max-width: 720px; margin: 0 auto;
+    }
+    .price {
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px; padding: 30px;
+    }
+    .price.featured {
+      background: #fff; color: var(--t1); position: relative;
+      transform: scale(1.02);
+    }
+    .price.featured .ribbon {
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      background: var(--green); color: #fff;
+      padding: 4px 14px; border-radius: 999px;
+      font-size: 11px; font-weight: 800; letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+    .price-name { font-size: 14px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; opacity: .7; margin-bottom: 8px; }
+    .price.featured .price-name { color: var(--green-d); opacity: 1; }
+    .price-tag { display: flex; align-items: baseline; gap: 6px; margin-bottom: 18px; }
+    .price-tag .amount { font-size: 44px; font-weight: 900; letter-spacing: -2px; line-height: 1; }
+    .price-tag .per { font-size: 14px; opacity: .7; }
+    .price ul { list-style: none; margin-bottom: 22px; }
+    .price li { padding: 8px 0; font-size: 14px; display: flex; align-items: flex-start; gap: 10px; }
+    .price li .v { color: var(--green); flex-shrink: 0; }
+    .price.featured li .v { color: var(--green-d); }
+    .price .btn { width: 100%; justify-content: center; }
+    .price.featured .btn { background: linear-gradient(135deg, var(--green-d), var(--green)); color: #fff; }
+
+    /* ── FAQ ───────────────────────────────────────────────────────────── */
+    .faq-list { max-width: 760px; margin: 0 auto; }
+    .faq {
+      background: #fff; border: 1px solid var(--bdr); border-radius: 12px;
+      padding: 18px 22px; margin-bottom: 10px;
+    }
+    .faq summary {
+      cursor: pointer; font-weight: 700; font-size: 15px;
+      display: flex; justify-content: space-between; align-items: center;
+      list-style: none; padding: 4px 0;
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after {
+      content: '+'; font-size: 22px; color: var(--t3); transition: transform .2s;
+    }
+    .faq[open] summary::after { transform: rotate(45deg); }
+    .faq p { color: var(--t2); font-size: 14px; line-height: 1.6; margin-top: 12px; }
+
+    /* ── FINAL CTA ─────────────────────────────────────────────────────── */
+    .final {
+      background:
+        radial-gradient(circle at 30% 50%, rgba(29,158,117,.15), transparent 60%),
+        radial-gradient(circle at 70% 50%, rgba(99,102,241,.15), transparent 60%),
+        #0f172a;
+      color: #fff; text-align: center;
+    }
+    .final h2 {
+      font-size: clamp(28px, 4vw, 44px); font-weight: 900;
+      letter-spacing: -1px; margin-bottom: 14px;
+    }
+    .final p { color: #cbd5e1; font-size: 17px; margin-bottom: 32px; max-width: 540px; margin-left: auto; margin-right: auto; }
+
+    /* ── FOOTER ────────────────────────────────────────────────────────── */
+    footer {
+      background: #fff; border-top: 1px solid var(--bdr);
+      padding: 40px 0 30px;
+    }
+    .footer-grid {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 24px;
+    }
+    .footer-links {
+      display: flex; gap: 22px; flex-wrap: wrap;
+      font-size: 13px; color: var(--t2);
+    }
+    .footer-links a:hover { color: var(--t1); }
+    .footer-copy { font-size: 13px; color: var(--t3); }
+
+    /* ── RESPONSIVE ────────────────────────────────────────────────────── */
+    @media (max-width: 860px) {
+      .nav-links .nav-link:not(.btn) { display: none; }
+      .demo-body { grid-template-columns: 1fr; }
+      .demo-sidebar { display: none; }
+      .demo-kpis { grid-template-columns: repeat(2, 1fr); }
+      .problem-grid { grid-template-columns: 1fr; gap: 30px; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .price.featured { transform: none; }
+      section { padding: 60px 0; }
+      .hero { padding: 50px 0 30px; }
+    }
+    @media (max-width: 480px) {
+      .demo-kpis { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .demo-kpi .k-val { font-size: 18px; }
+      .footer-grid { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ──────────────────────────────────────────────────── -->
+  <nav class="nav">
+    <div class="wrap nav-inner">
+      <a class="logo" href="/">
+        <span class="logo-mark">⚡</span>
+        TrainFlow
+      </a>
+      <div class="nav-links">
+        <a class="nav-link" href="#features">Fonctionnalités</a>
+        <a class="nav-link" href="#pricing">Tarifs</a>
+        <a class="nav-link" href="#faq">FAQ</a>
+        <a class="nav-link" href="https://app.trainflow.fr/login">Connexion</a>
+        <a class="btn btn-p" href="https://app.trainflow.fr/register">Commencer →</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── HERO ─────────────────────────────────────────────────── -->
+  <header class="hero">
+    <div class="wrap">
+      <div class="pill"><span class="pill-dot"></span> Beta privée en cours · Inscriptions ouvertes</div>
+      <h1>L'OS du coach sportif <em>indépendant</em>.</h1>
+      <p class="lead">
+        Clients, programmes, nutrition, factures, planning : tout ce que tu gères
+        aujourd'hui entre Excel, WhatsApp, Notion et Calendly, réuni dans une seule app.
+        Avec une IA qui te fait gagner 5 h par semaine.
+      </p>
+      <div class="hero-ctas">
+        <a class="btn btn-p btn-lg" href="https://app.trainflow.fr/register">
+          Commencer gratuitement →
+        </a>
+        <a class="btn btn-g btn-lg" href="#features">
+          Voir comment ça marche
+        </a>
+      </div>
+      <div class="hero-meta">
+        <span>✓ Gratuit jusqu'à 5 clients</span>
+        <span>✓ Sans carte bancaire</span>
+        <span>✓ Migration assistée</span>
+      </div>
+
+      <!-- Demo mockup -->
+      <div class="demo-wrap">
+        <div class="demo-frame">
+          <div class="demo-bar">
+            <i></i><i></i><i></i>
+            <span class="url">🔒 app.trainflow.fr/dashboard</span>
+          </div>
+          <div class="demo-body">
+            <aside class="demo-sidebar">
+              <div class="sb-logo"><span>⚡</span> TrainFlow</div>
+              <div class="sb-sec">Principal</div>
+              <div class="sb-item on">📊 Tableau de bord</div>
+              <div class="sb-item">👥 Clients</div>
+              <div class="sb-item">🏋️ Programmes</div>
+              <div class="sb-item">🥗 Nutrition</div>
+              <div class="sb-sec">Gestion</div>
+              <div class="sb-item">📅 Planning</div>
+              <div class="sb-item">💰 Revenus</div>
+              <div class="sb-item">💬 Messages</div>
+            </aside>
+            <main class="demo-main">
+              <div class="demo-kpis">
+                <div class="demo-kpi">
+                  <div class="k-lbl">Clients actifs</div>
+                  <div class="k-val">14</div>
+                  <div class="k-sub">+2 ce mois</div>
+                </div>
+                <div class="demo-kpi">
+                  <div class="k-lbl">MRR</div>
+                  <div class="k-val">2 380€</div>
+                  <div class="k-sub">+18%</div>
+                </div>
+                <div class="demo-kpi">
+                  <div class="k-lbl">Séances 7j</div>
+                  <div class="k-val">42</div>
+                  <div class="k-sub">+8</div>
+                </div>
+                <div class="demo-kpi">
+                  <div class="k-lbl">Complétion</div>
+                  <div class="k-val">87%</div>
+                  <div class="k-sub">+4 pts</div>
+                </div>
+              </div>
+              <div class="demo-chart">
+                <div class="bar" style="height: 40%"></div>
+                <div class="bar" style="height: 55%"></div>
+                <div class="bar" style="height: 48%"></div>
+                <div class="bar" style="height: 70%"></div>
+                <div class="bar" style="height: 62%"></div>
+                <div class="bar" style="height: 80%"></div>
+                <div class="bar" style="height: 75%"></div>
+                <div class="bar" style="height: 92%"></div>
+                <div class="bar" style="height: 88%"></div>
+                <div class="bar" style="height: 96%"></div>
+                <div class="bar" style="height: 90%"></div>
+                <div class="bar" style="height: 100%"></div>
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── PROBLEM ──────────────────────────────────────────────── -->
+  <section class="problem">
+    <div class="wrap">
+      <div class="sec-h">
+        <span class="label">Le problème</span>
+        <h2>Tu coaches. Tu ne devrais pas gérer 5 outils en parallèle.</h2>
+        <p>Chaque heure perdue en admin est une heure de moins avec tes clients — et un euro de moins dans ta poche.</p>
+      </div>
+      <div class="problem-grid">
+        <div>
+          <h3 style="font-size:18px;font-weight:800;margin-bottom:14px;color:#dc2626;">Aujourd'hui sans TrainFlow</h3>
+          <ul class="problem-list">
+            <li><span class="x">✕</span> <span><strong>Excel</strong> pour suivre tes clients (mais tu oublies de le mettre à jour)</span></li>
+            <li><span class="x">✕</span> <span><strong>WhatsApp</strong> pour envoyer les programmes (et tu les retrouves jamais)</span></li>
+            <li><span class="x">✕</span> <span><strong>Calendly</strong> pour les rendez-vous (en plus de Google Calendar)</span></li>
+            <li><span class="x">✕</span> <span><strong>Word + Mail</strong> pour les factures (le dimanche soir...)</span></li>
+            <li><span class="x">✕</span> <span><strong>Notion</strong> pour les recettes nutritionnelles</span></li>
+            <li><span class="x">✕</span> <span><strong>Aucune vue claire</strong> de tes revenus, de tes clients qui décrochent, de qui n'a pas payé</span></li>
+          </ul>
+        </div>
+        <div class="problem-after">
+          <div class="pa-title">✦ Avec TrainFlow</div>
+          <ul>
+            <li><span class="v">✓</span> <span>Tous tes clients, programmes et historiques au même endroit</span></li>
+            <li><span class="v">✓</span> <span>Plans entraînement & nutrition générés par IA en 30 sec</span></li>
+            <li><span class="v">✓</span> <span>Portail client mobile (PWA) + notifications push</span></li>
+            <li><span class="v">✓</span> <span>Facturation automatique + signature contrat en ligne</span></li>
+            <li><span class="v">✓</span> <span>Sync Google Calendar + réservation client autonome</span></li>
+            <li><span class="v">✓</span> <span>Dashboard : MRR, complétion, alertes (clients absents, factures impayées)</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FEATURES ─────────────────────────────────────────────── -->
+  <section id="features">
+    <div class="wrap">
+      <div class="sec-h">
+        <span class="label">Fonctionnalités</span>
+        <h2>Tout ce dont tu as besoin. Rien que tu n'utilises pas.</h2>
+        <p>Pensé pour les coachs indé qui veulent se concentrer sur le coaching, pas sur la gestion.</p>
+      </div>
+      <div class="features">
+        <div class="feat">
+          <div class="feat-icon">🏋️</div>
+          <h3>Programmes & séances</h3>
+          <p>Crée des programmes par mésocycle, planifie les séances, suis la complétion. Le client logue ses séries dans son portail.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">🤖</div>
+          <h3>Plans IA en 30 sec</h3>
+          <p>Génère un programme d'entraînement OU un plan nutritionnel adapté au profil, aux objectifs et au matériel du client. Quota mensuel inclus.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">📱</div>
+          <h3>Portail client mobile</h3>
+          <p>PWA installable sur iPhone/Android. Le client suit ses séances, logue ses mesures, gère sa nutrition, reçoit des notifs push.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">💰</div>
+          <h3>Facturation auto</h3>
+          <p>Forfait mensuel ou paiement par séance. Génération PDF, envoi mail, suivi des impayés avec alertes automatiques.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">📅</div>
+          <h3>Planning + Google Cal</h3>
+          <p>Sync bidirectionnelle avec Google Calendar. Tes clients réservent eux-mêmes leurs créneaux selon tes disponibilités.</p>
+        </div>
+        <div class="feat">
+          <div class="feat-icon">📊</div>
+          <h3>Suivi & analytics</h3>
+          <p>Évolution du poids, mesures corporelles, performances sportives, check-ins hebdo. Vue d'ensemble en 1 coup d'œil.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── STEPS ────────────────────────────────────────────────── -->
+  <section class="steps">
+    <div class="wrap">
+      <div class="sec-h">
+        <span class="label">3 étapes</span>
+        <h2>De l'inscription au premier client en 10 minutes.</h2>
+      </div>
+      <div class="steps-grid">
+        <div class="step">
+          <h3>Crée ton compte</h3>
+          <p>Inscription gratuite en 1 minute. Tu importes tes clients existants ou tu les ajoutes un par un (avec mail, objectifs, contraintes).</p>
+        </div>
+        <div class="step">
+          <h3>Génère un programme IA</h3>
+          <p>Sélectionne un client, décris l'objectif, l'IA te propose un programme complet sur 4 à 12 semaines. Tu ajustes en 2 clics.</p>
+        </div>
+        <div class="step">
+          <h3>Lance le suivi</h3>
+          <p>Le client reçoit ses identifiants, installe le portail sur son téléphone, et commence à logger. Tu vois tout en temps réel.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PRICING ──────────────────────────────────────────────── -->
+  <section id="pricing" class="pricing">
+    <div class="wrap">
+      <div class="sec-h">
+        <span class="label">Tarifs</span>
+        <h2>Beta gratuite. Ensuite, simple.</h2>
+        <p>Pas de carte bancaire requise. Pas d'engagement. Pas de surprise à la facture.</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="price">
+          <div class="price-name">Free</div>
+          <div class="price-tag">
+            <span class="amount">0€</span>
+            <span class="per">/ mois</span>
+          </div>
+          <ul>
+            <li><span class="v">✓</span> Jusqu'à 5 clients actifs</li>
+            <li><span class="v">✓</span> Programmes & séances illimités</li>
+            <li><span class="v">✓</span> Portail client mobile</li>
+            <li><span class="v">✓</span> Facturation</li>
+            <li><span class="v">✓</span> 10 générations IA/mois</li>
+          </ul>
+          <a class="btn btn-g" href="https://app.trainflow.fr/register">Démarrer en Free</a>
+        </div>
+        <div class="price featured">
+          <span class="ribbon">Recommandé</span>
+          <div class="price-name">Pro</div>
+          <div class="price-tag">
+            <span class="amount">29€</span>
+            <span class="per">/ mois</span>
+          </div>
+          <ul>
+            <li><span class="v">✓</span> <strong>Clients illimités</strong></li>
+            <li><span class="v">✓</span> Tout du Free</li>
+            <li><span class="v">✓</span> 100 générations IA/mois</li>
+            <li><span class="v">✓</span> Sync Google Calendar</li>
+            <li><span class="v">✓</span> Support prioritaire</li>
+            <li><span class="v">✓</span> <strong>Beta : -50% à vie</strong></li>
+          </ul>
+          <a class="btn" href="https://app.trainflow.fr/register">Démarrer en Pro</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ ──────────────────────────────────────────────────── -->
+  <section id="faq">
+    <div class="wrap">
+      <div class="sec-h">
+        <span class="label">Questions</span>
+        <h2>Tout ce que tu veux savoir.</h2>
+      </div>
+      <div class="faq-list">
+        <details class="faq">
+          <summary>C'est pour qui exactement ?</summary>
+          <p>TrainFlow est pensé pour les <strong>coachs sportifs indépendants</strong> (en présentiel, en ligne, ou les deux). Que tu débutes avec 3 clients ou que tu en gères 50, l'outil s'adapte. Si tu travailles en salle pour un patron, ce n'est probablement pas pour toi.</p>
+        </details>
+        <details class="faq">
+          <summary>Combien ça coûte vraiment ?</summary>
+          <p>Le plan Free (gratuit, sans CB) couvre jusqu'à 5 clients — suffisant pour démarrer. Le plan Pro est à 29 €/mois pour des clients illimités. <strong>Pendant la beta, les premiers coachs inscrits gardent un tarif de 14,50 €/mois à vie.</strong></p>
+        </details>
+        <details class="faq">
+          <summary>Et mes données dans tout ça ?</summary>
+          <p>Tes données et celles de tes clients restent <strong>en Europe</strong> (hébergement Hetzner Finlande, conforme RGPD). Tu peux exporter l'intégralité de tes données à tout moment en 1 clic depuis ton compte. On ne revend rien à personne. Promis-juré.</p>
+        </details>
+        <details class="faq">
+          <summary>Je peux migrer mes clients existants depuis Excel/Notion ?</summary>
+          <p>Oui, et on t'aide gratuitement. Envoie-nous ton fichier (Excel, Google Sheets, export Notion), on importe pour toi sous 24 h. C'est inclus dans tous les plans, beta ou pas.</p>
+        </details>
+        <details class="faq">
+          <summary>L'IA, ça veut dire que les programmes sont génériques ?</summary>
+          <p>Non. L'IA prend en compte le <strong>profil exact du client</strong> (âge, poids, niveau, blessures, contraintes alimentaires, matériel disponible, objectifs) et te propose un programme. Tu restes le coach : tu valides, tu ajustes, tu personnalises. L'IA fait gagner du temps, elle ne remplace pas ton expertise.</p>
+        </details>
+        <details class="faq">
+          <summary>Le portail client, ça marche vraiment sur leur téléphone ?</summary>
+          <p>Oui. C'est une <strong>PWA</strong> (Progressive Web App) : ton client l'installe sur son iPhone ou Android comme une vraie app, depuis Safari ou Chrome. Pas besoin d'aller sur l'App Store ni le Play Store. Notifications push incluses.</p>
+        </details>
+        <details class="faq">
+          <summary>Et si je veux arrêter ?</summary>
+          <p>Tu désinstalles ton compte en 2 clics. Toutes tes données sont effacées définitivement sous 30 jours. Pas d'engagement, pas de durée minimum. C'est ton outil tant que tu en veux.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FINAL CTA ────────────────────────────────────────────── -->
+  <section class="final">
+    <div class="wrap">
+      <h2>Prêt à arrêter de jongler ?</h2>
+      <p>Inscription en 1 min, sans CB. Tu peux tester tout l'outil avec 5 clients réels — gratuitement, à vie.</p>
+      <div class="hero-ctas" style="justify-content:center;">
+        <a class="btn btn-p btn-lg" href="https://app.trainflow.fr/register">
+          Créer mon compte →
+        </a>
+        <a class="btn btn-g btn-lg" href="mailto:bouzekri@trainflow.fr" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3);">
+          Parler au founder
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ───────────────────────────────────────────────── -->
+  <footer>
+    <div class="wrap footer-grid">
+      <div class="logo">
+        <span class="logo-mark">⚡</span>
+        TrainFlow
+      </div>
+      <div class="footer-links">
+        <a href="https://app.trainflow.fr/login">Connexion</a>
+        <a href="https://app.trainflow.fr/register">S'inscrire</a>
+        <a href="https://app.trainflow.fr/cgu">CGU</a>
+        <a href="mailto:bouzekri@trainflow.fr">Contact</a>
+      </div>
+      <div class="footer-copy">© 2026 TrainFlow — Made in France 🇫🇷</div>
+    </div>
+  </footer>
+
+</body>
+</html>

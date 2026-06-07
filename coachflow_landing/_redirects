@@ -1,0 +1,7 @@
+# Forcer www → apex
+https://www.trainflow.fr/* https://trainflow.fr/:splat 301!
+
+# Raccourcis utiles pour les CTAs
+/login    https://app.trainflow.fr/login    302
+/register https://app.trainflow.fr/register 302
+/app      https://app.trainflow.fr          302
